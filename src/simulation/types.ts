@@ -44,5 +44,6 @@ export interface WorldTemplate {
   // v1 houses share three floors: gathering, rest, and resource production.
   floors: { name: string; purpose: string; color: string; activity?: string }[];
   initialNames: string[];
+  starterResidents: readonly Pick<Character, 'name' | 'trait' | 'backstory'>[];
   initialMetrics?: { cohesion: number; tension: number; resources: number };
 }

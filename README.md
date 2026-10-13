@@ -71,6 +71,12 @@ One 4-second real-time tick advances 2 simulated minutes; a simulated day is 48 
 - Catch-up is bounded to 720 detailed ticks (one simulated day) per invocation. Longer gaps advance the clock across the older quiet interval and record that compression explicitly. There are no offline LLM calls.
 - The durable wall-clock cursor prevents duplicate simulation ticks on alarm retries.
 
+### Starter residents
+
+Each of the three house templates has 12 authored resident profiles in `src/simulation/residents.ts`. New worlds draw six profiles without replacement (or fewer when the population cap is below six), using the simulation’s seeded RNG. The server already supplies a fresh random seed for each new world; an explicit seed reproduces the selection and simulation. Names, existing traits, and backgrounds stay together. Background details add fictional texture, not new behavior rules or fabricated memories.
+
+Selection runs only in `createWorld`. The selected residents keep the existing per-world `c1`, `c2`, … IDs and are stored in the ordinary version-1 snapshot; loading a house never selects them again. Existing saves, personal histories, and relationship references are unchanged. Automatic later introductions avoid names already used by active or away residents; explicitly entered names remain user-controlled. To extend a roster, add a complete profile and keep names unique within its template. Changing roster contents can change future seed-to-roster results, but cannot change saved residents.
+
 ### State and history
 
 SQLite stores a versioned state snapshot and a separate history table. A synchronous transaction atomically persists the current state and new log records. The live snapshot carries the most recent 80 records; all older events are available through the history cursor. Each resident retains up to 64 event-grounded memories, balancing eight salient moments with recent experience. The profile separates fictional background from a dated personal history. Its default view uses a deterministic, display-only summary: at most two sentences/40 words, three distinct defining moments, and one recent recorded tension. Similar consecutive same-day encounters are grouped, with source event IDs and original memories behind native disclosures. Retained history starts collapsed and dialogue is one level deeper. This projection does not delete records, alter simulation recall, infer reconciliation or promises, or treat the retained window as a complete lifetime. Memories carry optional event IDs, kinds, other participant IDs, tone, and salience; old text/time-only saves remain readable without inferred provenance. Only actual participants remember new events; skipped catch-up intervals are never backfilled. `recallMemories(character, { participantIds, minute, limit, beforeEventId })` in `src/simulation/memories.ts` selects relevant context for dialogue. Recent shared social memories provide a fading, capped ±7.5 percentage-point influence on encounter outcomes and can inform procedural dialogue. AI context excludes the current event and future memories. Memory summaries describe encounters without copying dialogue that may later be enriched. Relationship affinity decays toward neutral after long periods without contact, including time away.
@@ -118,6 +124,7 @@ Wrangler provisions the SQLite Durable Object classes from the `v1` migration an
 pnpm test                 # deterministic simulation and domain invariants
 pnpm build                # strict TypeScript check and production frontend build
 pnpm test:integration     # run while pnpm dev:server is active
+pnpm test:residents       # isolated SQLite runtime restart across all templates (port 8791)
 pnpm test:events          # per-player quotas, multiple tabs, private budgets; about 90 seconds
 pnpm exec wrangler deploy --env "" --dry-run --outdir /tmp/kinarium-worker
 ```

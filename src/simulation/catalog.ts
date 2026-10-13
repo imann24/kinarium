@@ -1,9 +1,10 @@
 import type { WorldTemplate } from './types';
+import { RESIDENT_ROSTERS } from './residents';
 
 // Templates are data. A future generator can validate and register the same shape.
 export const TEMPLATES: Record<string, WorldTemplate> = {
   'common-house': {
-    id: 'common-house', name: 'The common house', description: 'Three floors, one elevator, a thousand small possibilities.',
+    id: 'common-house', starterResidents: RESIDENT_ROSTERS['common-house'], name: 'The common house', description: 'Three floors, one elevator, a thousand small possibilities.',
     floors: [
       { name: 'The gathering room', purpose: 'share a meal', color: '#eccead' },
       { name: 'The quiet floor', purpose: 'find a little quiet', color: '#e6dcc8' },
@@ -12,7 +13,7 @@ export const TEMPLATES: Record<string, WorldTemplate> = {
     initialNames: ['Milo', 'Juniper', 'Cleo', 'Otis', 'Fern', 'Remy', 'Ada', 'Sol'],
   },
   'makers-house': {
-    id: 'makers-house', name: 'The makers’ house', description: 'A busy workshop, a quiet retreat, and a studio full of unfinished ideas. Plenty of supplies; a few creative differences.',
+    id: 'makers-house', starterResidents: RESIDENT_ROSTERS['makers-house'], name: 'The makers’ house', description: 'A busy workshop, a quiet retreat, and a studio full of unfinished ideas. Plenty of supplies; a few creative differences.',
     floors: [
       { name: 'The shared workshop', purpose: 'build something together', activity: 'sorting tools', color: '#e5c4a7' },
       { name: 'The reading nook', purpose: 'rest with a sketchbook', activity: 'sketching ideas', color: '#e8dbc7' },
@@ -22,7 +23,7 @@ export const TEMPLATES: Record<string, WorldTemplate> = {
     initialMetrics: { cohesion: 54, tension: 26, resources: 88 },
   },
   'harbor-house': {
-    id: 'harbor-house', name: 'The harbor house', description: 'A seaside kitchen, a sheltered lounge, and a net-mending loft. Close-knit neighbors make the most of modest supplies.',
+    id: 'harbor-house', starterResidents: RESIDENT_ROSTERS['harbor-house'], name: 'The harbor house', description: 'A seaside kitchen, a sheltered lounge, and a net-mending loft. Close-knit neighbors make the most of modest supplies.',
     floors: [
       { name: 'The dockside kitchen', purpose: 'share a pot of chowder', activity: 'brewing seaside tea', color: '#e9d7bb' },
       { name: 'The sheltered lounge', purpose: 'rest out of the sea breeze', activity: 'reading tide charts', color: '#d6e1e1' },

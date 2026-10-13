@@ -1,0 +1,352 @@
+{
+  "version": 1,
+  "slug": "legacy-roster",
+  "name": "Before randomized starters",
+  "description": "A small place to belong. Let’s see what grows here.",
+  "templateId": "common-house",
+  "createdAt": 1000,
+  "settings": {
+    "mode": "fast-forward",
+    "populationCap": 12
+  },
+  "minute": 480,
+  "lastTickAt": 1000,
+  "seed": 260725464,
+  "nextCharacter": 7,
+  "characters": [
+    {
+      "id": "c1",
+      "name": "Milo",
+      "trait": "kind",
+      "color": "#ba7357",
+      "backstory": "Milo used to live by the sea. They still open the window before making tea.",
+      "floor": 0,
+      "x": 52.52327788504772,
+      "destination": 0,
+      "activity": "away for a while",
+      "away": true,
+      "mood": 62.896193851716816,
+      "energy": 74.39150492777117,
+      "belonging": 35,
+      "memories": [
+        {
+          "text": "I took some time away from the house.",
+          "minute": 480
+        },
+        {
+          "text": "My first day in the house.",
+          "minute": 480
+        }
+      ],
+      "inElevator": false
+    },
+    {
+      "id": "c2",
+      "name": "Juniper",
+      "trait": "curious",
+      "color": "#758969",
+      "backstory": "Juniper arrived with a well-worn notebook and a hope of finding somewhere to belong.",
+      "floor": 1,
+      "x": 22.69990024389699,
+      "destination": 1,
+      "activity": "settling in",
+      "away": false,
+      "mood": 77.22390152653679,
+      "energy": 89.86585688311607,
+      "belonging": 35,
+      "memories": [
+        {
+          "text": "My first day in the house.",
+          "minute": 480
+        }
+      ]
+    },
+    {
+      "id": "c3",
+      "name": "Cleo",
+      "trait": "reserved",
+      "color": "#d7ad55",
+      "backstory": "Cleo believes most problems can be solved by making something with your hands.",
+      "floor": 1,
+      "x": 56.73006151919253,
+      "destination": 1,
+      "activity": "settling in",
+      "away": false,
+      "mood": 76.95203612372279,
+      "energy": 79.91174441180192,
+      "belonging": 35,
+      "memories": [
+        {
+          "text": "My first day in the house.",
+          "minute": 480
+        }
+      ]
+    },
+    {
+      "id": "c4",
+      "name": "Otis",
+      "trait": "spirited",
+      "color": "#6d9297",
+      "backstory": "Otis arrived with a well-worn notebook and a hope of finding somewhere to belong.",
+      "floor": 0,
+      "x": 76.75573797430843,
+      "destination": 0,
+      "activity": "settling in",
+      "away": false,
+      "mood": 78.34021980734542,
+      "energy": 87.23672390682623,
+      "belonging": 35,
+      "memories": [
+        {
+          "text": "My first day in the house.",
+          "minute": 480
+        }
+      ]
+    },
+    {
+      "id": "c5",
+      "name": "Fern",
+      "trait": "practical",
+      "color": "#aa819b",
+      "backstory": "Fern has moved often, and is trying to learn what it means to stay.",
+      "floor": 0,
+      "x": 50.755555782234296,
+      "destination": 0,
+      "activity": "settling in",
+      "away": false,
+      "mood": 63.69726952444762,
+      "energy": 88.57804156490602,
+      "belonging": 35,
+      "memories": [
+        {
+          "text": "My first day in the house.",
+          "minute": 480
+        }
+      ]
+    },
+    {
+      "id": "c6",
+      "name": "Remy",
+      "trait": "kind",
+      "color": "#7981a8",
+      "backstory": "Remy believes most problems can be solved by making something with your hands.",
+      "floor": 0,
+      "x": 68.91065619653091,
+      "destination": 0,
+      "activity": "settling in",
+      "away": false,
+      "mood": 68.27229037834331,
+      "energy": 66.51762194000185,
+      "belonging": 35,
+      "memories": [
+        {
+          "text": "My first day in the house.",
+          "minute": 480
+        }
+      ]
+    }
+  ],
+  "relationships": {
+    "c1:c2": {
+      "a": "c1",
+      "b": "c2",
+      "affinity": 0,
+      "trust": 30,
+      "encounters": 0,
+      "lastMinute": 480
+    },
+    "c1:c3": {
+      "a": "c1",
+      "b": "c3",
+      "affinity": 0,
+      "trust": 30,
+      "encounters": 0,
+      "lastMinute": 480
+    },
+    "c2:c3": {
+      "a": "c2",
+      "b": "c3",
+      "affinity": 0,
+      "trust": 30,
+      "encounters": 0,
+      "lastMinute": 480
+    },
+    "c1:c4": {
+      "a": "c1",
+      "b": "c4",
+      "affinity": 0,
+      "trust": 30,
+      "encounters": 0,
+      "lastMinute": 480
+    },
+    "c2:c4": {
+      "a": "c2",
+      "b": "c4",
+      "affinity": 0,
+      "trust": 30,
+      "encounters": 0,
+      "lastMinute": 480
+    },
+    "c3:c4": {
+      "a": "c3",
+      "b": "c4",
+      "affinity": 0,
+      "trust": 30,
+      "encounters": 0,
+      "lastMinute": 480
+    },
+    "c1:c5": {
+      "a": "c1",
+      "b": "c5",
+      "affinity": 0,
+      "trust": 30,
+      "encounters": 0,
+      "lastMinute": 480
+    },
+    "c2:c5": {
+      "a": "c2",
+      "b": "c5",
+      "affinity": 0,
+      "trust": 30,
+      "encounters": 0,
+      "lastMinute": 480
+    },
+    "c3:c5": {
+      "a": "c3",
+      "b": "c5",
+      "affinity": 0,
+      "trust": 30,
+      "encounters": 0,
+      "lastMinute": 480
+    },
+    "c4:c5": {
+      "a": "c4",
+      "b": "c5",
+      "affinity": 0,
+      "trust": 30,
+      "encounters": 0,
+      "lastMinute": 480
+    },
+    "c1:c6": {
+      "a": "c1",
+      "b": "c6",
+      "affinity": 0,
+      "trust": 30,
+      "encounters": 0,
+      "lastMinute": 480
+    },
+    "c2:c6": {
+      "a": "c2",
+      "b": "c6",
+      "affinity": 0,
+      "trust": 30,
+      "encounters": 0,
+      "lastMinute": 480
+    },
+    "c3:c6": {
+      "a": "c3",
+      "b": "c6",
+      "affinity": 0,
+      "trust": 30,
+      "encounters": 0,
+      "lastMinute": 480
+    },
+    "c4:c6": {
+      "a": "c4",
+      "b": "c6",
+      "affinity": 0,
+      "trust": 30,
+      "encounters": 0,
+      "lastMinute": 480
+    },
+    "c5:c6": {
+      "a": "c5",
+      "b": "c6",
+      "affinity": 0,
+      "trust": 30,
+      "encounters": 0,
+      "lastMinute": 480
+    }
+  },
+  "history": [
+    {
+      "id": 1,
+      "minute": 480,
+      "kind": "world",
+      "text": "The doors open. A little world begins.",
+      "characters": []
+    },
+    {
+      "id": 2,
+      "minute": 480,
+      "kind": "arrival",
+      "text": "Milo arrives at the house. A new story begins.",
+      "characters": [
+        "c1"
+      ]
+    },
+    {
+      "id": 3,
+      "minute": 480,
+      "kind": "arrival",
+      "text": "Juniper arrives at the house. A new story begins.",
+      "characters": [
+        "c2"
+      ]
+    },
+    {
+      "id": 4,
+      "minute": 480,
+      "kind": "arrival",
+      "text": "Cleo arrives at the house. A new story begins.",
+      "characters": [
+        "c3"
+      ]
+    },
+    {
+      "id": 5,
+      "minute": 480,
+      "kind": "arrival",
+      "text": "Otis arrives at the house. A new story begins.",
+      "characters": [
+        "c4"
+      ]
+    },
+    {
+      "id": 6,
+      "minute": 480,
+      "kind": "arrival",
+      "text": "Fern arrives at the house. A new story begins.",
+      "characters": [
+        "c5"
+      ]
+    },
+    {
+      "id": 7,
+      "minute": 480,
+      "kind": "arrival",
+      "text": "Remy arrives at the house. A new story begins.",
+      "characters": [
+        "c6"
+      ]
+    },
+    {
+      "id": 8,
+      "minute": 480,
+      "kind": "departure",
+      "text": "Milo leaves for a while. Their place in the story remains.",
+      "characters": [
+        "c1"
+      ]
+    }
+  ],
+  "nextLog": 9,
+  "cohesion": 62,
+  "tension": 18,
+  "resources": 75,
+  "elevatorFloor": 0,
+  "elevatorDirection": 1,
+  "elevatorPhase": "stopped",
+  "cooldowns": {},
+  "lastRitualDay": -1
+}

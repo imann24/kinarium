@@ -13,6 +13,7 @@
     "preview": "wrangler dev --env local --port 8787",
     "deploy": "pnpm build && wrangler deploy --env \"\"",
     "test:integration": "node scripts/integration.mjs",
+    "test:residents": "node scripts/test-resident-persistence.mjs",
     "test:events": "node scripts/test-event-budget.mjs",
     "dev:server:ai": "wrangler dev --env \"\" --port 8787"
   },
