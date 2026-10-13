@@ -3,6 +3,8 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { createWorld, applyCommand } from '../src/simulation/engine';
 import { advanceConversations, beginConversation, TURN_INTERVAL } from '../src/simulation/conversations';
 import { conversationTitle, finalizeConversationTitle, CONVERSATION_TITLE_LIMIT } from '../src/simulation/conversation-titles';
+import { buildResidentSummary } from '../src/simulation/resident-summary';
+import { rememberEvent } from '../src/simulation/memories';
 import ConversationThread from '../src/client/ConversationThread';
 import type { LogEntry } from '../src/simulation/types';
 
@@ -84,6 +86,18 @@ describe('saved conversation titles', () => {
     applyCommand(world,{type:'set-away',characterId:a.id,away:true},0);
     expect(next.conversation!.status).toBe('interrupted');
     expect(next.conversation!.title).toBeTruthy();
+  });
+  it('preserves compact-history grouping and original memories despite distinct display titles', () => {
+    const {world,entry}=fixture(lines);
+    const next=structuredClone(entry); next.id++; world.history.push(next);
+    const resident=world.characters[0];
+    rememberEvent(resident,entry,'First revealed exchange',{tone:'warm'});
+    rememberEvent(resident,next,'Second revealed exchange',{tone:'warm'});
+    const before=buildResidentSummary(resident,world.characters,world.history,world.minute);
+    finalizeConversationTitle(world,entry); finalizeConversationTitle(world,next);
+    expect(conversationTitle(entry)).not.toBe(conversationTitle(next));
+    expect(buildResidentSummary(resident,world.characters,world.history,world.minute)).toEqual(before);
+    expect(before.timeline.some(episode=>episode.memories.length===2)).toBe(true);
   });
   it('renders the saved title in the thread summary and safely escapes fictional text', () => {
     const {world,entry} = fixture(lines);
