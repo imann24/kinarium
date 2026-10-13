@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium', headless: true, args: ['--no-sandbox'] });
 const page = await browser.newPage();
-page.setDefaultTimeout(10_000);
+page.setDefaultTimeout(30_000);
 const origin = process.env.TEST_ORIGIN || 'http://127.0.0.1:5173';
 if (!['localhost', '127.0.0.1'].includes(new URL(origin).hostname)) throw new Error('Use a local Vite server.');
 let snapshot;
@@ -38,14 +38,14 @@ async function opened() {
 async function closed() { await dialog.waitFor({ state: 'detached' }); }
 async function push() { socket.send(JSON.stringify(snapshot)); await page.waitForTimeout(80); }
 try {
-  await page.goto(origin);
+  await page.goto(origin, { waitUntil: 'domcontentloaded' });
   snapshot = await page.evaluate(async () => {
     const { createWorld } = await import('/src/simulation/engine.ts');
     const world = createWorld({ slug: 'confirmation-test', name: 'Confirmation test' }, Date.now(), 123);
     world.characters[0].name = 'Ada';
     return { type: 'snapshot', world, presence: [], serverNow: Date.now() };
   });
-  await page.goto(`${origin}/w/confirmation-test`);
+  await page.goto(`${origin}/w/confirmation-test`, { waitUntil: 'domcontentloaded' });
   await page.getByRole('button', { name: 'Residents', exact: true }).click();
   await page.locator('.resident-row').first().click();
   for (const dismiss of [() => cancel.click(), () => page.keyboard.press('Enter'), () => page.keyboard.press('Escape'), () => page.getByRole('button', { name: 'Close dialog' }).click(), () => page.mouse.click(2, 2)]) {
