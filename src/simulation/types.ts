@@ -1,7 +1,12 @@
 export type TimeMode = 'persistent' | 'fast-forward';
 export type Trait = 'kind' | 'curious' | 'reserved' | 'spirited' | 'practical';
 export type LogKind = 'arrival' | 'departure' | 'conversation' | 'conflict' | 'friendship' | 'event' | 'ritual' | 'world';
-export interface Memory { text: string; minute: number; }
+export interface Memory {
+  text: string; minute: number;
+  /** Optional so existing saved memories stay intact, without invented provenance. */
+  eventId?: number; kind?: LogKind; participantIds?: string[];
+  tone?: 'warm' | 'tense' | 'neutral'; salience?: number;
+}
 export interface Character {
   id: string; name: string; color: string; trait: Trait; backstory: string;
   floor: number; x: number; destination: number; inElevator?: boolean; activity: string; away: boolean;
