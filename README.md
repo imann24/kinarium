@@ -134,11 +134,11 @@ Integration tests exercise actual HTTP/WebSocket/SQLite/alarm behavior, includin
 
 ### Color themes
 
-The header’s **Color theme** control offers System (the default), Light, and Dark. System follows live OS preference changes; explicit choices persist in `localStorage` under `kinarium-theme` and sync across tabs. Choosing System removes the override. If storage is unavailable, switching still works for the current page.
+The header’s sun/moon icon switches between Light and Dark. Its accessible label names the next action (for example, “Switch to dark mode”). Choices persist in `localStorage` under `kinarium-theme` and sync across tabs. Missing, invalid, or legacy System preferences resolve once from the OS preference and are saved as Light or Dark; later OS changes do not override that choice. If storage is unavailable, switching still works for the current page.
 
 `public/theme.js` resolves the theme before the app paints; `ThemeControl.tsx` subscribes to that controller. `theme.css` extends the existing CSS with semantic surface/text tokens and SVG scene colors. New UI surfaces should use `--surface`, `--surface-soft`, `--text`, `--secondary`, `--muted`, `--line`, and `--control-border`. Theme preference is personal and never changes the simulation’s day/night cycle or shared world settings.
 
-Theme tests cover persistence, system changes, cross-tab sync, unavailable storage, and palette contrast. For browser verification, switch with the keyboard, reload each explicit choice, return to System and change OS preference, then inspect the directory, dialogs, world, profiles, bonds, and fullscreen at desktop and mobile widths.
+Theme tests cover preference migration, persistence, cross-tab sync, unavailable storage, and palette contrast. For browser verification, switch with Enter and Space, reload each choice, verify that OS changes do not override it, then inspect the directory, dialogs, world, profiles, bonds, and fullscreen at desktop and mobile widths.
 
 ## Extending Kinarium
 

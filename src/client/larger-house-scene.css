@@ -1,0 +1,15 @@
+/* Reserve the fitted area for the full live scene and its primary action. */
+.world-stage .building { overflow: hidden; }
+.world-stage .stage-footer { padding: 8px 16px; }
+.world-summary {
+  margin-top: 12px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+}
+@media(min-width:901px) {
+  .world-page:not(.world-fullscreen) .world-sidebar {
+    height: var(--world-stage-height);
+    max-height: var(--world-stage-height);
+    min-height: 0;
+  }
+}

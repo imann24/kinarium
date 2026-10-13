@@ -20,40 +20,66 @@ function boot({ stored = null as string | null, dark = false, blocked = false } 
   return { root, meta, storage, media, listeners, theme: window.kinariumTheme };
 }
 describe('theme bootstrap', () => {
-  it.each([true, false])('follows system preference before React renders (dark=%s)', dark => {
-    const { root, theme, meta } = boot({ dark });
-    expect(theme.getPreference()).toBe('system');
-    expect(root.dataset.theme).toBe(dark ? 'dark' : 'light');
-    expect(root.style.colorScheme).toBe(root.dataset.theme);
+  it.each([true, false])('resolves and saves the initial OS choice before React renders (dark=%s)', dark => {
+    const { root, theme, meta, storage, listeners } = boot({ dark });
+    const expected = dark ? 'dark' : 'light';
+    expect(theme.getPreference()).toBe(expected);
+    expect(storage.get('kinarium-theme')).toBe(expected);
+    expect(root.dataset.theme).toBe(expected);
+    expect(root.style.colorScheme).toBe(expected);
     expect(meta.setAttribute).toHaveBeenCalledWith('content', dark ? '#18211d' : '#f8f8f2');
+    expect(listeners.media).toBeUndefined();
   });
-  it('persists explicit choices, survives reload and ignores system changes until reset', () => {
+  it.each(['system', 'unexpected'])('migrates legacy/invalid %s values to a persistent binary choice', stored => {
+    for (const dark of [true, false]) {
+      const app = boot({ stored, dark });
+      const expected = dark ? 'dark' : 'light';
+      expect(app.theme.getPreference()).toBe(expected);
+      expect(app.storage.get('kinarium-theme')).toBe(expected);
+      expect(boot({ stored: app.storage.get('kinarium-theme'), dark: !dark }).root.dataset.theme).toBe(expected);
+    }
+  });
+  it.each(['light', 'dark'])('preserves an existing explicit %s preference over the OS default', stored => {
+    const app = boot({ stored, dark: stored === 'light' });
+    expect(app.root.dataset.theme).toBe(stored);
+    expect(app.theme.getPreference()).toBe(stored);
+  });
+  it('persists both choices across reloads and ignores later OS changes', () => {
     const app = boot({ dark: true });
-    app.theme.setPreference('light');
-    expect(app.storage.get('kinarium-theme')).toBe('light');
-    expect(boot({ stored: app.storage.get('kinarium-theme'), dark: true }).root.dataset.theme).toBe('light');
-    app.listeners.media();
-    expect(app.root.dataset.theme).toBe('light');
+    for (const choice of ['light', 'dark']) {
+      app.theme.setPreference(choice);
+      expect(app.storage.get('kinarium-theme')).toBe(choice);
+      expect(boot({ stored: app.storage.get('kinarium-theme'), dark: choice === 'light' }).root.dataset.theme).toBe(choice);
+      app.media.matches = !app.media.matches;
+      app.listeners.media?.();
+      expect(app.root.dataset.theme).toBe(choice);
+    }
     app.theme.setPreference('system');
-    expect(app.storage.has('kinarium-theme')).toBe(false);
-    expect(app.root.dataset.theme).toBe('dark');
-    app.media.matches = false; app.listeners.media();
-    expect(app.root.dataset.theme).toBe('light');
+    expect(app.theme.getPreference()).toBe('dark');
+    expect(app.storage.get('kinarium-theme')).toBe('dark');
   });
-  it('syncs preference changes and storage clearing from another tab', () => {
+  it('syncs other tabs, migrating cleared or legacy preferences without a third mode', () => {
     const app = boot();
-    app.storage.set('kinarium-theme', 'dark'); app.listeners.storage({ key: 'kinarium-theme' });
+    app.storage.set('kinarium-theme', 'dark'); app.listeners.storage({ key: 'unrelated' });
+    expect(app.root.dataset.theme).toBe('light');
+    app.listeners.storage({ key: 'kinarium-theme' });
     expect(app.root.dataset.theme).toBe('dark');
     app.storage.clear(); app.listeners.storage({ key: null });
-    expect(app.theme.getPreference()).toBe('system');
-    expect(app.root.dataset.theme).toBe('light');
-  });
-  it('handles invalid preferences and unavailable storage without breaking the app', () => {
-    expect(boot({ stored: 'unexpected', dark: true }).root.dataset.theme).toBe('dark');
-    const app = boot({ blocked: true });
-    app.theme.setPreference('dark');
-    expect(app.root.dataset.theme).toBe('dark');
+    expect(app.theme.getPreference()).toBe('light');
+    expect(app.storage.get('kinarium-theme')).toBe('light');
+    app.media.matches = true;
+    app.storage.set('kinarium-theme', 'system'); app.listeners.storage({ key: 'kinarium-theme' });
     expect(app.theme.getPreference()).toBe('dark');
+    expect(app.storage.get('kinarium-theme')).toBe('dark');
+  });
+  it('keeps both themes usable when storage is unavailable', () => {
+    const app = boot({ blocked: true, dark: true });
+    expect(app.root.dataset.theme).toBe('dark');
+    for (const choice of ['light', 'dark']) {
+      app.theme.setPreference(choice);
+      expect(app.root.dataset.theme).toBe(choice);
+      expect(app.theme.getPreference()).toBe(choice);
+    }
   });
 });
 
