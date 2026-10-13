@@ -23,11 +23,13 @@ Vite proxies `/api` and WebSockets to port 8787. Server source changes reload au
 
 - `/`: searchable public world directory, open-door and persistent-mode filters, creation dialog, field guide.
 - `/w/<slug>`: one shared authoritative simulation, live anonymous observer presence, automatic reconnection.
+- World settings include editable house names (1–60 characters) and optional descriptions (up to 240). Saving preserves the address and simulation history. Everyone admitted can edit; concurrent house edits require loading the latest details, while time mode and population settings remain independent.
 - Fullscreen world viewing from the stage toolbar, with Escape to exit and a page-filling fallback when browser fullscreen is unavailable. Resident profiles, settings, and events remain available.
 - Worlds start open by default; optionally protect entry with a password. Their names and descriptions remain public; snapshots, WebSockets, history, and commands require entry.
 - Three World v1 templates selectable at creation, with illustrated previews: the common house, the makers’ house, and the harbor house. Each has themed rooms, colors, furnishings, and initial residents. The makers’ house starts with more supplies and creative tension; the harbor house starts with stronger cohesion and modest supplies. All share three floors, an elevator, and vector residents. Travel and stopped ticks alternate; residents board and leave only while stopped. The renderer uses one eased cabin trajectory for all passengers and waits for arrival plus a pause before showing an exit, including when snapshots arrive close together.
 - Autonomous movement, energy/rest, mood, belonging, conversations, conflict, friendship, shared resources, evening rituals, and community degradation/recovery.
 - Conversation headings use saved titles grounded in revealed dialogue, with nearby titles considered to reduce repetition. A title stays fixed while the exchange unfolds and is finalized once it ends or is interrupted. Procedural exchanges work without AI; old saves retain their topic heading. Identical exchanges can still share a title rather than inventing differences.
+- Procedural conversations choose complete 4–6 turn arcs about company, curiosity, rest, play, decisions, help, fairness, recent events, or a grounded callback. Personality, energy, belonging, supplies and trust affect selection and voice; recent pair and neighborhood topics discourage repetition. Active arcs survive saves and only revealed lines become memories. Existing AI requests use the same provider and context fields, with a local guard against replayed exchanges.
 - Pairwise affinity and trust; bounded personal memories; a durable, paginated world history.
 - Six extensible events with a shared 45-second world cooldown and a separate allowance of 3 events per player per world in any rolling 5-minute window: shared meal, gift, story night, common project, outage, rumor.
 - Adjustable active population cap (1–40), new residents, reversible time away. Away residents retain memories and relationships and do not count against the cap. Maximum 200 total archived/active residents per world for this first version.
@@ -118,6 +120,29 @@ pnpm deploy
 
 Wrangler provisions the SQLite Durable Object classes from the `v1` migration and uploads the built static assets. Choose a unique Worker name in `wrangler.jsonc` if needed. The default deployment enables metered Workers AI within the limits above; set the top-level `LLM_PROVIDER` to `disabled` before deploying for procedural-only play. The first directory visit initializes The Common House. Custom domains can be attached in Cloudflare. No production deployment or paid resources are provisioned by local development.
 
+### If editing reports “Unknown action.”
+
+The house-details form sends `type: "house-details"` to the world's command API.
+That command was added in PR #26 to both the Worker validator and simulation
+engine. A newer frontend paired with the earlier backend rejects it with HTTP
+400 `Unknown action.`; this is not an empty-name, password, or revision error.
+The form keeps the draft so it can be retried after the server update.
+
+The deployment must include the Worker and its Durable Object implementation
+as well as the built frontend assets from the same checkout. Publishing only
+assets cannot add server commands. Follow the normal deployment process above;
+do not recreate worlds, change their slugs, or clear stored data. Old snapshots
+without `detailsRevision` start at revision zero and can be renamed in place.
+A merged PR alone does not deploy this repository: Cloudflare deployment is
+managed separately.
+
+For a local reproduction, build the current frontend and run
+`node scripts/test-house-details-upgrade.mjs` with an available Playwright
+installation (`PLAYWRIGHT_MODULE` and `CHROMIUM_PATH` may select existing tools).
+It starts a pre-edit Worker on port 8791, verifies the rejection, upgrades the
+Worker over the same isolated SQLite state, and retries the retained draft.
+It never contacts the deployed site.
+
 ## Verification
 
 ```sh
@@ -133,14 +158,20 @@ Integration tests exercise actual HTTP/WebSocket/SQLite/alarm behavior, includin
 
 ### Color themes
 
-The header’s **Color theme** control offers System (the default), Light, and Dark. System follows live OS preference changes; explicit choices persist in `localStorage` under `kinarium-theme` and sync across tabs. Choosing System removes the override. If storage is unavailable, switching still works for the current page.
+The header’s sun/moon icon switches between Light and Dark. Its accessible label names the next action (for example, “Switch to dark mode”). Choices persist in `localStorage` under `kinarium-theme` and sync across tabs. Missing, invalid, or legacy System preferences resolve once from the OS preference and are saved as Light or Dark; later OS changes do not override that choice. If storage is unavailable, switching still works for the current page.
 
 `public/theme.js` resolves the theme before the app paints; `ThemeControl.tsx` subscribes to that controller. `theme.css` extends the existing CSS with semantic surface/text tokens and SVG scene colors. New UI surfaces should use `--surface`, `--surface-soft`, `--text`, `--secondary`, `--muted`, `--line`, and `--control-border`. Theme preference is personal and never changes the simulation’s day/night cycle or shared world settings.
 
-Theme tests cover persistence, system changes, cross-tab sync, unavailable storage, and palette contrast. For browser verification, switch with the keyboard, reload each explicit choice, return to System and change OS preference, then inspect the directory, dialogs, world, profiles, bonds, and fullscreen at desktop and mobile widths.
+Theme tests cover preference migration, persistence, cross-tab sync, unavailable storage, and palette contrast. For browser verification, switch with Enter and Space, reload each choice, verify that OS changes do not override it, then inspect the directory, dialogs, world, profiles, bonds, and fullscreen at desktop and mobile widths.
 
 ## Extending Kinarium
 
 Add an event to `EVENTS`; its controls and effects come from that registry. Add advanced behavior with a validated command or a deterministic simulation system. New templates should register a stable ID and versioned data in `TEMPLATES`; the current renderer is purpose-built for the three-floor house, so a template with different geometry also needs a renderer selected by its template ID. For v1 houses, floor 0 gathers residents, floor 1 restores energy, and practical residents on floor 2 replenish resources. Optional floor `activity` text and `initialMetrics` customize daily life and starting conditions; omitted values preserve the original common-house behavior. Furniture is selected by template ID in `Building.tsx`. Creation choices and directory previews come from the template registry. A future template generator should produce validated data and select a renderer, never execute generated code. Preserve old template IDs so existing worlds continue to load.
 
 The initial state is schema version 1. Older snapshots without `elevatorPhase` resume from a stopped landing; the next simulation step writes the phase. Add an explicit load-time state migration before changing persisted fields incompatibly. Add a new Wrangler migration only for Durable Object class/storage migrations. World password changes and owner roles are intentionally absent in this version.
+
+### Conversation variety evaluation
+
+`pnpm test` includes a deterministic 360-encounter sample: three settings, five personality pairings, warm and tense encounters, and twelve conversations per fixed pair. Against the previous implementation at `5056043`, unique transcripts summed within those sequences increased from 75 to 210; distinct topics from 30 to 150. Adjacent repeated topics fell from 330 to 90, all explicit revisit arcs; no identical arcs occurred consecutively. This finite scripted sample does not prove unlimited novelty or measure live-model quality. Event-specific scenarios, saved-state continuity and provider rejection/fallback have separate tests.
+
+With Vite running and Playwright installed, `node tests/conversation-variety.browser.mjs` checks procedural threads and stable headings at 1440/390/320px. Set `PLAYWRIGHT_MODULE` and `CHROMIUM_PATH` for an external installation. AI tests use mocked responses; no new provider, context fields or inference calls are added.

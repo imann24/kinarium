@@ -24,7 +24,7 @@ try {
     const created = await page.request.post(`${base}/api/worlds`, { data: { slug, name: `Canvas check ${templateId}`, templateId, mode: 'persistent', populationCap: 12 } });
     assert(created.ok(), await created.text());
    }
-   for (const [width, height] of [[1440,900], [1280,800], [1920,1080], [768,1024], [390,844], [844,390]]) {
+   for (const [width, height] of [[1440,900], [1280,800], [1920,1080], [1280,1200], [768,1024], [390,844], [844,390]]) {
     await page.setViewportSize({width,height});
     await page.goto(`${base}/w/${slug}`, {waitUntil:'domcontentloaded'});
     const toggle = page.locator('.journal-panel-toggle');
@@ -33,7 +33,7 @@ try {
     const measure = () => page.locator('.world-stage .building').evaluate(svg => {
      const m = svg.getScreenCTM(), b = svg.getBoundingClientRect(), v = svg.viewBox.baseVal;
      const footer = document.querySelector('.stage-footer').getBoundingClientRect();
-     return {scale:m.a, scaleY:m.d, width:b.width, height:b.height, x:m.e, y:m.f, right:m.e+v.width*m.a, bottom:m.f+v.height*m.d, footerBottom:footer.bottom};
+     return {scale:m.a, scaleY:m.d, width:b.width, height:b.height, x:m.e+v.x*m.a, y:m.f+v.y*m.d, right:m.e+(v.x+v.width)*m.a, bottom:m.f+(v.y+v.height)*m.d, footerBottom:footer.bottom};
     });
     await page.evaluate(() => document.fonts.ready);
     await page.waitForTimeout(100);
@@ -42,13 +42,13 @@ try {
      const geometry = await page.locator('.world-stage').evaluate(stage => ({
       bottom: stage.getBoundingClientRect().bottom,
       canvasTop: stage.querySelector('.building').getBoundingClientRect().top,
-      controls: stage.querySelector('.stage-footer').offsetHeight + stage.querySelector('.community-stats').offsetHeight,
+      controls: stage.querySelector('.stage-footer').offsetHeight,
       overflow: document.documentElement.scrollWidth > innerWidth,
      }));
      assert(!geometry.overflow, 'No horizontal overflow');
      if (width > 900) {
       assert(geometry.canvasTop < 285, 'Compact desktop header leaves room for the world');
-      assert(scene.height >= height-460, 'Actual default canvas uses reclaimed header space');
+      if (height <= 1080) assert(scene.height >= height-460, 'Actual default canvas uses reclaimed header space');
      }
      assert(await page.locator('.journal-panel-toggle').evaluate(el => {
       const r=el.getBoundingClientRect();
@@ -70,6 +70,15 @@ try {
      if (width===1440 || width===390) await page.screenshot({path:`${output}/normal-${templateId}-${width}-${fallback?'dark':'light'}.png`});
     }
     const normal = await measure();
+    assert(await page.locator('.world-stage .building').evaluate(svg => {
+     const frame=svg.getBoundingClientRect();
+     return [...svg.querySelectorAll('.building-shell, [data-resident-id], [data-elevator-cabin], :scope > text:last-child')].every(el=>{
+      const b=el.getBoundingClientRect();
+      return b.left>=frame.left-1 && b.right<=frame.right+1 && b.top>=frame.top-1 && b.bottom<=frame.bottom+1;
+     });
+    }), 'Live scene framing retains the house, residents, elevator and caption');
+    assert.equal(await page.locator('.world-stage .community-stats').count(),0);
+    assert.equal(await page.getByRole('region',{name:'Community summary'}).count(),1);
     await page.getByRole('button', {name:'Enter fullscreen',exact:true}).click();
     await page.locator('.world-fullscreen').waitFor();
     await page.waitForTimeout(100);
@@ -80,7 +89,10 @@ try {
     assert.equal(await page.locator('#world-journal-panel').isVisible(), false);
     if (!baseline) {
      assert(hidden.scale >= shown.scale - .002, 'Collapsing must not shrink the scene');
-     if (width > 900) assert(hidden.scale > shown.scale * 1.05, 'Actual artwork must grow, not just the SVG box');
+     // Once height-limited, reclaiming journal width cannot safely enlarge the scene.
+     if (width > 900 && Math.abs(shown.right-shown.x-shown.width)<2) {
+      assert(hidden.scale > shown.scale*1.05, 'Hiding journal enlarges width-limited artwork');
+     }
      assert(Math.abs(hidden.scale - hidden.scaleY) < .0001, 'Preserve aspect ratio');
      assert(hidden.x >= 0 && hidden.right <= width + 1, 'Full world width visible');
      if (height > 500) assert(hidden.y >= 0 && hidden.bottom <= height && hidden.footerBottom <= height, 'World and action controls fit');

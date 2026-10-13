@@ -48,7 +48,7 @@ await page.goto(savedUrl,{waitUntil:'domcontentloaded'});await page.locator('.in
 await page.getByText('View activity as a table',{exact:true}).click();assert.equal(await page.locator('table').isVisible(),true);
 await page.getByText('View activity as a table',{exact:true}).click();
 for(const theme of ['light','dark']){
- await page.getByLabel('Color theme').selectOption(theme);
+ if (await page.locator('html').getAttribute('data-theme') !== theme) await page.getByRole('button', { name: `Switch to ${theme} mode` }).click();
  for(const width of [1440,768,390,320]){
   await page.setViewportSize({width,height:1000});
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`${theme} ${width} overflow`);

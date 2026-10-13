@@ -1,3 +1,4 @@
+import { updateHouseDetails } from './house-details';
 import { advanceConversations, beginConversation, isConversing, interruptConversations } from './conversations';
 import { memoryInfluence, rememberEvent } from './memories';
 import { COLORS, EVENTS, TEMPLATES, TRAITS } from './catalog';
@@ -133,6 +134,7 @@ export function advance(s: WorldState, now: number) {
 }
 export function applyCommand(s: WorldState, command: Command, now: number) {
   switch (command.type) {
+    case 'house-details': updateHouseDetails(s, command); break;
     case 'add-character': createCharacter(s, command.name, command.trait, command.backstory); break;
     case 'set-away': {
       const c = s.characters.find(c => c.id === command.characterId);

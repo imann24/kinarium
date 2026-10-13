@@ -30,7 +30,7 @@ try {
   assert.match(await narrative.innerText(), /Older entries are outside this snapshot/);
   assert.match(await narrative.innerText(), /including recorded interactions with residents now away/);
   for (const theme of ['light', 'dark']) {
-    await page.getByLabel('Color theme').selectOption(theme);
+    if (await page.locator('html').getAttribute('data-theme') !== theme) await page.getByRole('button', { name: `Switch to ${theme} mode` }).click();
     for (const width of [1440, 768, 390, 320]) {
       await page.setViewportSize({ width, height: 900 });
       assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${theme} ${width} overflow`);
