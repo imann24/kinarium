@@ -55,7 +55,7 @@ process.stdout.write(JSON.stringify(response));
 `, { mode: 0o755 });
   const env = {
     ...process.env, PATH: `${directory}:${process.env.PATH}`, GH_TOKEN: 'mock-only',
-    GITHUB_REPOSITORY: repository, TESTED_SHA: sha, GITHUB_OUTPUT: output,
+    GITHUB_REPOSITORY: repository, PR_NUMBER: '42', TESTED_SHA: sha, GITHUB_OUTPUT: output,
     FIXTURE: JSON.stringify(data), CALLS: calls,
   };
   try {
@@ -85,10 +85,23 @@ describe('safe native branch cleanup before auto-merge', () => {
     expect(workflow).toContain('github.event.pull_request.draft == false');
     expect(workflow).toContain('github.event.pull_request.head.repo.full_name == github.repository');
     expect(workflow).toContain("if: steps.cleanup.outputs.eligible == 'true'");
-    expect(workflow).toContain("if: github.event_name == 'workflow_run'");
-    expect(workflow).toContain('workflows: [Test]');
-    expect(workflow).toContain('contents: write\n  pull-requests: write');
-    expect(workflow).not.toContain('uses:');
+    expect(workflow).toContain('needs: test');
+    expect(workflow).toContain('uses: ./.github/workflows/test.yml');
+    expect(workflow).not.toContain('workflow_run:');
+    expect(workflow).not.toContain('secrets: inherit');
+    const mergeJob = workflow.split('  enable-auto-merge:\n')[1];
+    expect(mergeJob).toContain('contents: write\n      pull-requests: write');
+    expect(mergeJob).not.toContain('uses:');
+    const testJob = workflow.split('  test:\n')[1].split('  enable-auto-merge:\n')[0];
+    expect(testJob).toContain('contents: read');
+    expect(testJob).not.toContain('write');
+    const testWorkflow = readFileSync(new URL('../.github/workflows/test.yml', import.meta.url), 'utf8');
+    expect(testWorkflow).toContain('workflow_call:');
+    expect(testWorkflow).toContain('persist-credentials: false');
+    expect(testWorkflow).toContain('contents: read');
+    expect(testWorkflow).not.toContain('continue-on-error');
+    expect(testWorkflow).toContain('run: pnpm check');
+    expect(testWorkflow).toContain('run: pnpm test');
   });
 
   it('uses native deletion after an atomic squash merge of the validated tested head', () => {
@@ -153,22 +166,24 @@ describe('safe native branch cleanup before auto-merge', () => {
     expect(result.calls.flat()).not.toContain('DELETE');
   });
 
-  const jobGuard = workflow.match(/    if: >-\n([\s\S]+?)    runs-on:/)![1].trim();
+  const jobGuard = workflow.split('  enable-auto-merge:\n')[1].match(/    if: >-\n([\s\S]+?)    runs-on:/)![1].trim();
   const completion = () => ({
-    event_name: 'workflow_run', repository,
-    event: { workflow_run: { conclusion: 'success', event: 'pull_request', head_repository: { full_name: repository } } },
+    github: { repository, event: { pull_request: fixture().pr } },
+    needs: { test: { result: 'success' } },
   });
-  it('accepts only successful same-repository pull-request Test completions', () => {
-    expect(runInNewContext(jobGuard, { github: completion() })).toBe(true);
+  it('requires a successful Test dependency in the same run and eligible PR metadata', () => {
+    expect(runInNewContext(jobGuard, completion())).toBe(true);
     for (const conclusion of ['failure', 'cancelled', 'skipped', 'timed_out', 'action_required']) {
-      const github = completion();
-      github.event.workflow_run.conclusion = conclusion;
-      expect(runInNewContext(jobGuard, { github })).toBe(false);
+      const context = completion();
+      context.needs.test.result = conclusion;
+      expect(runInNewContext(jobGuard, context)).toBe(false);
     }
-    const push = completion(); push.event.workflow_run.event = 'push';
-    expect(runInNewContext(jobGuard, { github: push })).toBe(false);
-    const fork = completion(); fork.event.workflow_run.head_repository.full_name = 'other/kinarium';
-    expect(runInNewContext(jobGuard, { github: fork })).toBe(false);
+    const fork = completion(); fork.github.event.pull_request.head.repo.full_name = 'other/kinarium';
+    expect(runInNewContext(jobGuard, fork)).toBe(false);
+    const draft = completion(); draft.github.event.pull_request.draft = true;
+    expect(runInNewContext(jobGuard, draft)).toBe(false);
+    const otherAuthor = completion(); otherAuthor.github.event.pull_request.user.login = 'other';
+    expect(runInNewContext(jobGuard, otherAuthor)).toBe(false);
   });
 
   it('has no active Cloudflare deployment workflow or invocation', () => {

@@ -3,45 +3,47 @@ name: Auto Merge
 on:
   pull_request:
     types: [opened, reopened, synchronize, ready_for_review]
-  workflow_run:
-    workflows: [Test]
-    types: [completed]
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 jobs:
-  enable-auto-merge:
+  test:
     if: >-
-      (github.event_name == 'pull_request' &&
       github.event.pull_request.draft == false &&
       github.event.pull_request.user.login == 'imann24' &&
-      github.event.pull_request.head.repo.full_name == github.repository) ||
-      (github.event_name == 'workflow_run' &&
-      github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.event == 'pull_request' &&
-      github.event.workflow_run.head_repository.full_name == github.repository)
+      github.event.pull_request.head.repo.full_name == github.repository
+    permissions:
+      contents: read
+    uses: ./.github/workflows/test.yml
+
+  enable-auto-merge:
+    needs: test
+    if: >-
+      needs.test.result == 'success' &&
+      github.event.pull_request.draft == false &&
+      github.event.pull_request.user.login == 'imann24' &&
+      github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
-      - name: Wait for the current head to pass Test
-        if: github.event_name == 'pull_request'
-        run: echo 'Auto-merge resumes when the Test workflow completes successfully for this head.'
       # Native deletion runs after immediate AND deferred merges, without needing
       # a second Actions event. gh --auto --delete-branch skips deferred deletion.
       - name: Verify safe automatic branch deletion
         id: cleanup
-        if: github.event_name == 'workflow_run'
         env:
           GH_TOKEN: ${{ github.token }}
-          TESTED_SHA: ${{ github.event.workflow_run.head_sha }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          TESTED_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           set -euo pipefail
-          # workflow_run uses this workflow from the default branch. Never check
-          # out PR code or download artifacts into this privileged job.
+          # Only the separate read-only Test job checks out PR code. Never check
+          # out code or download artifacts into this privileged merge job.
           open_prs=$(gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/pulls?state=open&per_page=100")
-          candidates=$(jq -c --arg repo "$GITHUB_REPOSITORY" --arg sha "$TESTED_SHA" '
-            [.[][] | select(.head.repo.full_name == $repo and .head.sha == $sha and
+          candidates=$(jq -c --arg repo "$GITHUB_REPOSITORY" --arg sha "$TESTED_SHA" --argjson number "$PR_NUMBER" '
+            [.[][] | select(.number == $number and .head.repo.full_name == $repo and .head.sha == $sha and
               .user.login == "imann24" and .draft == false)]
           ' <<< "$open_prs")
           if [[ $(jq 'length' <<< "$candidates") != 1 ]]; then
