@@ -95,7 +95,7 @@ export default function Building({ world, selected, onSelect, miniature = false 
     {[0,1,2].map(i => <g key={i}><path d={`M710 ${245+i*143}h97`} stroke="#a6a893" strokeWidth="5"/><circle cx="714" cy={206+i*143} r="3" fill="#efe3b9"/></g>)}
     <rect x="88" y="94" width="744" height="15" rx="3" fill="#7b8872"/><rect x="85" y="551" width="750" height="12" rx="3" fill="#9eaa8c"/>
     <path d="M317 92v-9h263v9" fill="#aab299"/><rect x="356" y="69" width="185" height="24" rx="3" fill="#e9e8d8"/>
-    <text x="448" y="85" textAnchor="middle" fontSize="9" fill="#73806b" letterSpacing={template.id === 'common-house' ? 3 : 1}>{template.id === 'common-house' ? 'A LITTLE LIFE TOGETHER' : template.name.toUpperCase()}</text>
+    <text x="448" y="85" textAnchor="middle" fontSize="9" fill="#52604b" letterSpacing={template.id === 'common-house' ? 3 : 1}>{template.id === 'common-house' ? 'A LITTLE LIFE TOGETHER' : template.name.toUpperCase()}</text>
     {people.map(c => {
       const position = motion.position(c.id);
       const x = position?.x ?? (c.inElevator ? 757 : 135 + c.x * 5.85);

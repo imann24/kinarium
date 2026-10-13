@@ -55,3 +55,29 @@ describe('theme bootstrap', () => {
     expect(app.theme.getPreference()).toBe('dark');
   });
 });
+
+// WCAG contrast checks for the shared dark palette and the unchanged semantic meter colors.
+const css = readFileSync(new URL('../src/client/theme.css', import.meta.url), 'utf8');
+const darkBlock = css.match(/:root\[data-theme='dark'\]\s*\{([^}]+)\}/)![1];
+const colors = Object.fromEntries([...darkBlock.matchAll(/--([\w-]+):\s*(#[\da-f]{6})/g)].map(([, key, value]) => [key, value]));
+function luminance(hex: string) {
+  return hex.slice(1).match(/../g)!.map(v => parseInt(v, 16) / 255)
+    .map(v => v <= .04045 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4)
+    .reduce((sum, v, i) => sum + v * [.2126, .7152, .0722][i], 0);
+}
+function contrast(a: string, b: string) {
+  const x = luminance(a), y = luminance(b);
+  return (Math.max(x, y) + .05) / (Math.min(x, y) + .05);
+}
+it('keeps dark text, controls and scene labels at accessible contrast', () => {
+  for (const bg of ['page', 'surface', 'surface-soft', 'surface-hover']) {
+    for (const fg of ['text', 'secondary', 'muted', 'accent']) expect(contrast(colors[fg], colors[bg])).toBeGreaterThanOrEqual(4.5);
+    expect(contrast(colors.focus, colors[bg])).toBeGreaterThanOrEqual(3);
+    expect(contrast(colors['control-border'], colors[bg])).toBeGreaterThanOrEqual(3);
+  }
+  expect(contrast(colors['scene-text'], colors['scene-bubble'])).toBeGreaterThanOrEqual(4.5);
+  expect(contrast(colors['scene-caption'], colors['sky-horizon'])).toBeGreaterThanOrEqual(4.5);
+  const track = css.match(/\.stat-track,\.bond-meter,\.allowance-meter>span\)\s*\{ background:(#[\da-f]{6})/)! [1];
+  for (const fill of ['#7d926e', '#c79b6c', '#8ca8a3', '#99ab83', '#c79782']) expect(contrast(fill, track)).toBeGreaterThanOrEqual(3);
+  for (const badge of ['#718564', '#b77b59', '#7396a1', '#ab8299']) expect(contrast('#0b140d', badge)).toBeGreaterThanOrEqual(4.5);
+});

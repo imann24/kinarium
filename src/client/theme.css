@@ -4,13 +4,15 @@
   --page: #f8f8f2;
   --text: #414c3f;
   --secondary: #64705b;
-  --muted: #68745f;
+  --muted: #5e6b54;
   --surface: #fffef8;
   --surface-soft: #eef2e7;
   --surface-hover: #e4ebda;
   --control-border: #8b997d;
   --accent: #52684a;
   --focus: #52684a;
+  --scene-caption: #5e6b54;
+  --scene-label: #585b49;
 }
 :root[data-theme='dark'] {
   color-scheme: dark;
@@ -64,7 +66,7 @@
 :root[data-theme='dark'] :is(.card-meta,.stage-toolbar,.stage-footer,.community-stats,.stat,.sidebar-tabs,.journal-entry,.resident-row,.small-bond,.bond-card,.presence-row,.memories p,.section-top h2 span) { border-color:var(--line); }
 :root[data-theme='dark'] .input-prefix input { border-left-color:var(--control-border)!important; }
 :root[data-theme='dark'] .timeline-icon { border-color:var(--surface); }
-:root[data-theme='dark'] :is(.stat-track,.bond-meter,.allowance-meter>span) { background:#45513e; }
+:root[data-theme='dark'] :is(.stat-track,.bond-meter,.allowance-meter>span) { background:#34402e; }
 :root[data-theme='dark'] .stat-track>span { background:#a6bf87; }
 :root[data-theme='dark'] .allowance-meter .ready i { background:#b8d197; }
 :root[data-theme='dark'] .allowance-meter i { background:#849775; }
@@ -81,7 +83,7 @@
 :root[data-theme='dark'] :is(.card-art,.art-2) { background:#2c3c32; }
 :root[data-theme='dark'] .art-1 { background:#3b392c; }
 :root[data-theme='dark'] .presence-group>span { border-color:var(--page); }
-:root[data-theme='dark'] :is(.presence-group>span,.presence-row>span) { color:#142016; }
+:root[data-theme='dark'] :is(.presence-group>span,.presence-row>span) { color:#0b140d; }
 :root[data-theme='dark'] :is(.journal-scroll,.resident-list,.bonds-list,.character-detail) { scrollbar-color:#677a5b transparent; }
 :root[data-theme='dark'] :is(.card-title svg,.event-arrow,.resident-row>svg,.bond-card svg,.stage-footer i) { color:var(--muted); }
 /* Preserve resident/furniture colors and simulation time; only the scene surfaces change. */
@@ -96,3 +98,18 @@
   .site-header nav a { height:48px; }
   .theme-control select { font-size:11px; }
 }
+/* Shared world controls, including fullscreen and resident mention popovers. */
+:root .primary, :root .stage-footer .primary, :root .resident-list .primary { color:#fffef2; }
+:root[data-theme='dark'] .primary, :root[data-theme='dark'] .stage-footer .primary, :root[data-theme='dark'] .resident-list .primary { color:#1e2c1d; }
+:root[data-theme='dark'] .world-page.world-fullscreen { background:var(--page); }
+:root[data-theme='dark'] :is(.time-mode-status strong,.fullscreen-toggle,.character-name,.character-name-choices button) { color:var(--accent); }
+:root[data-theme='dark'] :is(.time-mode-tooltip,.character-name-choices) { background:var(--surface); color:var(--text); border-color:var(--control-border); box-shadow:0 5px 18px #0004; }
+:root[data-theme='dark'] :is(.time-mode-tooltip>span,.character-name-choices>span,.character-name-choices button>span) { color:var(--muted); }
+:root[data-theme='dark'] :is(.fullscreen-toggle,.character-name-choices button) { border-color:var(--control-border); }
+:root[data-theme='dark'] :is(.fullscreen-toggle:hover:not(:disabled),.character-name:hover) { background:var(--surface-hover); color:var(--text); }
+:root[data-theme='dark'] .character-name { text-decoration-color:var(--control-border); }
+:root .time-mode-status:focus-visible { outline-color:var(--focus); }
+
+:root[data-theme='light'] :is(.live-chip,.card-badge,.section-top h2 span,.tiny-star,.stage-footer i) { color:var(--secondary); }
+:root[data-theme='light'] :is(.presence-group>span,.presence-row>span) { color:#0b140d; }
+:root[data-theme='light'] :is(.fullscreen-toggle,.bond-card b span,.guide-copy b) { color:var(--secondary); }

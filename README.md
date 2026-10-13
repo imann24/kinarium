@@ -123,6 +123,14 @@ pnpm exec wrangler deploy --env "" --dry-run --outdir /tmp/kinarium-worker
 
 Integration tests exercise actual HTTP/WebSocket/SQLite/alarm behavior, including two-player synchronization, concurrent population enforcement, away/return, invalid origins, passwords, protected history, event cooldowns, and both time modes. They take about 80 seconds because they verify an unoccupied persistent world really advances. They only accept localhost targets, create `test-*` worlds, and leave successful fixtures in fast-forward mode.
 
+### Color themes
+
+The header’s **Color theme** control offers System (the default), Light, and Dark. System follows live OS preference changes; explicit choices persist in `localStorage` under `kinarium-theme` and sync across tabs. Choosing System removes the override. If storage is unavailable, switching still works for the current page.
+
+`public/theme.js` resolves the theme before the app paints; `ThemeControl.tsx` subscribes to that controller. `theme.css` extends the existing CSS with semantic surface/text tokens and SVG scene colors. New UI surfaces should use `--surface`, `--surface-soft`, `--text`, `--secondary`, `--muted`, `--line`, and `--control-border`. Theme preference is personal and never changes the simulation’s day/night cycle or shared world settings.
+
+Theme tests cover persistence, system changes, cross-tab sync, unavailable storage, and palette contrast. For browser verification, switch with the keyboard, reload each explicit choice, return to System and change OS preference, then inspect the directory, dialogs, world, profiles, bonds, and fullscreen at desktop and mobile widths.
+
 ## Extending Kinarium
 
 Add an event to `EVENTS`; its controls and effects come from that registry. Add advanced behavior with a validated command or a deterministic simulation system. New templates should register a stable ID and versioned data in `TEMPLATES`; the current renderer is purpose-built for the three-floor house, so a template with different geometry also needs a renderer selected by its template ID. For v1 houses, floor 0 gathers residents, floor 1 restores energy, and practical residents on floor 2 replenish resources. Optional floor `activity` text and `initialMetrics` customize daily life and starting conditions; omitted values preserve the original common-house behavior. Furniture is selected by template ID in `Building.tsx`. Creation choices and directory previews come from the template registry. A future template generator should produce validated data and select a renderer, never execute generated code. Preserve old template IDs so existing worlds continue to load.
