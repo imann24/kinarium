@@ -24,3 +24,7 @@
 .world-page.world-fullscreen{position:fixed;inset:0;z-index:10;width:100%;height:100dvh;max-width:none;margin:0;padding:20px 28px;overflow:auto;background:#f8f8f2}.world-fullscreen .world-heading{margin-bottom:18px}.world-fullscreen .world-layout{min-height:500px;height:calc(100dvh - 155px)}.world-fullscreen .world-stage{display:flex;flex-direction:column;align-self:stretch;min-height:0}.world-fullscreen .stage-toolbar,.world-fullscreen .stage-footer,.world-fullscreen .community-stats{flex-shrink:0}.world-fullscreen .world-stage .building{flex:1;min-height:0;height:0;max-height:none}.world-fullscreen .world-sidebar{height:auto;min-height:0;max-height:none}
 @media(max-width:900px){.world-page.world-fullscreen{padding:18px}.world-fullscreen .world-layout{height:auto;min-height:0}.world-fullscreen .world-stage .building{flex:none;height:auto;min-height:0;max-height:calc(100dvh - 260px)}.world-fullscreen .world-sidebar{height:520px}}
 @media(max-width:450px){.stage-toolbar-actions{gap:9px}.fullscreen-toggle span{display:none}.fullscreen-toggle{min-width:36px}.world-fullscreen .world-stage .building{max-height:none}}
+
+/* Fit the initial world view; fullscreen retains its own layout. */
+.world-page:not(.world-fullscreen) .world-stage{align-self:start}
+.world-page:not(.world-fullscreen) .world-stage .building{min-height:0;max-height:var(--world-canvas-height,none)}
