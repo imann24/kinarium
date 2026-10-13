@@ -3,7 +3,7 @@ import { activeCharacters, advance, applyCommand, createWorld, summarize, TICK_M
 import { TEMPLATES, TRAITS } from '../simulation/catalog';
 import type { Command, LogEntry, Presence, Snapshot, TimeMode, WorldState, WorldSummary } from '../simulation/types';
 import { body, digest, equal, json, passwordHash, string, validOrigin } from './security';
-import { enrichDialogue, type LLMConfig } from './llm';
+import { enrichDialogue, isLLMConfigured, type LLMConfig } from './llm';
 import { availableEvents, consumeEvent, eventBudget } from '../simulation/event-budget';
 
 interface Env extends LLMConfig { WORLDS: DurableObjectNamespace<WorldRoom>; DIRECTORY: DurableObjectNamespace<WorldDirectory>; ASSETS: Fetcher; }
@@ -251,7 +251,7 @@ export class WorldRoom extends DurableObject<Env> {
     if (!this.data) return;
     advance(this.data.world, Date.now()); this.save(); this.broadcast(); await this.schedule();
     if (this.data.world.minute % 30 < 2) this.index();
-    if (!this.env.AI_GATEWAY_API_KEY || !this.ctx.getWebSockets().length) return;
+    if (!isLLMConfigured(this.env) || !this.ctx.getWebSockets().length) return;
     const today = new Date().toISOString().slice(0, 10);
     if (this.data.llmDay !== today) { this.data.llmDay = today; this.data.llmCalls = 0; }
     const configuredLimit = Number(this.env.LLM_DAILY_CALL_LIMIT ?? 24);

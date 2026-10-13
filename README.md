@@ -28,7 +28,7 @@ Vite proxies `/api` and WebSockets to port 8787. Server source changes reload au
 - Six extensible events with a shared 45-second world cooldown and a separate allowance of 3 events per player per world in any rolling 5-minute window: shared meal, gift, story night, common project, outage, rumor.
 - Adjustable active population cap (1–40), new residents, reversible time away. Away residents retain memories and relationships and do not count against the cap. Maximum 200 total archived/active residents per world for this first version.
 - Persistent or fast-forward time, configurable for each world.
-- Optional, budget-limited AI dialogue, using Vercel AI Gateway by default.
+- Optional, budget-limited AI dialogue, using Cloudflare Workers AI by default.
 
 There are deliberately no accounts, ownership privileges, direct NPC controls, or objectives. Everyone admitted to a world has the same influence, including settings. Presence represents browser identities, not verified people; multiple tabs with the same identity are grouped.
 
@@ -75,34 +75,38 @@ The directory is an eventually updated summary, not a continuously live view of 
 
 ## Optional AI
 
-Copy `.dev.vars.example` to `.dev.vars` and set `AI_GATEWAY_API_KEY`. Do not commit it. With no key, all gameplay works using procedural content.
+Production uses **Cloudflare Workers AI** through the native `AI` binding. Inference runs in the same Cloudflare account as the Worker; it needs no separate provider API key. The default is Llama 3.1 8B FP8 Fast, an inexpensive, non-reasoning model for brief dialogue. Provider-specific code stays in `src/server/llm.ts`; the simulation has no model dependency.
 
 Defaults in `wrangler.jsonc`:
 
 ```text
-LLM_BASE_URL=https://ai-gateway.vercel.sh/v1
-LLM_MODEL=openai/gpt-4o-mini
+LLM_PROVIDER=cloudflare
+LLM_MODEL=@cf/meta/llama-3.1-8b-instruct-fp8-fast
 LLM_DAILY_CALL_LIMIT=24
 ```
 
-The adapter uses the [OpenAI-compatible Chat Completions endpoint](https://vercel.com/docs/ai-gateway/openai-compat/rest-api). Change the base URL, model, and key to switch providers. The key variable keeps its name even when routing to another provider.
+Set `LLM_PROVIDER=disabled` to use only procedural dialogue. Errors, quota exhaustion, and malformed responses also preserve procedural dialogue. There is no automatic retry or cross-provider fallback.
 
-AI enriches an occasional recent conversation while someone is present, at most once per five real minutes and 24 attempts per world per UTC day by default. Each request has a 90-token output limit and six-second timeout. Failed attempts consume the reserved daily allowance; the existing procedural line remains. Generated dialogue is visibly labeled in the journal. Limits are per world, not a deployment-wide dollar cap: set an account-level spending limit in the gateway for an overall budget.
+`pnpm dev`, `pnpm dev:server`, and `pnpm preview` select the `local` Wrangler environment, which omits the remote AI binding and disables generation. No Cloudflare login or inference charges are required for ordinary development. Wrangler may warn that `env.local` does not inherit `ai`; this omission is intentional. To test real Workers AI, log in with `pnpm exec wrangler login`, then run `pnpm dev:server:ai` and `pnpm dev:client` in separate terminals. This deliberately opts into real Cloudflare inference and metered usage; [Workers AI has no local emulator](https://developers.cloudflare.com/workers/local-development/).
+
+To switch to Vercel AI Gateway or another OpenAI-compatible Chat Completions service, set `LLM_PROVIDER=openai-compatible`, `LLM_BASE_URL`, and `LLM_MODEL`, and store `LLM_API_KEY` with `pnpm exec wrangler secret put LLM_API_KEY`. For local testing, copy `.dev.vars.example` to `.dev.vars.local` and fill in those values. The old `AI_GATEWAY_API_KEY` secret remains supported as an alias, but provider selection is explicit. When deploying with a compatible provider, remove the unused `ai` binding if desired. Secrets and environment-specific `.dev.vars` files are ignored by Git.
+
+AI enriches an occasional recent conversation while someone is present, at most once per five real minutes and 24 attempts per world per UTC day by default. Each request has a 90-token output limit and six-second timeout. Failed attempts consume the reserved daily allowance; disabled/unconfigured providers do not. Generated dialogue is visibly labeled in the journal. Limits are per world, not a deployment-wide dollar cap; monitor account usage as world count grows.
+
+As of October 2026, [Workers AI pricing](https://developers.cloudflare.com/workers-ai/platform/pricing/) lists a shared free allocation of 10,000 neurons/day and this model at $0.045/million input tokens and $0.384/million output tokens. At an illustrative 500 input tokens and the full 90 output tokens, 24 calls/day for 30 days is roughly **$0.04/world/month for inference before the free allocation**, excluding Worker, storage, and other application costs. Actual prompt sizes and usage vary. Model quality and end-to-end latency need validation with live inference.
 
 Model generation of names, backstories, memories, rituals, and events is not needed for v1; those currently come from the simulation. The adapter boundary is ready for additional content generators. Never let generated prose issue commands or mutate authoritative state.
 
 ## Deploy
 
-Deploy this app to your Cloudflare account as one Worker. It does not require Vercel hosting to use Vercel AI Gateway.
+Deploy this app to your Cloudflare account as one Worker, including its Workers AI binding.
 
 ```sh
 pnpm exec wrangler login
-# Optional, only when enabling AI:
-pnpm exec wrangler secret put AI_GATEWAY_API_KEY
 pnpm deploy
 ```
 
-Wrangler provisions the SQLite Durable Object classes from the `v1` migration and uploads the built static assets. Choose a unique Worker name in `wrangler.jsonc` if needed. After the first deployment, use `pnpm exec wrangler secret put AI_GATEWAY_API_KEY` if the Worker needed to exist before secrets could be set. The first directory visit initializes The Common House. Custom domains can be attached in Cloudflare. No production deployment or paid resources are provisioned by local development.
+Wrangler provisions the SQLite Durable Object classes from the `v1` migration and uploads the built static assets. Choose a unique Worker name in `wrangler.jsonc` if needed. The default deployment enables metered Workers AI within the limits above; set the top-level `LLM_PROVIDER` to `disabled` before deploying for procedural-only play. The first directory visit initializes The Common House. Custom domains can be attached in Cloudflare. No production deployment or paid resources are provisioned by local development.
 
 ## Verification
 
@@ -111,7 +115,7 @@ pnpm test                 # deterministic simulation and domain invariants
 pnpm build                # strict TypeScript check and production frontend build
 pnpm test:integration     # run while pnpm dev:server is active
 pnpm test:events          # per-player quotas, multiple tabs, private budgets; about 90 seconds
-pnpm exec wrangler deploy --dry-run --outdir /tmp/kinarium-worker
+pnpm exec wrangler deploy --env "" --dry-run --outdir /tmp/kinarium-worker
 ```
 
 Integration tests exercise actual HTTP/WebSocket/SQLite/alarm behavior, including two-player synchronization, concurrent population enforcement, away/return, invalid origins, passwords, protected history, event cooldowns, and both time modes. They take about 80 seconds because they verify an unoccupied persistent world really advances. They only accept localhost targets, create `test-*` worlds, and leave successful fixtures in fast-forward mode.

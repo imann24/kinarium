@@ -1,6 +1,11 @@
-# Optional. The simulation works without this key.
-AI_GATEWAY_API_KEY=
-# Optional overrides; any OpenAI-compatible Chat Completions service works.
+# Ordinary local development disables AI; no secrets are required.
+# Copy to .dev.vars.local to opt into a compatible provider locally.
+# For native Workers AI, use pnpm dev:server:ai after wrangler login.
+# That command uses the Cloudflare defaults and makes real, metered calls.
+
+# Optional OpenAI-compatible provider, including Vercel AI Gateway:
+# LLM_PROVIDER=openai-compatible
+# LLM_API_KEY=your-provider-key
 # LLM_BASE_URL=https://ai-gateway.vercel.sh/v1
 # LLM_MODEL=openai/gpt-4o-mini
 # LLM_DAILY_CALL_LIMIT=24

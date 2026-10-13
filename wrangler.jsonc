@@ -1,9 +1,70 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "kinarium", "main": "src/server/index.ts", "compatibility_date": "2025-10-01",
-  "assets": { "directory": "./dist", "binding": "ASSETS", "not_found_handling": "single-page-application", "run_worker_first": ["/api/*"] },
-  "durable_objects": { "bindings": [ { "name": "WORLDS", "class_name": "WorldRoom" }, { "name": "DIRECTORY", "class_name": "WorldDirectory" } ] },
-  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["WorldRoom", "WorldDirectory"] }],
-  "vars": { "LLM_BASE_URL": "https://ai-gateway.vercel.sh/v1", "LLM_MODEL": "openai/gpt-4o-mini", "LLM_DAILY_CALL_LIMIT": "24" },
-  "observability": { "enabled": true }
+  "name": "kinarium",
+  "main": "src/server/index.ts",
+  "compatibility_date": "2025-10-01",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": [
+      "/api/*"
+    ]
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "WORLDS",
+        "class_name": "WorldRoom"
+      },
+      {
+        "name": "DIRECTORY",
+        "class_name": "WorldDirectory"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": [
+        "WorldRoom",
+        "WorldDirectory"
+      ]
+    }
+  ],
+  "vars": {
+    "LLM_PROVIDER": "cloudflare",
+    "LLM_MODEL": "@cf/meta/llama-3.1-8b-instruct-fp8-fast",
+    "LLM_DAILY_CALL_LIMIT": "24"
+  },
+  "observability": {
+    "enabled": true
+  },
+  "ai": {
+    "binding": "AI",
+    "remote": true
+  },
+  "env": {
+    // AI is deliberately not inherited: ordinary local development is offline.
+    "local": {
+      "name": "kinarium",
+      "durable_objects": {
+        "bindings": [
+          {
+            "name": "WORLDS",
+            "class_name": "WorldRoom"
+          },
+          {
+            "name": "DIRECTORY",
+            "class_name": "WorldDirectory"
+          }
+        ]
+      },
+      "vars": {
+        "LLM_PROVIDER": "disabled",
+        "LLM_MODEL": "@cf/meta/llama-3.1-8b-instruct-fp8-fast",
+        "LLM_DAILY_CALL_LIMIT": "24"
+      }
+    }
+  }
 }
