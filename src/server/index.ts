@@ -3,7 +3,8 @@ import { activeCharacters, advance, applyCommand, createWorld, summarize, TICK_M
 import { TEMPLATES, TRAITS } from '../simulation/catalog';
 import type { Command, LogEntry, Presence, Snapshot, TimeMode, WorldState, WorldSummary } from '../simulation/types';
 import { body, digest, equal, json, passwordHash, string, validOrigin } from './security';
-import { enrichDialogue, isLLMConfigured, type LLMConfig } from './llm';
+import { enrichConversation, isLLMConfigured, type LLMConfig } from './llm';
+import { applyConversationPlan, dailyConversationLimit } from './conversation-policy';
 import { availableEvents, consumeEvent, eventBudget } from '../simulation/event-budget';
 
 interface Env extends LLMConfig { WORLDS: DurableObjectNamespace<WorldRoom>; DIRECTORY: DurableObjectNamespace<WorldDirectory>; ASSETS: Fetcher; }
@@ -91,6 +92,7 @@ export class WorldDirectory extends DurableObject<Env> {
 
 export class WorldRoom extends DurableObject<Env> {
   private data: Stored | undefined;
+  private generatingConversation = false;
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
     ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS state (id INTEGER PRIMARY KEY CHECK(id=1), payload TEXT NOT NULL)');
@@ -108,7 +110,7 @@ export class WorldRoom extends DurableObject<Env> {
     const data = this.data;
     this.ctx.storage.transactionSync(() => {
       extra?.();
-      for (const entry of data.world.history) if (entry.id > data.persistedLog) this.ctx.storage.sql.exec('INSERT OR IGNORE INTO history(id,payload) VALUES(?,?)', entry.id, JSON.stringify(entry));
+      for (const entry of data.world.history) if (entry.id > data.persistedLog || entry.conversation) this.ctx.storage.sql.exec('INSERT INTO history(id,payload) VALUES(?,?) ON CONFLICT(id) DO UPDATE SET payload=excluded.payload', entry.id, JSON.stringify(entry));
       data.persistedLog = data.world.nextLog - 1;
       data.world.history = data.world.history.slice(-80);
       this.ctx.storage.sql.exec('INSERT INTO state(id,payload) VALUES(1,?) ON CONFLICT(id) DO UPDATE SET payload=excluded.payload', JSON.stringify(data));
@@ -251,27 +253,27 @@ export class WorldRoom extends DurableObject<Env> {
     if (!this.data) return;
     advance(this.data.world, Date.now()); this.save(); this.broadcast(); await this.schedule();
     if (this.data.world.minute % 30 < 2) this.index();
-    if (!isLLMConfigured(this.env) || !this.ctx.getWebSockets().length) return;
+    if (this.generatingConversation || !isLLMConfigured(this.env) || !this.ctx.getWebSockets().length) return;
     const today = new Date().toISOString().slice(0, 10);
     if (this.data.llmDay !== today) { this.data.llmDay = today; this.data.llmCalls = 0; }
-    const configuredLimit = Number(this.env.LLM_DAILY_CALL_LIMIT ?? 24);
-    const limit = Number.isFinite(configuredLimit) ? Math.max(0, Math.min(1000, configuredLimit)) : 24;
-    if (this.data.llmCalls >= limit || Date.now() - this.data.lastLLM < 300_000) return;
-    const entry = this.data.world.history.at(-1);
-    if (!entry || !['conversation', 'conflict'].includes(entry.kind) || entry.generated || this.data.world.minute - entry.minute > 6) return;
-    // Reserve budget durably before network I/O. Failures count, preventing retry storms.
+    const limit = dailyConversationLimit(this.env.LLM_DAILY_CALL_LIMIT);
+    if (this.data.llmCalls >= limit || Date.now() - this.data.lastLLM < 8_000) return;
+    const entry = this.data.world.history.find(e => e.conversation?.status === 'active' && !e.conversation.generationAttempted && e.conversation.turns.length < 4);
+    if (!entry) return;
+    // Reserve once per thread before I/O. Failed requests never create retry storms.
+    entry.conversation!.generationAttempted = true;
+    const turnCount = entry.conversation!.turns.length;
     this.data.llmCalls++; this.data.lastLLM = Date.now(); this.save();
-    const text = await enrichDialogue(this.env, structuredClone(this.data.world), entry);
-    if (!text) return;
-    const saved = this.ctx.storage.sql.exec<{ payload: string }>('SELECT payload FROM history WHERE id=?', entry.id).toArray()[0];
-    if (!saved) return;
-    const updated = JSON.parse(saved.payload) as LogEntry; updated.text = updated.text.replace(/“.*”$/, `“${text}”`); updated.generated = true;
-    this.ctx.storage.sql.exec('UPDATE history SET payload=? WHERE id=?', JSON.stringify(updated), entry.id);
-    const recent = this.data.world.history.find(e => e.id === entry.id); if (recent) Object.assign(recent, updated);
-    const speaker = this.data.world.characters.find(c => c.id === entry.characters[0]);
-    if (speaker && !speaker.away && this.data.world.minute - entry.minute <= 6) speaker.speech = text;
-    this.save(); this.broadcast();
+    this.generatingConversation = true;
+    try {
+      const turns = await enrichConversation(this.env, structuredClone(this.data.world), structuredClone(entry));
+      const current = this.data.world.history.find(e => e.id === entry.id);
+      // Commands can replace the world while inference is in flight; never apply a stale plan.
+      if (!applyConversationPlan(current, turnCount, turns)) return;
+      this.save(); this.broadcast();
+    } finally { this.generatingConversation = false; }
   }
+
   async webSocketMessage(ws: WebSocket, message: string | ArrayBuffer) { if (message === 'ping') ws.send('pong'); else ws.close(1008, 'Use the world command API.'); }
   async webSocketClose(ws: WebSocket) { ws.close(1000, 'See you soon'); this.broadcast(); await this.schedule(); }
   async webSocketError(ws: WebSocket) { ws.close(1011, 'Connection interrupted'); this.broadcast(); await this.schedule(); }

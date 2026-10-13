@@ -1,0 +1,9 @@
+.conversation-thread { margin-top: 8px; }
+.conversation-thread summary { cursor: pointer; line-height: 1.5; padding: 4px 0; }
+.conversation-thread summary strong { font-size: 13px; }
+.conversation-thread summary span, .conversation-thread summary small { display: block; margin-left: 15px; }
+.conversation-thread summary small, .conversation-speaker time, .conversation-progress { opacity: .7; font-size: 10px; }
+.conversation-thread ol { list-style: none; padding: 0 0 0 12px; margin: 12px 0; border-left: 2px solid currentColor; }
+.conversation-thread li { padding: 7px 0; }
+.conversation-speaker { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px; font-size: 11px; }
+.conversation-thread li p { margin: 5px 0; overflow-wrap: anywhere; }

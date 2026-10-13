@@ -8,4 +8,4 @@
 # LLM_API_KEY=your-provider-key
 # LLM_BASE_URL=https://ai-gateway.vercel.sh/v1
 # LLM_MODEL=openai/gpt-4o-mini
-# LLM_DAILY_CALL_LIMIT=24
+# LLM_DAILY_CALL_LIMIT=240

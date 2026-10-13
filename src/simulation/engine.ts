@@ -1,3 +1,4 @@
+import { advanceConversations, beginConversation, isConversing, interruptConversations } from './conversations';
 import { COLORS, EVENTS, TEMPLATES, TRAITS } from './catalog';
 import type { Character, Command, LogKind, Relationship, WorldState, WorldSummary } from './types';
 
@@ -58,16 +59,12 @@ function interact(s: WorldState, a: Character, b: Character) {
   a.mood = clamp(a.mood + (positive ? 3 : -5)); b.mood = clamp(b.mood + (positive ? 3 : -5));
   a.belonging = clamp(a.belonging + (positive ? 2 : -3)); b.belonging = clamp(b.belonging + (positive ? 2 : -3));
   s.cohesion = clamp(s.cohesion + (positive ? .5 : -.9)); s.tension = clamp(s.tension + (positive ? -.5 : 1.2));
-  const speech = positive ? pick(s, ['I saved you a seat.', 'It feels a little like home here.', 'Want to make something together?', 'Tell me more about that.', 'I’m glad you’re here.', 'The garden is doing well today.']) : pick(s, ['I wish you had asked first.', 'We can’t keep ignoring this.', 'I need a little space.', 'That’s not what I meant.']);
-  a.speech = speech; a.speechUntil = s.minute + 6; a.activity = positive ? `talking with ${b.name}` : `disagreeing with ${b.name}`;
-  b.activity = positive ? `listening to ${a.name}` : `disagreeing with ${a.name}`;
-  const text = `${a.name} ${positive ? 'shares a moment with' : 'clashes with'} ${b.name}. “${speech}”`;
-  log(s, positive ? 'conversation' : 'conflict', text, [a.id, b.id]);
-  if (!positive || r.encounters % 4 === 0) { remember(a, s, text); remember(b, s, text); }
+  beginConversation(s, a, b, positive);
   if (previous < 35 && r.affinity >= 35) { const t = `${a.name} and ${b.name} are becoming real friends.`; log(s, 'friendship', t, [a.id, b.id]); remember(a, s, t); remember(b, s, t); }
 }
 export function step(s: WorldState) {
   s.minute += MINUTES_PER_TICK;
+  advanceConversations(s);
   const people = activeCharacters(s);
   const template = TEMPLATES[s.templateId];
   // A travel tick is followed by a complete stopped tick for boarding/exiting.
@@ -83,6 +80,7 @@ export function step(s: WorldState) {
     c.energy = clamp(c.energy + (night || c.floor === 1 ? 1.8 : -.35));
     c.belonging = clamp(c.belonging - .025);
     c.mood = clamp(c.mood + (s.resources < 20 ? -.2 : .035) + (c.belonging - 50) / 2000 - s.tension / 4000);
+    if (isConversing(s, c.id)) continue;
     if (c.inElevator) {
       c.floor = s.elevatorFloor;
       c.activity = 'riding the elevator';
@@ -96,7 +94,7 @@ export function step(s: WorldState) {
     } else { c.x = clamp(c.x + (random(s) - .5) * 18, 8, 84); if (!c.speech) c.activity = night ? 'resting' : (template.floors[c.floor].activity ?? ['making tea', 'reading', 'tending the plants'][c.floor]); }
   }
   if (people.length > 1 && random(s) < .48) {
-    const a = pick(s, people); const nearby = people.filter(b => b.id !== a.id && !b.inElevator && !a.inElevator && b.floor === a.floor && b.destination === b.floor && a.destination === a.floor);
+    const a = pick(s, people); const nearby = people.filter(b => !isConversing(s, a.id) && !isConversing(s, b.id) && b.id !== a.id && !b.inElevator && !a.inElevator && b.floor === a.floor && b.destination === b.floor && a.destination === a.floor);
     if (nearby.length) interact(s, a, pick(s, nearby));
   }
   s.resources = clamp(s.resources - people.length * .008 + people.filter(c => c.floor === 2 && c.trait === 'practical').length * .12);
@@ -130,6 +128,7 @@ export function applyCommand(s: WorldState, command: Command, now: number) {
       if (!c) throw new Error('That character could not be found.');
       if (c.away === command.away) return;
       if (!command.away && activeCharacters(s).length >= s.settings.populationCap) throw new Error('The house is full. Make some room before welcoming them back.');
+      if (command.away) interruptConversations(s, c.id);
       c.away = command.away; c.inElevator = false; c.destination = c.floor; c.x = Math.min(c.x, 84); c.speech = undefined; c.activity = c.away ? 'away for a while' : 'finding their feet again';
       log(s, c.away ? 'departure' : 'arrival', `${c.name} ${c.away ? 'leaves for a while. Their place in the story remains.' : 'returns to the house. There is a familiar face at the door.'}`, [c.id]);
       remember(c, s, c.away ? 'I took some time away from the house.' : 'I came back to the house.'); break;
