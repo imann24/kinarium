@@ -10,30 +10,27 @@ export function useFullscreenCanvas(pageRef: RefObject<HTMLElement | null>, acti
     const canvas = stage.querySelector<SVGSVGElement>('.building')!;
     const toolbar = stage.querySelector<HTMLElement>('.stage-toolbar')!;
     const footer = stage.querySelector<HTMLElement>('.stage-footer')!;
-    const stats = stage.querySelector<HTMLElement>('.community-stats')!;
     const layout = stage.parentElement!;
     // Returning from a scrolled journal should reveal the newly fitted scene.
     page.scrollTop = 0;
     function fit() {
       const top = stage.getBoundingClientRect().top - page!.getBoundingClientRect().top + page!.scrollTop;
       const controls = toolbar.offsetHeight + footer.offsetHeight;
-      // In the focused view the summary remains just below the scene and its actions.
-      const summary = collapsed ? 0 : stats.offsetHeight;
-      const available = page!.clientHeight - top - controls - summary - 18;
+      const available = page!.clientHeight - top - controls - 18;
       // Very short screens can scroll instead of reducing the world to a sliver.
       const height = Math.min(Math.max(160, available), (stage.clientWidth * canvas.viewBox.baseVal.height) / canvas.viewBox.baseVal.width);
       const value = `${Math.floor(height)}px`;
       if (layout.style.getPropertyValue('--fullscreen-canvas-height') !== value) {
         layout.style.setProperty('--fullscreen-canvas-height', value);
       }
-      const stageHeight = `${Math.floor(height) + controls + stats.offsetHeight + 2}px`;
+      const stageHeight = `${Math.floor(height) + controls + 2}px`;
       if (layout.style.getPropertyValue('--fullscreen-stage-height') !== stageHeight) {
         layout.style.setProperty('--fullscreen-stage-height', stageHeight);
       }
     }
     fit();
     const observer = new ResizeObserver(fit);
-    [page, stage, toolbar, footer, stats, ...page.querySelectorAll('.world-heading, .journal-panel-controls, .world-view-controls, .error-box')].forEach(el => observer.observe(el));
+    [page, stage, toolbar, footer, ...page.querySelectorAll('.world-heading, .journal-panel-controls, .world-view-controls, .error-box')].forEach(el => observer.observe(el));
     window.addEventListener('resize', fit);
     window.visualViewport?.addEventListener('resize', fit);
     return () => {

@@ -8,13 +8,14 @@ export function useWorldViewport(stageRef: RefObject<HTMLElement | null>, ready:
 
     const canvas = stage.querySelector<SVGSVGElement>('.building');
     const footer = stage.querySelector<HTMLElement>('.stage-footer');
-    const stats = stage.querySelector<HTMLElement>('.community-stats');
-    if (!canvas || !footer || !stats) return;
+    const toolbar = stage.querySelector<HTMLElement>('.stage-toolbar');
+    const layout = stage.parentElement!;
+    if (!canvas || !footer || !toolbar) return;
 
     function fit() {
       // Use the document position so scrolling never changes the house's scale.
       const top = canvas!.getBoundingClientRect().top + window.scrollY;
-      const controls = footer!.getBoundingClientRect().height + stats!.getBoundingClientRect().height;
+      const controls = footer!.getBoundingClientRect().height;
       const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
       // Leave 16px below the stage, plus its 1px bottom border.
       // Short screens can scroll instead of shrinking the scene to a sliver.
@@ -23,6 +24,9 @@ export function useWorldViewport(stageRef: RefObject<HTMLElement | null>, ready:
       if (stage!.style.getPropertyValue('--world-canvas-height') !== value) {
         stage!.style.setProperty('--world-canvas-height', value);
       }
+      const sceneHeight = Math.min(height, stage!.clientWidth * canvas!.viewBox.baseVal.height / canvas!.viewBox.baseVal.width);
+      const stageHeight = `${Math.ceil(sceneHeight + controls + toolbar!.offsetHeight + 2)}px`;
+      if (layout.style.getPropertyValue('--world-stage-height') !== stageHeight) layout.style.setProperty('--world-stage-height', stageHeight);
     }
 
     fit();
@@ -30,7 +34,7 @@ export function useWorldViewport(stageRef: RefObject<HTMLElement | null>, ready:
     const observer = new ResizeObserver(fit);
     observer.observe(stage);
     observer.observe(footer);
-    observer.observe(stats);
+    observer.observe(toolbar);
     const page = stage.closest('.world-page');
     const heading = page?.querySelector('.world-heading');
     const header = document.querySelector('.site-header');
@@ -43,6 +47,7 @@ export function useWorldViewport(stageRef: RefObject<HTMLElement | null>, ready:
     return () => {
       observer.disconnect();
       stage.style.removeProperty('--world-canvas-height');
+      layout.style.removeProperty('--world-stage-height');
       window.removeEventListener('resize', fit);
       window.visualViewport?.removeEventListener('resize', fit);
     };
