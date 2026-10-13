@@ -16,6 +16,8 @@ export interface Character {
 export interface Relationship { a: string; b: string; affinity: number; trust: number; encounters: number; lastMinute: number; }
 export interface ConversationTurn { speakerId: string; text: string; minute: number; generated?: boolean; }
 export interface Conversation {
+  /** Saved once the exchange ends; absent in active threads and legacy snapshots. */
+  title?: string;
   topic: string; tone: 'warm' | 'tense'; status: 'active' | 'finished' | 'interrupted';
   turns: ConversationTurn[]; nextTurnAt: number; targetTurns: number;
   planned?: { speakerId: string; text: string }[]; generationAttempted?: boolean;

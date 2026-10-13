@@ -1,3 +1,4 @@
+import { finalizeConversationTitle } from './conversation-titles';
 import { EVENTS, TEMPLATES } from './catalog';
 import { recallMemories, rememberEvent } from './memories';
 import type { Character, LogEntry, WorldState } from './types';
@@ -9,6 +10,7 @@ export function isConversing(world: WorldState, id: string) {
 function finish(world: WorldState, entry: LogEntry, interrupted = false) {
   const thread = entry.conversation!;
   thread.status = interrupted ? 'interrupted' : 'finished';
+  finalizeConversationTitle(world, entry);
   thread.planned = undefined;
   // Only revealed turns are final; discarded planned replies never become memories.
   const transcript = thread.turns.map(t => `${world.characters.find(c => c.id === t.speakerId)?.name ?? t.speakerId}: “${t.text}”`).join(' ');
