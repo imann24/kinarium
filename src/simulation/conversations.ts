@@ -1,4 +1,4 @@
-import { EVENTS } from './catalog';
+import { EVENTS, TEMPLATES } from './catalog';
 import type { Character, LogEntry, WorldState } from './types';
 
 export const TURN_INTERVAL = 6;
@@ -26,9 +26,10 @@ export function beginConversation(world: WorldState, a: Character, b: Character,
   const recentEvent = [...world.history].reverse().find(e => e.kind === 'event');
   const previous = [...world.history].reverse().find(e => e.conversation && e.characters.includes(a.id) && e.characters.includes(b.id));
   const event = recentEvent && world.minute - recentEvent.minute < 120 ? recentEvent : undefined;
-  const topic = event ? EVENTS.find(e => e.text === event.text)?.name ?? 'Today in the house' : previous?.conversation?.topic ?? (positive ? 'Company at the common table' : 'Who gets a say in the shared garden');
+  const space = TEMPLATES[world.templateId].floors[2].name.toLowerCase();
+  const topic = event ? EVENTS.find(e => e.text === event.text)?.name ?? 'Today in the house' : previous?.conversation?.topic ?? (positive ? 'Company at the common table' : `Who gets a say in ${space}`);
   const previousReply = previous?.conversation?.turns.filter(t => t.speakerId === b.id).at(-1);
-  const text = event ? `After today, I keep thinking about ${topic.toLowerCase()}. What stayed with you?` : previousReply ? (positive ? `Last time you said, “${previousReply.text}” Does that still feel true?` : `I’m still uneasy about ${topic.toLowerCase()}. Where did our last conversation leave you?`) : positive ? (a.trait === 'reserved' ? 'At the common table, I want company, but I’m not always ready to talk. Does that make sense?' : 'At the common table, would you rather be invited into the conversation or have room to listen?') : 'If we change the shared garden, I want everyone to get a say. Would you find that frustrating?';
+  const text = event ? `After today, I keep thinking about ${topic.toLowerCase()}. What stayed with you?` : previousReply ? (positive ? `Last time you said, “${previousReply.text}” Does that still feel true?` : `I’m still uneasy about ${topic.toLowerCase()}. Where did our last conversation leave you?`) : positive ? (a.trait === 'reserved' ? 'At the common table, I want company, but I’m not always ready to talk. Does that make sense?' : 'At the common table, would you rather be invited into the conversation or have room to listen?') : `If we change ${space}, I want everyone to get a say. Would you find that frustrating?`;
   const entry: LogEntry = { id: world.nextLog++, minute: world.minute, kind: positive ? 'conversation' : 'conflict', text: `${a.name} ${positive ? 'talks with' : 'works through a disagreement with'} ${b.name}.${event ? ` ${event.text}` : ''}`, characters: [a.id, b.id], conversation: { topic, tone: positive ? 'warm' : 'tense', status: 'active', turns: [{ speakerId: a.id, text, minute: world.minute }], nextTurnAt: world.minute + TURN_INTERVAL, targetTurns: 6 } };
   world.history.push(entry);
   a.speech = text; a.speechUntil = world.minute + TURN_INTERVAL;
@@ -37,12 +38,13 @@ export function beginConversation(world: WorldState, a: Character, b: Character,
 }
 function fallback(entry: LogEntry, speaker: Character) {
   const thread = entry.conversation!;
-  const warm = !thread.topic.includes('garden');
+  const warm = !thread.topic.startsWith('Who gets a say');
+  const space = thread.topic.replace('Who gets a say in ', '');
   if (/^(Last time you said|I’m still uneasy)/.test(thread.turns[0].text)) {
     return [
       'Some of it still feels true. Talking about it didn’t make the feeling disappear.',
       'What part is still weighing on you?',
-      warm ? 'Wanting company but not knowing how to join in. I still worry that being quiet looks like being unfriendly.' : 'The garden is shared, but that doesn’t mean everyone finds it equally easy to speak up about it.',
+      warm ? 'Wanting company but not knowing how to join in. I still worry that being quiet looks like being unfriendly.' : `${space.charAt(0).toUpperCase() + space.slice(1)} is shared, but that doesn’t mean everyone finds it equally easy to speak up about it.`,
       'That helps me understand. I don’t think one conversation can settle how it feels to belong here.',
       'No, but being able to say it out loud makes a difference to me.',
     ][Math.min(thread.turns.length - 1, 4)];
@@ -64,8 +66,8 @@ function fallback(entry: LogEntry, speaker: Character) {
     'Someone who notices when I go quiet. I don’t always know how to ask for company.',
     'That makes sense. Sharing a table quietly feels different from sitting there alone.',
   ] : [
-    speaker.trait === 'spirited' ? 'A little, yes. I worry we’ll spend all our time debating the garden and never agree on anything.' : 'I’d worry that asking everyone about the garden would mean nothing ever got decided.',
-    'I understand that worry. But it’s a shared garden; a quick decision can still leave someone feeling shut out.',
+    speaker.trait === 'spirited' ? `A little, yes. I worry we’ll spend all our time debating ${space} and never agree on anything.` : `I’d worry that asking everyone about ${space} would mean nothing ever got decided.`,
+    'I understand that worry. But it’s a shared space; a quick decision can still leave someone feeling shut out.',
     'Could we check with each other first next time, even if we don’t end up agreeing?',
     'That would help. I’m still upset, but I don’t want this to become the only way we talk.',
     'Neither do I. I’m not sure we agree yet, but I understand why having a say matters to you.',

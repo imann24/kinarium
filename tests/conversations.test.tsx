@@ -55,6 +55,12 @@ describe('conversation lifecycle', () => {
     expect(next.conversation!.topic).toBe(entry.conversation!.topic);
     expect(next.conversation!.turns[0].text).toContain(entry.conversation!.turns.at(-1)!.text);
   });
+  it.each(['makers-house', 'harbor-house'])('grounds topics in the actual %s setting', templateId => {
+    const world = createWorld({slug:'setting',name:'Setting',templateId},0);
+    const entry = beginConversation(world,world.characters[0],world.characters[1],false);
+    expect(entry.conversation!.topic).not.toContain('garden');
+    expect(entry.conversation!.turns[0].text).toContain(templateId === 'makers-house' ? 'studio' : 'loft');
+  });
   it('grounds an event conversation in an event that actually occurred', () => {
     const { world, a, b } = fixture();
     applyCommand(world, { type:'trigger-event', eventId:'power-outage' }, 0);
