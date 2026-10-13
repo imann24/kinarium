@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import type { Snapshot, WorldState } from '../simulation/types';
 import { api, ApiError } from './api';
 import './house-details.css';
+import { houseDetailsError } from './house-details-error';
 
 export default function HouseDetailsForm({ world, onSaved, onCancel, onBusy, disabled }: {
   world: WorldState; disabled: boolean; onSaved: (snapshot: Snapshot) => void; onCancel: () => void; onBusy: (busy: boolean) => void;
@@ -25,7 +26,7 @@ export default function HouseDetailsForm({ world, onSaved, onCancel, onBusy, dis
       const snapshot = await api<Snapshot>(`/worlds/${world.slug}/commands`, { type: 'house-details', name, description, expectedRevision: baseline.detailsRevision ?? 0 });
       onSaved(snapshot); setBaseline(snapshot.world); setName(snapshot.world.name); setDescription(snapshot.world.description); setSaved(true); setConflict(false);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not save house details. Try again.');
+      setError(houseDetailsError(e));
       setConflict(e instanceof ApiError && e.status === 409);
     } finally { submitting.current = false; setBusy(false); onBusy(false); }
   }

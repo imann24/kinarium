@@ -119,6 +119,29 @@ pnpm deploy
 
 Wrangler provisions the SQLite Durable Object classes from the `v1` migration and uploads the built static assets. Choose a unique Worker name in `wrangler.jsonc` if needed. The default deployment enables metered Workers AI within the limits above; set the top-level `LLM_PROVIDER` to `disabled` before deploying for procedural-only play. The first directory visit initializes The Common House. Custom domains can be attached in Cloudflare. No production deployment or paid resources are provisioned by local development.
 
+### If editing reports “Unknown action.”
+
+The house-details form sends `type: "house-details"` to the world's command API.
+That command was added in PR #26 to both the Worker validator and simulation
+engine. A newer frontend paired with the earlier backend rejects it with HTTP
+400 `Unknown action.`; this is not an empty-name, password, or revision error.
+The form keeps the draft so it can be retried after the server update.
+
+The deployment must include the Worker and its Durable Object implementation
+as well as the built frontend assets from the same checkout. Publishing only
+assets cannot add server commands. Follow the normal deployment process above;
+do not recreate worlds, change their slugs, or clear stored data. Old snapshots
+without `detailsRevision` start at revision zero and can be renamed in place.
+A merged PR alone does not deploy this repository: Cloudflare deployment is
+managed separately.
+
+For a local reproduction, build the current frontend and run
+`node scripts/test-house-details-upgrade.mjs` with an available Playwright
+installation (`PLAYWRIGHT_MODULE` and `CHROMIUM_PATH` may select existing tools).
+It starts a pre-edit Worker on port 8791, verifies the rejection, upgrades the
+Worker over the same isolated SQLite state, and retries the retained draft.
+It never contacts the deployed site.
+
 ## Verification
 
 ```sh
