@@ -1,5 +1,6 @@
-import { EVENTS, TEMPLATES } from './catalog';
-import { recallMemories, rememberEvent } from './memories';
+import { EVENTS } from './catalog';
+import { rememberEvent } from './memories';
+import { chooseConversationScene } from './conversation-scenes';
 import { conversationTitle } from './conversation-titles';
 import type { Character, LogEntry, WorldState } from './types';
 
@@ -12,6 +13,7 @@ function finish(world: WorldState, entry: LogEntry, interrupted = false) {
   thread.title = conversationTitle(world, entry);
   thread.status = interrupted ? 'interrupted' : 'finished';
   thread.planned = undefined;
+  thread.fallbackTurns = undefined;
   // Only revealed turns are final; discarded planned replies never become memories.
   const transcript = thread.turns.map(t => `${world.characters.find(c => c.id === t.speakerId)?.name ?? t.speakerId}: “${t.text}”`).join(' ');
   for (const id of entry.characters) {
@@ -27,16 +29,10 @@ export function interruptConversations(world: WorldState, id: string) {
   for (const entry of world.history) if (entry.conversation?.status === 'active' && entry.characters.includes(id)) finish(world, entry, true);
 }
 export function beginConversation(world: WorldState, a: Character, b: Character, positive: boolean) {
-  const recentEvent = [...world.history].reverse().find(e => e.kind === 'event');
-  const previous = [...world.history].reverse().find(e => e.conversation && e.characters.includes(a.id) && e.characters.includes(b.id));
-  const event = recentEvent && world.minute - recentEvent.minute < 120 ? recentEvent : undefined;
-  const space = TEMPLATES[world.templateId].floors[2].name.toLowerCase();
-  const topic = event ? EVENTS.find(e => e.text === event.text)?.name ?? 'Today in the house' : previous?.conversation?.topic ?? (positive ? 'Company at the common table' : `Who gets a say in ${space}`);
-  const previousReply = previous?.conversation?.turns.filter(t => t.speakerId === b.id).at(-1);
-  const recalled = recallMemories(a, { participantIds: [b.id], minute: world.minute }).find(m => m.participantIds?.includes(b.id) && ['conversation', 'conflict', 'friendship'].includes(m.kind ?? ''));
-  const memoryOpening = recalled?.kind === 'conflict' ? (positive ? 'Could we try again after our disagreement? What stayed with you?' : 'Our disagreement is still on my mind. How does it feel to you now?') : positive && recalled?.tone === 'warm' ? 'I remember our time together. What has been on your mind since then?' : undefined;
-  const text = event ? `After today, I keep thinking about ${topic.toLowerCase()}. What stayed with you?` : previousReply ? (positive ? `Last time you said, “${previousReply.text}” Does that still feel true?` : `I’m still uneasy about ${topic.toLowerCase()}. Where did our last conversation leave you?`) : memoryOpening ?? (positive ? (a.trait === 'reserved' ? 'At the common table, I want company, but I’m not always ready to talk. Does that make sense?' : 'At the common table, would you rather be invited into the conversation or have room to listen?') : `If we change ${space}, I want everyone to get a say. Would you find that frustrating?`);
-  const entry: LogEntry = { id: world.nextLog++, minute: world.minute, kind: positive ? 'conversation' : 'conflict', text: `${a.name} ${positive ? 'talks with' : 'works through a disagreement with'} ${b.name}.${event ? ` ${event.text}` : ''}`, characters: [a.id, b.id], conversation: { topic, tone: positive ? 'warm' : 'tense', status: 'active', turns: [{ speakerId: a.id, text, minute: world.minute }], nextTurnAt: world.minute + TURN_INTERVAL, targetTurns: 6 } };
+  const scene = chooseConversationScene(world, a, b, positive);
+  const { topic } = scene;
+  const text = scene.lines[0];
+  const entry: LogEntry = { id: world.nextLog++, minute: world.minute, kind: positive ? 'conversation' : 'conflict', text: `${a.name} ${positive ? 'talks with' : 'works through a disagreement with'} ${b.name}.${scene.eventText ? ` ${scene.eventText}` : ''}`, characters: [a.id, b.id], conversation: { topic, sceneId: scene.id, fallbackTurns: scene.lines.slice(1), tone: positive ? 'warm' : 'tense', status: 'active', turns: [{ speakerId: a.id, text, minute: world.minute }], nextTurnAt: world.minute + TURN_INTERVAL, targetTurns: scene.lines.length } };
   entry.conversation!.title = conversationTitle(world, entry);
   world.history.push(entry);
   a.speech = text; a.speechUntil = world.minute + TURN_INTERVAL;
@@ -45,6 +41,8 @@ export function beginConversation(world: WorldState, a: Character, b: Character,
 }
 function fallback(entry: LogEntry, speaker: Character) {
   const thread = entry.conversation!;
+  const scripted = thread.fallbackTurns?.[thread.turns.length - 1];
+  if (scripted) return scripted;
   const warm = !thread.topic.startsWith('Who gets a say');
   const space = thread.topic.replace('Who gets a say in ', '');
   if (/^(Last time you said|I’m still uneasy|Could we try again|Our disagreement|I remember our time)/.test(thread.turns[0].text)) {

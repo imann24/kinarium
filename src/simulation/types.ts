@@ -18,6 +18,8 @@ export interface ConversationTurn { speakerId: string; text: string; minute: num
 export interface Conversation {
   topic: string; title?: string; tone: 'warm' | 'tense'; status: 'active' | 'finished' | 'interrupted';
   turns: ConversationTurn[]; nextTurnAt: number; targetTurns: number;
+  /** Saved procedural arc; absent in legacy threads. Never treated as revealed dialogue. */
+  sceneId?: string; fallbackTurns?: string[];
   planned?: { speakerId: string; text: string }[]; generationAttempted?: boolean;
 }
 export interface LogEntry { id: number; minute: number; kind: LogKind; text: string; characters: string[]; generated?: boolean; conversation?: Conversation; }
