@@ -23,6 +23,7 @@ Vite proxies `/api` and WebSockets to port 8787. Server source changes reload au
 
 - `/`: searchable public world directory, open-door and persistent-mode filters, creation dialog, field guide.
 - `/w/<slug>`: one shared authoritative simulation, live anonymous observer presence, automatic reconnection.
+- Fullscreen world viewing from the stage toolbar, with Escape to exit and a page-filling fallback when browser fullscreen is unavailable. Resident profiles, settings, and events remain available.
 - Worlds start open by default; optionally protect entry with a password. Their names and descriptions remain public; snapshots, WebSockets, history, and commands require entry.
 - Three-floor common-house template with a shared elevator and vector residents. Travel and stopped ticks alternate; residents board and leave only while stopped. The renderer uses one eased cabin trajectory for all passengers and waits for arrival plus a pause before showing an exit, including when snapshots arrive close together.
 - Autonomous movement, energy/rest, mood, belonging, conversations, conflict, friendship, shared resources, evening rituals, and community degradation/recovery.
