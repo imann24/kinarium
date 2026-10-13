@@ -21,6 +21,21 @@ async function until(fn, message, ms = 8_000) { const end = Date.now()+ms; while
 const command = (slug, data, cookie, status) => request(`/worlds/${slug}/commands`,data,cookie,status);
 try {
   const { value: list } = await request('/worlds'); assert.ok(list.worlds.some(w=>w.slug==='the-common-house'));
+  const { value: templates } = await request('/templates');
+  for (const templateId of ['makers-house', 'harbor-house']) {
+    const template = templates.find(t => t.id === templateId); assert.ok(template, `${templateId} should be discoverable`);
+    const fixture = `test-${templateId}-${suffix}`;
+    const { value: created } = await request('/worlds', { name: template.name, slug: fixture, templateId, populationCap: 7 }, undefined, 201);
+    assert.equal(created.templateId, templateId);
+    const { value: snapshot } = await request(`/worlds/${fixture}`);
+    assert.equal(snapshot.world.version, 1); assert.equal(snapshot.world.templateId, templateId);
+    assert.deepEqual(snapshot.world.characters.map(c => c.name), template.initialNames.slice(0, 6));
+    await command(fixture, { type: 'add-character' });
+    const { value: restored } = await request(`/worlds/${fixture}`);
+    assert.equal(restored.world.templateId, templateId); assert.equal(restored.world.characters[6].name, template.initialNames[6]);
+  }
+  await request('/worlds', { name: 'Unknown template', slug: `test-invalid-${suffix}`, templateId: 'missing' }, undefined, 400);
+  console.log('PASS: template discovery, creation, persisted selection, template residents, and invalid-template rejection');
   const slug = `test-live-${suffix}`;
   await request('/worlds',{name:'Integration house',slug,populationCap:7},undefined,201);
   await request('/worlds',{name:'Duplicate',slug},undefined,409);
