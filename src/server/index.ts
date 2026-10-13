@@ -110,7 +110,7 @@ export class WorldRoom extends DurableObject<Env> {
     const data = this.data;
     this.ctx.storage.transactionSync(() => {
       extra?.();
-      for (const entry of data.world.history) if (entry.id > data.persistedLog || entry.conversation) this.ctx.storage.sql.exec('INSERT INTO history(id,payload) VALUES(?,?) ON CONFLICT(id) DO UPDATE SET payload=excluded.payload', entry.id, JSON.stringify(entry));
+      for (const entry of data.world.history) if (entry.id > data.persistedLog || entry.conversation) this.ctx.storage.sql.exec('INSERT INTO history(id,payload) VALUES(?,?) ON CONFLICT(id) DO UPDATE SET payload=excluded.payload WHERE history.payload != excluded.payload', entry.id, JSON.stringify(entry));
       data.persistedLog = data.world.nextLog - 1;
       data.world.history = data.world.history.slice(-80);
       this.ctx.storage.sql.exec('INSERT INTO state(id,payload) VALUES(1,?) ON CONFLICT(id) DO UPDATE SET payload=excluded.payload', JSON.stringify(data));
