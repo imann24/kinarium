@@ -44,6 +44,8 @@ export function Person({ character, small = false }: { character: Pick<Character
   const variant = Number(character.id.replace(/\D/g, '')) % 3;
   return <g transform={small ? 'scale(.8)' : undefined}>
     <ellipse cy="1" rx="16" ry="4" fill="#514d3d" opacity=".1"/>
+    {/* Keep the original trousers visible over dark walls without recoloring them. */}
+    <path d="M-7-11-8 0M7-11 8 0" fill="none" stroke="var(--resident-leg-outline, none)" strokeWidth="7" strokeLinecap="round"/>
     <path d="M-7-11-8 0M7-11 8 0" stroke="#555b50" strokeWidth="5" strokeLinecap="round"/>
     <path d="M-13-13q0-25 13-25t13 25Z" fill={character.color}/>
     <path d="M-13-28-18-15M13-28 18-17" stroke={character.color} strokeWidth="6" strokeLinecap="round"/>

@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { runInNewContext } from 'node:vm';
 import { describe, expect, it, vi } from 'vitest';
+import { TEMPLATES } from '../src/simulation/catalog';
 
 const script = readFileSync(new URL('../public/theme.js', import.meta.url), 'utf8');
 function boot({ stored = null as string | null, dark = false, blocked = false } = {}) {
@@ -69,6 +70,19 @@ function contrast(a: string, b: string) {
   const x = luminance(a), y = luminance(b);
   return (Math.max(x, y) + .05) / (Math.min(x, y) + .05);
 }
+it('keeps the resident leg silhouette visible against every dark room wall', () => {
+  // Use the actual theme mix and template colors so new rooms/palette changes
+  // cannot silently reintroduce the disappearing-leg effect.
+  const [, percent, base] = css.match(/\.building-room\s*\{\s*fill:color-mix\(in srgb,var\(--room-color\)\s+(\d+)%,(#[\da-f]{6})\)/)!;
+  const weight = Number(percent) / 100;
+  const rgb = (hex: string) => hex.slice(1).match(/../g)!.map(v => parseInt(v, 16));
+  for (const template of Object.values(TEMPLATES)) {
+    for (const floor of template.floors) {
+      const room = `#${rgb(floor.color).map((v, i) => Math.round(v * weight + rgb(base)[i] * (1 - weight)).toString(16).padStart(2, '0')).join('')}`;
+      expect(contrast(colors['resident-leg-outline'], room), `${template.id}: ${floor.name}`).toBeGreaterThanOrEqual(3);
+    }
+  }
+});
 it('keeps dark text, controls and scene labels at accessible contrast', () => {
   for (const bg of ['page', 'surface', 'surface-soft', 'surface-hover']) {
     for (const fg of ['text', 'secondary', 'muted', 'accent']) expect(contrast(colors[fg], colors[bg])).toBeGreaterThanOrEqual(4.5);
