@@ -43,6 +43,7 @@
   --scene-text: #eef2df;
   --scene-outline: #8ba17b;
   --scene-selection: #e0f2a8;
+  --resident-leg-outline: #c5cfba;
   color: var(--text);
   background: var(--page);
 }
