@@ -1,5 +1,6 @@
 import { EVENTS, TEMPLATES } from './catalog';
 import { recallMemories, rememberEvent } from './memories';
+import { conversationTitle } from './conversation-titles';
 import type { Character, LogEntry, WorldState } from './types';
 
 export const TURN_INTERVAL = 6;
@@ -8,6 +9,7 @@ export function isConversing(world: WorldState, id: string) {
 }
 function finish(world: WorldState, entry: LogEntry, interrupted = false) {
   const thread = entry.conversation!;
+  thread.title = conversationTitle(world, entry);
   thread.status = interrupted ? 'interrupted' : 'finished';
   thread.planned = undefined;
   // Only revealed turns are final; discarded planned replies never become memories.
@@ -35,6 +37,7 @@ export function beginConversation(world: WorldState, a: Character, b: Character,
   const memoryOpening = recalled?.kind === 'conflict' ? (positive ? 'Could we try again after our disagreement? What stayed with you?' : 'Our disagreement is still on my mind. How does it feel to you now?') : positive && recalled?.tone === 'warm' ? 'I remember our time together. What has been on your mind since then?' : undefined;
   const text = event ? `After today, I keep thinking about ${topic.toLowerCase()}. What stayed with you?` : previousReply ? (positive ? `Last time you said, “${previousReply.text}” Does that still feel true?` : `I’m still uneasy about ${topic.toLowerCase()}. Where did our last conversation leave you?`) : memoryOpening ?? (positive ? (a.trait === 'reserved' ? 'At the common table, I want company, but I’m not always ready to talk. Does that make sense?' : 'At the common table, would you rather be invited into the conversation or have room to listen?') : `If we change ${space}, I want everyone to get a say. Would you find that frustrating?`);
   const entry: LogEntry = { id: world.nextLog++, minute: world.minute, kind: positive ? 'conversation' : 'conflict', text: `${a.name} ${positive ? 'talks with' : 'works through a disagreement with'} ${b.name}.${event ? ` ${event.text}` : ''}`, characters: [a.id, b.id], conversation: { topic, tone: positive ? 'warm' : 'tense', status: 'active', turns: [{ speakerId: a.id, text, minute: world.minute }], nextTurnAt: world.minute + TURN_INTERVAL, targetTurns: 6 } };
+  entry.conversation!.title = conversationTitle(world, entry);
   world.history.push(entry);
   a.speech = text; a.speechUntil = world.minute + TURN_INTERVAL;
   a.activity = `talking with ${b.name}`; b.activity = `listening to ${a.name}`;
