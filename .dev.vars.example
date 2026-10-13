@@ -1,0 +1,6 @@
+# Optional. The simulation works without this key.
+AI_GATEWAY_API_KEY=
+# Optional overrides; any OpenAI-compatible Chat Completions service works.
+# LLM_BASE_URL=https://ai-gateway.vercel.sh/v1
+# LLM_MODEL=openai/gpt-4o-mini
+# LLM_DAILY_CALL_LIMIT=24
