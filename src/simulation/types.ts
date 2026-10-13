@@ -28,4 +28,10 @@ export type Command =
   | { type: 'set-away'; characterId: string; away: boolean }
   | { type: 'trigger-event'; eventId: string }
   | { type: 'settings'; mode: TimeMode; populationCap: number };
-export interface WorldTemplate { id: string; name: string; description: string; floors: { name: string; purpose: string; color: string }[]; initialNames: string[]; }
+export interface WorldTemplate {
+  id: string; name: string; description: string;
+  // v1 houses share three floors: gathering, rest, and resource production.
+  floors: { name: string; purpose: string; color: string; activity?: string }[];
+  initialNames: string[];
+  initialMetrics?: { cohesion: number; tension: number; resources: number };
+}

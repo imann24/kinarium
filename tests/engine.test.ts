@@ -1,9 +1,54 @@
 import { describe, expect, it } from 'vitest';
 import { activeCharacters, advance, applyCommand, createCharacter, createWorld, MAX_CATCHUP_STEPS, MINUTES_PER_TICK, relationship, step, TICK_MS } from '../src/simulation/engine';
-import { EVENTS } from '../src/simulation/catalog';
+import { EVENTS, TEMPLATES } from '../src/simulation/catalog';
 
 const world = (cap = 12) => createWorld({ slug: 'test-house', name: 'Test house', populationCap: cap }, 1_000, 42);
 describe('the community engine', () => {
+  it.each(Object.values(TEMPLATES))('runs $id through a full day and resumes saved state deterministically', template => {
+    const a = createWorld({ slug: 'template-test', name: template.name, templateId: template.id }, 1_000, 42);
+    expect(a.version).toBe(1);
+    expect(a.characters.map(c => c.name)).toEqual(template.initialNames.slice(0, 6));
+    const b = JSON.parse(JSON.stringify(a));
+    const activities = new Set<string>();
+    for (let i = 0; i < 720; i++) {
+      if (i === 100) {
+        createCharacter(a); createCharacter(b);
+        applyCommand(a, { type: 'trigger-event', eventId: 'shared-meal' }, 500_000);
+        applyCommand(b, { type: 'trigger-event', eventId: 'shared-meal' }, 500_000);
+      }
+      step(a); step(b);
+      expect(a.elevatorFloor).toBeGreaterThanOrEqual(0);
+      expect(a.elevatorFloor).toBeLessThan(template.floors.length);
+      for (const c of a.characters) {
+        expect(template.floors[c.floor]).toBeDefined();
+        expect(template.floors[c.destination]).toBeDefined();
+        expect(c.activity).toBeTruthy();
+        if (c.inElevator) expect(c.floor).toBe(a.elevatorFloor);
+        activities.add(c.activity);
+      }
+    }
+    expect(a).toEqual(b);
+    expect(a.history.some(e => e.kind === 'ritual')).toBe(true);
+    expect(Object.values(a.relationships).some(r => r.encounters > 0)).toBe(true);
+    for (const floor of template.floors) if (floor.activity) expect(activities.has(floor.activity)).toBe(true);
+    for (const metric of [a.cohesion, a.tension, a.resources]) {
+      expect(Number.isFinite(metric)).toBe(true);
+      expect(metric).toBeGreaterThanOrEqual(0); expect(metric).toBeLessThanOrEqual(100);
+    }
+  });
+  it('preserves the original default and gives the new templates different community conditions', () => {
+    const common = world();
+    expect(common.templateId).toBe('common-house');
+    expect([common.cohesion, common.tension, common.resources]).toEqual([62, 18, 75]);
+    const makers = createWorld({ slug: 'makers', name: 'Makers', templateId: 'makers-house' }, 1_000, 42);
+    const harbor = createWorld({ slug: 'harbor', name: 'Harbor', templateId: 'harbor-house' }, 1_000, 42);
+    expect(makers.resources).toBeGreaterThan(common.resources);
+    expect(makers.tension).toBeGreaterThan(common.tension);
+    expect(harbor.cohesion).toBeGreaterThan(common.cohesion);
+    expect(harbor.resources).toBeLessThan(common.resources);
+    advance(makers, 601_000); advance(harbor, 601_000);
+    expect(makers.relationships).not.toEqual(harbor.relationships);
+  });
   it('is deterministic and survives serialization without diverging', () => {
     const a = world(); const b = JSON.parse(JSON.stringify(a));
     advance(a, 601_000); advance(b, 601_000); expect(a).toEqual(b);
