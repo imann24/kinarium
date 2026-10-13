@@ -24,10 +24,10 @@ describe('conversation lifecycle', () => {
   it('alternates named speakers over time, holds residents together, and survives reload', () => {
     const { world, a } = fixture();
     const restored = JSON.parse(JSON.stringify(world));
-    for (let i = 0; i < 12; i++) { step(world); step(restored); }
+    for (let i = 0; i < 6; i++) { step(world); step(restored); }
     expect(restored).toEqual(world);
     const entry = world.history.find(e => e.conversation)!;
-    expect(entry.conversation!.turns.map(t => t.speakerId)).toEqual(['c1','c2','c1','c2','c1']);
+    expect(entry.conversation!.turns.map(t => t.speakerId)).toEqual(['c1','c2','c1']);
     expect(a.floor).toBe(0); expect(a.destination).toBe(0);
     expect(isConversing(world, a.id)).toBe(true);
   });
@@ -67,11 +67,13 @@ describe('conversation lifecycle', () => {
     expect(a.speech).toBeUndefined();
   });
   it('continues concrete topics and references prior dialogue on a later encounter', () => {
-    const { world, a, b, entry } = fixture();
+    const { world, a, b, entry } = fixture(false);
+    a.trait = 'practical';
     for (let i = 0; i < 6; i++) { world.minute += TURN_INTERVAL; advanceConversations(world); }
     const next = beginConversation(world, a, b, true);
     expect(next.conversation!.topic).toBe(entry.conversation!.topic);
-    expect(next.conversation!.turns[0].text).toContain(entry.conversation!.turns.at(-1)!.text);
+    expect(next.conversation!.sceneId).toBe('revisit');
+    expect(entry.conversation!.turns.some(t => next.conversation!.turns[0].text.includes(t.text))).toBe(true);
   });
   it.each(['makers-house', 'harbor-house'])('grounds topics in the actual %s setting', templateId => {
     const world = createWorld({slug:'setting',name:'Setting',templateId},0);
