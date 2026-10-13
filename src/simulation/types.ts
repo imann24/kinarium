@@ -1,7 +1,12 @@
 export type TimeMode = 'persistent' | 'fast-forward';
 export type Trait = 'kind' | 'curious' | 'reserved' | 'spirited' | 'practical';
 export type LogKind = 'arrival' | 'departure' | 'conversation' | 'conflict' | 'friendship' | 'event' | 'ritual' | 'world';
-export interface Memory { text: string; minute: number; }
+export interface Memory {
+  text: string; minute: number;
+  /** Optional so existing saved memories stay intact, without invented provenance. */
+  eventId?: number; kind?: LogKind; participantIds?: string[];
+  tone?: 'warm' | 'tense' | 'neutral'; salience?: number;
+}
 export interface Character {
   id: string; name: string; color: string; trait: Trait; backstory: string;
   floor: number; x: number; destination: number; inElevator?: boolean; activity: string; away: boolean;
@@ -9,7 +14,13 @@ export interface Character {
   speech?: string; speechUntil?: number;
 }
 export interface Relationship { a: string; b: string; affinity: number; trust: number; encounters: number; lastMinute: number; }
-export interface LogEntry { id: number; minute: number; kind: LogKind; text: string; characters: string[]; generated?: boolean; }
+export interface ConversationTurn { speakerId: string; text: string; minute: number; generated?: boolean; }
+export interface Conversation {
+  topic: string; tone: 'warm' | 'tense'; status: 'active' | 'finished' | 'interrupted';
+  turns: ConversationTurn[]; nextTurnAt: number; targetTurns: number;
+  planned?: { speakerId: string; text: string }[]; generationAttempted?: boolean;
+}
+export interface LogEntry { id: number; minute: number; kind: LogKind; text: string; characters: string[]; generated?: boolean; conversation?: Conversation; }
 export interface WorldSettings { mode: TimeMode; populationCap: number; }
 export interface WorldState {
   version: 1; slug: string; name: string; description: string; templateId: string; createdAt: number;

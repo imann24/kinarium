@@ -1,0 +1,18 @@
+.journal-panel-controls {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
+.journal-panel-toggle {
+  min-height: 44px;
+}
+
+.world-layout.journal-collapsed {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* Author display:flex otherwise overrides the browser's hidden rule. */
+.world-sidebar[hidden] {
+  display: none;
+}
