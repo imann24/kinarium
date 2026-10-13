@@ -1,3 +1,4 @@
+import { MEMORY_LIMIT } from '../src/simulation/memories';
 import { describe, expect, it } from 'vitest';
 import { activeCharacters, advance, applyCommand, createCharacter, createWorld, MAX_CATCHUP_STEPS, MINUTES_PER_TICK, relationship, step, TICK_MS } from '../src/simulation/engine';
 import { EVENTS, TEMPLATES } from '../src/simulation/catalog';
@@ -111,7 +112,7 @@ describe('the community engine', () => {
     }
     for (const value of [a.cohesion,a.resources,a.tension,...a.characters.flatMap(c => [c.mood,c.energy,c.belonging])]) { expect(value).toBeGreaterThanOrEqual(0); expect(value).toBeLessThanOrEqual(100); }
     for (const r of Object.values(a.relationships)) { expect(r.affinity).toBeGreaterThanOrEqual(-100); expect(r.affinity).toBeLessThanOrEqual(100); expect(r.trust).toBeGreaterThanOrEqual(0); expect(r.trust).toBeLessThanOrEqual(100); }
-    expect(a.characters.every(c => c.memories.length <= 16)).toBe(true);
+    expect(a.characters.every(c => c.memories.length <= MEMORY_LIMIT)).toBe(true);
   });
   it('rejects invalid population limits and unknown commands', () => {
     const a = world();
