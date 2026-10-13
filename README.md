@@ -85,7 +85,7 @@ Defaults in `wrangler.jsonc`:
 ```text
 LLM_PROVIDER=cloudflare
 LLM_MODEL=@cf/meta/llama-3.1-8b-instruct-fp8-fast
-LLM_DAILY_CALL_LIMIT=24
+LLM_DAILY_CALL_LIMIT=240
 ```
 
 Set `LLM_PROVIDER=disabled` to use only procedural dialogue. Errors, quota exhaustion, and malformed responses also preserve procedural dialogue. There is no automatic retry or cross-provider fallback.
@@ -94,7 +94,7 @@ Set `LLM_PROVIDER=disabled` to use only procedural dialogue. Errors, quota exhau
 
 To switch to Vercel AI Gateway or another OpenAI-compatible Chat Completions service, set `LLM_PROVIDER=openai-compatible`, `LLM_BASE_URL`, and `LLM_MODEL`, and store `LLM_API_KEY` with `pnpm exec wrangler secret put LLM_API_KEY`. For local testing, copy `.dev.vars.example` to `.dev.vars.local` and fill in those values. The old `AI_GATEWAY_API_KEY` secret remains supported as an alias, but provider selection is explicit. When deploying with a compatible provider, remove the unused `ai` binding if desired. Secrets and environment-specific `.dev.vars` files are ignored by Git.
 
-AI enriches an occasional recent conversation while someone is present, at most once per five real minutes and 24 attempts per world per UTC day by default. Each request has a 90-token output limit and six-second timeout. Failed attempts consume the reserved daily allowance; disabled/unconfigured providers do not. Generated dialogue is visibly labeled in the journal. Limits are per world, not a deployment-wide dollar cap; monitor account usage as world count grows.
+Conversations are persistent threads with alternating turns, revealed every six simulation minutes. Residents stay together while talking; departures interrupt the thread. Completed exchanges enter both residents’ memories. AI plans 3–7 responsive replies using the transcript, personalities, backstories, memories, relationship, prior exchange, and recent events. It runs only while observers are connected, at most one request at a time, at least eight seconds apart, and 240 attempts per world per UTC day by default (configurable up to 10,000). Requests have a 900-token output limit and six-second cancellation signal. Each thread gets one attempt; failures consume the reserved allowance and keep procedural replies. Stale results are discarded. AI turns are individually labeled in expandable journal threads. Older one-line history remains readable. Limits are per world, not a deployment-wide dollar cap; monitor account usage as world count grows.
 
 As of October 2026, [Workers AI pricing](https://developers.cloudflare.com/workers-ai/platform/pricing/) lists a shared free allocation of 10,000 neurons/day and this model at $0.045/million input tokens and $0.384/million output tokens. At an illustrative 500 input tokens and the full 90 output tokens, 24 calls/day for 30 days is roughly **$0.04/world/month for inference before the free allocation**, excluding Worker, storage, and other application costs. Actual prompt sizes and usage vary. Model quality and end-to-end latency need validation with live inference.
 

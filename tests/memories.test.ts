@@ -75,6 +75,6 @@ describe('resident personal history', () => {
     const world = makeWorld();
     for (const c of world.characters) c.memories = world.characters.filter(other => other !== c).map(other => ({ text: 'We disagreed.', minute: 480, kind: 'conflict', participantIds: [other.id], tone: 'tense', salience: 3 }));
     for (let i = 0; i < 100; i++) step(world);
-    expect(world.history.some(e => e.text.includes('after our disagreement') || e.text.includes('still on my mind'))).toBe(true);
+    expect(world.history.some(e => e.conversation?.turns.some(t => t.text.includes('after our disagreement') || t.text.includes('still on my mind')))).toBe(true);
   });
 });
