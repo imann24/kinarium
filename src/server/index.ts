@@ -1,3 +1,4 @@
+import { HouseDetailsConflict } from '../simulation/house-details';
 import { DurableObject } from 'cloudflare:workers';
 import { activeCharacters, advance, applyCommand, createWorld, summarize, TICK_MS } from '../simulation/engine';
 import { TEMPLATES, TRAITS } from '../simulation/catalog';
@@ -235,7 +236,7 @@ export class WorldRoom extends DurableObject<Env> {
         advance(this.data.world, Date.now()); this.save(); await this.schedule(); return json(this.snapshot(visitor.id), 200, visitor.headers);
       }
       return json({ error: 'Method not allowed.' }, 405);
-    } catch (error) { return json({ error: error instanceof Error ? error.message : 'Invalid request.' }, 400); }
+    } catch (error) { return json({ error: error instanceof Error ? error.message : 'Invalid request.' }, error instanceof HouseDetailsConflict ? 409 : 400); }
   }
   private validate(input: Record<string, unknown>): Command {
     switch (input.type) {
@@ -245,6 +246,7 @@ export class WorldRoom extends DurableObject<Env> {
       }
       case 'set-away': if (typeof input.away !== 'boolean') throw new Error('Specify whether the character is away.'); return { type: input.type, characterId: string(input.characterId, 30), away: input.away };
       case 'trigger-event': return { type: input.type, eventId: string(input.eventId, 40) };
+      case 'house-details': return { type: input.type, name: input.name as string, description: input.description as string, expectedRevision: input.expectedRevision as number };
       case 'settings': return { type: input.type, mode: input.mode as TimeMode, populationCap: input.populationCap as number };
       default: throw new Error('Unknown action.');
     }

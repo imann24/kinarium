@@ -1,0 +1,61 @@
+// Run against the local app with PLAYWRIGHT_MODULE and CHROMIUM_PATH if needed.
+import assert from 'node:assert/strict';
+import { mkdir } from 'node:fs/promises';
+const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
+const base = process.env.BASE_URL || 'http://127.0.0.1:5173';
+assert(['localhost', '127.0.0.1'].includes(new URL(base).hostname));
+const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH, args: ['--no-sandbox'] });
+const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
+const page = await context.newPage(), other = await context.newPage();
+const errors = []; for (const p of [page, other]) p.on('pageerror', e => errors.push(e.message));
+const slug = `test-details-${Date.now().toString(36)}`;
+const output = process.env.SCREENSHOT_DIR || '/tmp/kinarium-house-details';
+await mkdir(output, { recursive: true });
+const open = async p => { await p.getByRole('button', { name: 'World settings', exact: true }).click(); await p.locator('#house-name').waitFor(); };
+const save = p => p.getByRole('button', { name: 'Save house details', exact: true });
+try {
+  const created = await context.request.post(base + '/api/worlds', { data: { slug, name: 'Original house', description: 'Original description' } });
+  assert.equal(created.status(), 201);
+  await page.goto(`${base}/w/${slug}`); await other.goto(`${base}/w/${slug}/insights`);
+  await open(page);
+  assert.equal(await page.getByLabel('House name', { exact: true }).inputValue(), 'Original house');
+  assert.equal(await page.getByLabel('Description', { exact: true }).inputValue(), 'Original description');
+  await page.getByLabel('House name', { exact: true }).fill('Cancelled');
+  await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+  await open(page); assert.equal(await page.locator('#house-name').inputValue(), 'Original house');
+  await page.locator('#house-name').fill('   '); await save(page).click();
+  await page.getByRole('alert').filter({ hasText: 'Enter a house name.' }).waitFor();
+  await page.locator('#house-name').fill('Renamed house'); await page.locator('#house-description').fill('New description');
+  let calls = 0;
+  await page.route('**/commands', async route => { calls++; await new Promise(r => setTimeout(r, 500)); await route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ error: 'Test save unavailable' }) }); });
+  await save(page).click(); assert.equal(await save(page).isDisabled(), true);
+  await page.locator('.house-details').evaluate(form => form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })));
+  await page.getByRole('alert').filter({ hasText: 'Test save unavailable' }).waitFor(); assert.equal(calls, 1);
+  assert.equal(await page.locator('#house-name').inputValue(), 'Renamed house');
+  await page.unroute('**/commands'); await save(page).click(); await page.getByRole('status').filter({ hasText: 'House details saved.' }).waitFor();
+  await other.getByRole('heading', { name: /Renamed house/ }).waitFor();
+  assert.equal(new URL(page.url()).pathname, `/w/${slug}`);
+  await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+  await page.reload(); await page.getByRole('heading', { name: /Renamed house/ }).waitFor();
+  await open(page); await open(other);
+  await page.locator('#house-name').fill('Draft held during conflict');
+  await other.locator('#house-name').fill('Other session house'); await save(other).click();
+  await page.getByRole('status').filter({ hasText: 'House details changed in another session.' }).waitFor();
+  assert.equal(await page.locator('#house-name').inputValue(), 'Draft held during conflict'); assert.equal(await save(page).isDisabled(), true);
+  await page.getByRole('button', { name: 'Load latest details' }).click();
+  await page.waitForFunction(() => document.querySelector('#house-name').value === 'Other session house');
+  await page.locator('#house-description').fill(''); await save(page).click(); await page.getByRole('status').filter({ hasText: 'House details saved.' }).waitFor();
+  for (const width of [1440, 390]) for (const theme of ['light', 'dark']) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.evaluate(theme => window.kinariumTheme.setPreference(theme), theme);
+    await page.screenshot({ path: `${output}/${width}-${theme}.png`, fullPage: true });
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+    assert.equal(await page.locator('dialog').evaluate(el => el.scrollWidth <= el.clientWidth), true);
+  }
+  await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+  await page.goto(base); await page.locator(`a[href="/w/${slug}"]`).getByRole('heading', { name: 'Other session house', exact: true }).waitFor();
+  const saved = await (await context.request.get(`${base}/api/worlds/${slug}`)).json();
+  assert.equal(saved.world.description, ''); assert.equal(saved.world.slug, slug);
+  assert.deepEqual(errors, []);
+  console.log(`PASS: prefill, cancel, validation, failed-save draft, loading, repeated submit, save/reload, live Insights, conflict recovery, blank description, directory, mobile/desktop light/dark. Fixture: ${slug}. Screenshots: ${output}`);
+} finally { await browser.close(); }

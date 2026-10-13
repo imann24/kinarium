@@ -49,6 +49,22 @@ try {
   const a = await connect(slug,'Alice'); const b = await connect(slug,'Bob');
   await until(()=>a.snapshots.at(-1)?.presence.length===2 && b.snapshots.at(-1)?.presence.length===2,'Both players should see one another');
   const initialMinute = a.snapshots.at(-1).world.minute;
+  const original = a.snapshots.at(-1).world;
+  const details = {type:'house-details',name:'Renamed integration house',description:'Updated description',expectedRevision:0};
+  await command(slug,details);
+  await command(slug,details); // Safe repeat after a lost response.
+  await command(slug,{...details,name:'Stale edit'},undefined,409);
+  for (const invalid of [{name:'   '},{name:'x'.repeat(61)},{description:'x'.repeat(241)},{expectedRevision:-1},{description:null}])
+    await command(slug,{...details,...invalid},undefined,400);
+  await until(()=>a.snapshots.at(-1)?.world.name===details.name && b.snapshots.at(-1)?.world.description===details.description,'House details should broadcast to both sessions');
+  const renamed = (await request(`/worlds/${slug}`)).value.world;
+  assert.equal(renamed.slug,slug); assert.equal(renamed.createdAt,original.createdAt); assert.equal(renamed.detailsRevision,1);
+  assert.deepEqual(renamed.settings,original.settings);
+  assert.ok(original.history.every(entry=>renamed.history.some(saved=>saved.id===entry.id && saved.text===entry.text)));
+  const directory = (await request('/worlds')).value.worlds.find(w=>w.slug===slug);
+  assert.equal(directory.name,details.name); assert.equal(directory.description,details.description);
+  console.log('PASS: house details persistence, directory, two-session broadcast, stable identity/history, validation, stale and repeated submissions');
+
   const results = await Promise.all([1,2,3].map(i => fetch(`${origin}/api/worlds/${slug}/commands`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'add-character',name:`Neighbor ${i}`})})));
   assert.deepEqual(results.map(r=>r.status).sort(),[200,400,400]);
   await until(()=>a.snapshots.at(-1)?.world.characters.length===7 && b.snapshots.at(-1)?.world.characters.length===7,'Both visitors should receive the same new resident');
@@ -74,9 +90,12 @@ try {
   await request('/worlds',{name:'Private integration house',slug:locked,password:'a secret password',mode:'persistent'},undefined,201);
   for(const tail of ['','/history','/socket']) await request(`/worlds/${locked}${tail}`,undefined,undefined,401);
   await command(locked,{type:'add-character'},undefined,401);
+  await command(locked,{type:'house-details',name:'Unauthorized',description:'',expectedRevision:0},undefined,401);
   await request(`/worlds/${locked}/unlock`,{password:'incorrect'},undefined,401);
   const { cookie } = await request(`/worlds/${locked}/unlock`,{password:'a secret password'}); assert.ok(cookie);
   const { value: privateState } = await request(`/worlds/${locked}`,undefined,cookie); assert.equal(privateState.protected,true);
+  await command(locked,{type:'house-details',name:'Authorized private house',description:'',expectedRevision:0},cookie);
+  await command(locked,{type:'house-details',name:'Unauthorized',description:'',expectedRevision:1},undefined,401);
   const c = await connect(locked,'Carol',cookie); await until(()=>c.snapshots.length>0,'Authorized websocket should open'); c.close();
   const before = (await request(`/worlds/${locked}/history`,undefined,cookie)).value.entries;
   const oldest = before.at(-1).id; const page = (await request(`/worlds/${locked}/history?before=${oldest}`,undefined,cookie)).value; assert.equal(page.entries.length,0);
