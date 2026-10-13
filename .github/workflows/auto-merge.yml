@@ -29,9 +29,7 @@ jobs:
       contents: write
       pull-requests: write
     steps:
-      # Native deletion runs after immediate AND deferred merges, without needing
-      # a second Actions event. gh --auto --delete-branch skips deferred deletion.
-      - name: Verify safe automatic branch deletion
+      - name: Verify safe automatic merge and branch cleanup
         id: cleanup
         env:
           GH_TOKEN: ${{ github.token }}
@@ -52,11 +50,6 @@ jobs:
           fi
           PR_NUMBER=$(jq -er '.[0].number' <<< "$candidates")
           repository=$(gh api "repos/$GITHUB_REPOSITORY")
-          if ! jq -e '.delete_branch_on_merge == true' <<< "$repository" >/dev/null; then
-            echo '::error::Automatic head-branch deletion must be enabled in repository settings. No settings were changed.'
-            exit 1
-          fi
-
           pr=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER")
           if ! jq -e --arg repo "$GITHUB_REPOSITORY" --arg sha "$TESTED_SHA" '
             .state == "open" and .draft == false and .merged == false and
@@ -108,4 +101,60 @@ jobs:
           result=$(gh api --method PUT "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/merge" \
             -f "sha=$HEAD_SHA" -f 'merge_method=squash')
           jq -e '.merged == true' <<< "$result" >/dev/null
-          echo 'Merge confirmed. GitHub native automatic head-branch deletion handles cleanup.'
+          echo 'Merge confirmed.'
+      - name: Delete only the unchanged merged feature branch
+        if: steps.merge.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ steps.cleanup.outputs.number }}
+          HEAD_SHA: ${{ steps.cleanup.outputs.sha }}
+        run: |
+          set -euo pipefail
+          # Recheck after the merge; never infer success from a closed event.
+          pr=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER")
+          if ! jq -e --arg repo "$GITHUB_REPOSITORY" --arg sha "$HEAD_SHA" '
+            .merged == true and .state == "closed" and .draft == false and
+            .user.login == "imann24" and .head.repo.full_name == $repo and
+            .base.repo.full_name == $repo and .head.sha == $sha
+          ' <<< "$pr" >/dev/null; then
+            echo 'Merged PR identity could not be verified; keeping the branch.'
+            exit 0
+          fi
+          repository=$(gh api "repos/$GITHUB_REPOSITORY")
+          head=$(jq -er '.head.ref | select(length > 0)' <<< "$pr")
+          base=$(jq -er '.base.ref | select(length > 0)' <<< "$pr")
+          default=$(jq -er '.default_branch | select(length > 0)' <<< "$repository")
+          if [[ "$head" == "$base" || "$head" == "$default" ]]; then
+            echo 'Keeping the base/default branch.'
+            exit 0
+          fi
+          encoded_head=$(jq -rn --arg head "$head" '$head | @uri')
+          refs=$(gh api "repos/$GITHUB_REPOSITORY/git/matching-refs/heads/$encoded_head")
+          matches=$(jq --arg ref "refs/heads/$head" '[.[] | select(.ref == $ref)] | length' <<< "$refs")
+          if [[ "$matches" == 0 ]]; then
+            echo 'Merged head branch is already deleted.'
+            exit 0
+          fi
+          [[ "$matches" == 1 ]]
+          branch=$(gh api "repos/$GITHUB_REPOSITORY/branches/$encoded_head")
+          if ! jq -e --arg sha "$HEAD_SHA" '.protected == false and .commit.sha == $sha' <<< "$branch" >/dev/null; then
+            echo 'Branch is protected, protection is unknown, or the head changed; keeping it.'
+            exit 0
+          fi
+          open_prs=$(gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/pulls?state=open&per_page=100")
+          in_use=$(jq -r --arg head "$head" --arg repo "$GITHUB_REPOSITORY" '
+            any(.[][]; .base.ref == $head or (.head.repo.full_name == $repo and .head.ref == $head))
+          ' <<< "$open_prs")
+          if [[ "$in_use" != false ]]; then
+            echo 'Another open PR uses this branch; keeping it.'
+            exit 0
+          fi
+          # An explicit SHA lease rejects concurrent pushes/recreated refs. Use
+          # an empty temporary repository: no checkout, hooks, or persisted token.
+          temporary=$(mktemp -d)
+          trap 'rm -rf "$temporary"' EXIT
+          git init --quiet "$temporary"
+          git -C "$temporary" -c credential.helper= -c 'credential.helper=!gh auth git-credential' \
+            push --force-with-lease="refs/heads/$head:$HEAD_SHA" \
+            "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git" ":refs/heads/$head"
+          echo 'Deleted the unchanged merged feature branch.'

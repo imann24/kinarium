@@ -14,19 +14,27 @@ PR event's head SHA must still match the live PR before it can merge.
 
 ## Branch cleanup
 
-The workflow requires GitHub's existing **Automatically delete head branches**
-setting (`delete_branch_on_merge: true`). GitHub performs cleanup only after a
-successful merge, including deferred merges initiated outside this workflow.
-This avoids both the CLI's deferred `--delete-branch` limitation and relying on
-a `pull_request: closed` event suppressed by `GITHUB_TOKEN`.
+The workflow deletes only its own successfully merged feature head in the same
+run. Native automatic deletion is enabled in this repository, but live checks
+found merged branches (including PR #17) still present, so the workflow does not
+rely on that setting or on a token-suppressed `pull_request: closed` event.
 
 Before merging, the workflow revalidates PR state, author, repository and tested
 SHA. It rejects default/base/protected head branches and branches used by another
 open PR as head or base. Unknown protection and API failures stop the operation.
-It never issues a branch deletion request or changes repository settings. If
-native deletion is disabled later, it fails with an explicit setup error. Rules
-may prevent native deletion; the workflow will not override them. Administrative
-changes made after these checks remain subject to GitHub's native behavior.
+After a confirmed merge, it rechecks the merged PR's identity and SHA, the default
+and base branches, branch protection, and other open PRs. It keeps a head with
+new commits. An exact Git SHA lease rejects deletion if the branch moves between
+checking and deleting; there is no force or admin bypass. Already-deleted heads
+are a successful no-op. Git uses an empty temporary repository and the existing
+token through the CLI credential helper; no code checkout or token persistence
+is needed. API/protection/lease failures do not authorize deletion. GitHub's
+current branch rules still apply; concurrent administrative changes remain under
+their control. No repository settings are changed.
+
+There is no historical sweep. Open/unmerged branches and old merged leftovers
+are left alone. Removing historical leftovers requires a separate bounded review
+of merged PR status, unchanged head, protection, default/base status and reuse.
 
 The test job has only `contents: read`, does not persist checkout credentials,
 and receives no inherited repository secrets. The separate merge job checks out
