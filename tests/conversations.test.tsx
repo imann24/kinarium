@@ -4,6 +4,7 @@ import { applyCommand, createWorld, step } from '../src/simulation/engine';
 import { advanceConversations, beginConversation, isConversing, TURN_INTERVAL } from '../src/simulation/conversations';
 import { enrichConversation } from '../src/server/llm';
 import { applyConversationPlan, dailyConversationLimit } from '../src/server/conversation-policy';
+import { MEMORY_LIMIT, rememberEvent } from '../src/simulation/memories';
 import ConversationThread from '../src/client/ConversationThread';
 
 function fixture(positive = true) {
@@ -35,10 +36,27 @@ describe('conversation lifecycle', () => {
     for (let i = 0; i < 7; i++) { world.minute += TURN_INTERVAL; advanceConversations(world); }
     expect(entry.conversation!.status).toBe('finished');
     expect(entry.conversation!.turns).toHaveLength(6);
-    expect(a.memories[0]).toEqual(b.memories[0]);
+    expect(a.memories[0]).toMatchObject({ eventId: entry.id, participantIds: [b.id], kind: 'conflict', tone: 'tense', minute: entry.minute });
+    expect(b.memories[0]).toMatchObject({ eventId: entry.id, participantIds: [a.id] });
+    expect(a.memories[0].text).not.toBe(b.memories[0].text);
     expect(a.memories[0].text).toContain(entry.conversation!.turns[1].text);
     expect(isConversing(world, a.id)).toBe(false);
     expect(entry.conversation!.topic).toContain('garden');
+  });
+  it('retains defining memories beyond 16 entries and records only revealed interrupted turns once', () => {
+    const { world, a, b, entry } = fixture();
+    const arrival = a.memories[0];
+    for (let i = 0; i < 70; i++) rememberEvent(a, { id: 100 + i, minute: 400 + i, kind: 'event', characters: [a.id], text: 'Recorded event' }, `Moment ${i}`);
+    applyConversationPlan(entry, 1, [...replies]);
+    applyCommand(world, { type: 'set-away', characterId: b.id, away: true }, 0);
+    const remembered = a.memories.find(m => m.eventId === entry.id)!;
+    expect(a.memories).toHaveLength(MEMORY_LIMIT);
+    expect(a.memories).toContainEqual(arrival);
+    expect(remembered.text).toContain(entry.conversation!.turns[0].text);
+    expect(remembered.text).not.toContain(replies[0].text);
+    expect(remembered.text).toContain('interrupted');
+    advanceConversations(world);
+    expect(a.memories.filter(m => m.eventId === entry.id)).toHaveLength(1);
   });
   it('interrupts immediately on departure and never speaks for away residents', () => {
     const { world, a, entry } = fixture();
@@ -98,14 +116,15 @@ describe('conversation lifecycle', () => {
 describe('thread generation', () => {
   it('sends transcript, personal history, relationship and event context to the provider', async () => {
     const { world, entry, a } = fixture();
-    a.memories.unshift({text:'A specific old memory',minute:400});
+    a.memories.unshift({text:'A specific old memory',minute:400}, {text:'Current encounter',minute:entry.minute,eventId:entry.id});
     const run = vi.fn().mockResolvedValue({response:JSON.stringify({turns:replies})});
     expect(await enrichConversation({AI:{run}},world,entry)).toEqual(replies);
     const input = run.mock.calls[0][1];
     const context = JSON.parse(input.messages[1].content);
     expect(context.transcript).toEqual(entry.conversation!.turns);
     expect(context.characters[0]).toMatchObject({backstory:a.backstory,trait:a.trait});
-    expect(context.characters[0].memories[0].text).toBe('A specific old memory');
+    expect(context.characters[0].memories.map((m: {text:string}) => m.text)).toContain('A specific old memory');
+    expect(context.characters[0].memories.some((m: {eventId?:number}) => m.eventId === entry.id)).toBe(false);
     expect(context.relationship).toMatchObject({a:'c1',b:'c2'});
     expect(input.max_tokens).toBe(900);
   });

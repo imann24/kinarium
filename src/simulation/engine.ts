@@ -1,4 +1,5 @@
 import { advanceConversations, beginConversation, isConversing, interruptConversations } from './conversations';
+import { memoryInfluence, rememberEvent } from './memories';
 import { COLORS, EVENTS, TEMPLATES, TRAITS } from './catalog';
 import type { Character, Command, LogKind, Relationship, WorldState, WorldSummary } from './types';
 
@@ -14,7 +15,6 @@ export function log(s: WorldState, kind: LogKind, text: string, characters: stri
   const entry = { id: s.nextLog++, minute: s.minute, kind, text, characters };
   s.history.push(entry); return entry;
 }
-function remember(c: Character, s: WorldState, text: string) { c.memories.unshift({ text, minute: s.minute }); c.memories = c.memories.slice(0, 16); }
 export function relationship(s: WorldState, a: string, b: string): Relationship {
   const [first, second] = [a, b].sort(); const key = `${first}:${second}`;
   return s.relationships[key] ??= { a: first, b: second, affinity: 0, trust: 30, encounters: 0, lastMinute: s.minute };
@@ -33,8 +33,8 @@ export function createCharacter(s: WorldState, name?: string, trait?: Character[
   };
   c.destination = c.floor;
   for (const other of s.characters) relationship(s, c.id, other.id);
-  s.characters.push(c); log(s, 'arrival', `${c.name} arrives at the house. A new story begins.`, [c.id]);
-  remember(c, s, 'My first day in the house.'); return c;
+  s.characters.push(c); const arrival = log(s, 'arrival', `${c.name} arrives at the house. A new story begins.`, [c.id]);
+  rememberEvent(c, arrival, 'I arrived at the house, ready to begin a new chapter.', { salience: 5 }); return c;
 }
 export function createWorld(input: { slug: string; name: string; description?: string; mode?: WorldState['settings']['mode']; populationCap?: number; templateId?: string }, now = Date.now(), seed = 271828): WorldState {
   const templateId = input.templateId ?? 'common-house';
@@ -52,7 +52,7 @@ function interact(s: WorldState, a: Character, b: Character) {
   const r = relationship(s, a.id, b.id);
   const scarcity = s.resources < 25 ? .15 : 0;
   const kindness = (a.trait === 'kind' || b.trait === 'kind') ? .13 : 0;
-  const positive = random(s) > clamp(.19 + s.tension / 240 + scarcity - kindness - r.affinity / 400, .06, .87);
+  const positive = random(s) > clamp(.19 + s.tension / 240 + scarcity - kindness - r.affinity / 400 - (memoryInfluence(a, b.id, s.minute) + memoryInfluence(b, a.id, s.minute)) / 2, .06, .87);
   const previous = r.affinity;
   r.affinity = clamp(r.affinity + (positive ? 4 : -7), -100, 100);
   r.trust = clamp(r.trust + (positive ? 2 : -4)); r.encounters++; r.lastMinute = s.minute;
@@ -60,7 +60,7 @@ function interact(s: WorldState, a: Character, b: Character) {
   a.belonging = clamp(a.belonging + (positive ? 2 : -3)); b.belonging = clamp(b.belonging + (positive ? 2 : -3));
   s.cohesion = clamp(s.cohesion + (positive ? .5 : -.9)); s.tension = clamp(s.tension + (positive ? -.5 : 1.2));
   beginConversation(s, a, b, positive);
-  if (previous < 35 && r.affinity >= 35) { const t = `${a.name} and ${b.name} are becoming real friends.`; log(s, 'friendship', t, [a.id, b.id]); remember(a, s, t); remember(b, s, t); }
+  if (previous < 35 && r.affinity >= 35) { const t = `${a.name} and ${b.name} are becoming real friends.`; const friendship = log(s, 'friendship', t, [a.id, b.id]); rememberEvent(a, friendship, `I’m becoming friends with ${b.name}.`, { tone: 'warm', salience: 5 }); rememberEvent(b, friendship, `I’m becoming friends with ${a.name}.`, { tone: 'warm', salience: 5 }); }
 }
 export function step(s: WorldState) {
   s.minute += MINUTES_PER_TICK;
@@ -108,7 +108,7 @@ export function step(s: WorldState) {
   const day = Math.floor(s.minute / 1440);
   if (s.minute % 1440 >= 1080 && s.lastRitualDay < day && people.length >= 2) {
     s.lastRitualDay = day;
-    if (s.cohesion > 45) { log(s, 'ritual', 'As evening settles, the house gathers for tea. An ordinary habit becomes a little tradition.', people.map(c => c.id)); s.cohesion = clamp(s.cohesion + 3); s.resources = clamp(s.resources + 8); for (const c of people) remember(c, s, 'We gathered for evening tea.'); }
+    if (s.cohesion > 45) { const ritual = log(s, 'ritual', 'As evening settles, the house gathers for tea. An ordinary habit becomes a little tradition.', people.map(c => c.id)); s.cohesion = clamp(s.cohesion + 3); s.resources = clamp(s.resources + 8); for (const c of people) rememberEvent(c, ritual, 'I joined the house for evening tea.', { tone: 'warm', salience: 2 }); }
     else { log(s, 'ritual', 'Evening comes, but the common table stays quiet. Everyone keeps to their own corner.'); s.tension = clamp(s.tension + 2); }
   }
 }
@@ -130,8 +130,8 @@ export function applyCommand(s: WorldState, command: Command, now: number) {
       if (!command.away && activeCharacters(s).length >= s.settings.populationCap) throw new Error('The house is full. Make some room before welcoming them back.');
       if (command.away) interruptConversations(s, c.id);
       c.away = command.away; c.inElevator = false; c.destination = c.floor; c.x = Math.min(c.x, 84); c.speech = undefined; c.activity = c.away ? 'away for a while' : 'finding their feet again';
-      log(s, c.away ? 'departure' : 'arrival', `${c.name} ${c.away ? 'leaves for a while. Their place in the story remains.' : 'returns to the house. There is a familiar face at the door.'}`, [c.id]);
-      remember(c, s, c.away ? 'I took some time away from the house.' : 'I came back to the house.'); break;
+      const departure = log(s, c.away ? 'departure' : 'arrival', `${c.name} ${c.away ? 'leaves for a while. Their place in the story remains.' : 'returns to the house. There is a familiar face at the door.'}`, [c.id]);
+      rememberEvent(c, departure, c.away ? 'I took some time away from the house.' : 'I came back to the house.', { salience: 5 }); break;
     }
     case 'trigger-event': {
       const event = EVENTS.find(e => e.id === command.eventId);
@@ -140,9 +140,10 @@ export function applyCommand(s: WorldState, command: Command, now: number) {
       s.cooldowns.events = now + EVENT_COOLDOWN_MS;
       s.cohesion = clamp(s.cohesion + event.cohesion); s.tension = clamp(s.tension + event.tension); s.resources = clamp(s.resources + event.resources);
       const people = activeCharacters(s);
-      for (const c of people) { c.mood = clamp(c.mood + event.mood); remember(c, s, event.text); if (event.tone === 'kind') c.destination = 0; }
+      const occasion = log(s, 'event', event.text, people.map(c => c.id));
+      for (const c of people) { c.mood = clamp(c.mood + event.mood); rememberEvent(c, occasion, `I was here for ${event.name.toLowerCase()}. ${event.text}`, { tone: event.mood > 0 ? 'warm' : event.mood < 0 ? 'tense' : 'neutral', salience: 3 }); if (event.tone === 'kind') c.destination = 0; }
       for (let i = 0; i < people.length; i++) for (let j = i + 1; j < people.length; j++) { const r = relationship(s, people[i].id, people[j].id); r.affinity = clamp(r.affinity + (event.tone === 'kind' ? 3 : -2), -100, 100); r.trust = clamp(r.trust + (event.tone === 'kind' ? 2 : -2)); }
-      log(s, 'event', event.text, people.map(c => c.id)); break;
+      break;
     }
     case 'settings': {
       if (!Number.isInteger(command.populationCap) || command.populationCap < 1 || command.populationCap > 40) throw new Error('Population cap must be between 1 and 40.');
