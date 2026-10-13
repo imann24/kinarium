@@ -65,7 +65,7 @@ describe('grounded conversation titles', () => {
     entry.conversation!.title = '<script>boats</script>';
     const html = renderToStaticMarkup(<ConversationThread entry={entry} characters={world.characters}/>);
     expect(html).toContain('&lt;script&gt;boats&lt;/script&gt;');
-    expect(html).toContain('Milo'); expect(html).toContain('Juniper');
+    for (const id of entry.characters) expect(html).toContain(world.characters.find(character => character.id === id)!.name);
     expect(html).not.toContain('Company at the common table');
   });
 });

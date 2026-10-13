@@ -24,6 +24,8 @@ export interface LogEntry { id: number; minute: number; kind: LogKind; text: str
 export interface WorldSettings { mode: TimeMode; populationCap: number; }
 export interface WorldState {
   version: 1; slug: string; name: string; description: string; templateId: string; createdAt: number;
+  /** Older snapshots begin at revision zero. Independent of simulation ticks/settings. */
+  detailsRevision?: number;
   settings: WorldSettings; minute: number; lastTickAt: number; seed: number; nextCharacter: number;
   characters: Character[]; relationships: Record<string, Relationship>; history: LogEntry[]; nextLog: number;
   cohesion: number; tension: number; resources: number; elevatorFloor: number; elevatorDirection: number;
@@ -35,6 +37,7 @@ export interface WorldSummary { slug: string; name: string; description: string;
 export interface Presence { id: string; name: string; color: string; }
 export interface Snapshot { world: WorldState; presence: Presence[]; protected: boolean; serverNow: number; playerEvents: import('./event-budget').PlayerEventBudget; }
 export type Command =
+  | { type: 'house-details'; name: string; description: string; expectedRevision: number }
   | { type: 'add-character'; name?: string; trait?: Trait; backstory?: string }
   | { type: 'set-away'; characterId: string; away: boolean }
   | { type: 'trigger-event'; eventId: string }
