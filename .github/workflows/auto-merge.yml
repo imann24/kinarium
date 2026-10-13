@@ -5,23 +5,107 @@ on:
     types: [opened, reopened, synchronize, ready_for_review]
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 jobs:
-  enable-auto-merge:
+  test:
     if: >-
       github.event.pull_request.draft == false &&
       github.event.pull_request.user.login == 'imann24' &&
       github.event.pull_request.head.repo.full_name == github.repository
+    permissions:
+      contents: read
+    uses: ./.github/workflows/test.yml
+
+  enable-auto-merge:
+    needs: test
+    if: >-
+      needs.test.result == 'success' &&
+      github.event.pull_request.draft == false &&
+      github.event.pull_request.user.login == 'imann24' &&
+      github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
-      - name: Enable auto-merge
+      # Native deletion runs after immediate AND deferred merges, without needing
+      # a second Actions event. gh --auto --delete-branch skips deferred deletion.
+      - name: Verify safe automatic branch deletion
+        id: cleanup
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          TESTED_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          gh pr merge "$PR_NUMBER" \
-            --repo "$GITHUB_REPOSITORY" \
-            --auto \
-            --squash
+          set -euo pipefail
+          # Only the separate read-only Test job checks out PR code. Never check
+          # out code or download artifacts into this privileged merge job.
+          open_prs=$(gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/pulls?state=open&per_page=100")
+          candidates=$(jq -c --arg repo "$GITHUB_REPOSITORY" --arg sha "$TESTED_SHA" --argjson number "$PR_NUMBER" '
+            [.[][] | select(.number == $number and .head.repo.full_name == $repo and .head.sha == $sha and
+              .user.login == "imann24" and .draft == false)]
+          ' <<< "$open_prs")
+          if [[ $(jq 'length' <<< "$candidates") != 1 ]]; then
+            echo 'No unique eligible open PR for this tested head; leaving branches untouched.'
+            exit 0
+          fi
+          PR_NUMBER=$(jq -er '.[0].number' <<< "$candidates")
+          repository=$(gh api "repos/$GITHUB_REPOSITORY")
+          if ! jq -e '.delete_branch_on_merge == true' <<< "$repository" >/dev/null; then
+            echo '::error::Automatic head-branch deletion must be enabled in repository settings. No settings were changed.'
+            exit 1
+          fi
+
+          pr=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER")
+          if ! jq -e --arg repo "$GITHUB_REPOSITORY" --arg sha "$TESTED_SHA" '
+            .state == "open" and .draft == false and .merged == false and
+            .user.login == "imann24" and .head.repo.full_name == $repo and
+            .base.repo.full_name == $repo and .head.sha == $sha
+          ' <<< "$pr" >/dev/null; then
+            echo 'PR is no longer eligible; leaving it and its branch untouched.'
+            exit 0
+          fi
+
+          head=$(jq -r '.head.ref' <<< "$pr")
+          base=$(jq -r '.base.ref' <<< "$pr")
+          default=$(jq -er '.default_branch | select(length > 0)' <<< "$repository")
+          if [[ "$head" == "$base" || "$head" == "$default" ]]; then
+            echo 'Base/default head branches are not eligible for automatic cleanup.'
+            exit 0
+          fi
+          encoded_head=$(jq -rn --arg head "$head" '$head | @uri')
+          branch=$(gh api "repos/$GITHUB_REPOSITORY/branches/$encoded_head")
+          if ! jq -e '.protected == false' <<< "$branch" >/dev/null; then
+            echo 'Protected or unknown-protection head branch; leaving it untouched.'
+            exit 0
+          fi
+
+          # Do not retire a branch still used by another open PR (as head or base).
+          in_use=$(jq -r --arg head "$head" --arg repo "$GITHUB_REPOSITORY" --argjson number "$PR_NUMBER" '
+            any(.[][]; .number != $number and
+              (.base.ref == $head or (.head.repo.full_name == $repo and .head.ref == $head)))
+          ' <<< "$open_prs")
+          if [[ "$in_use" != false ]]; then
+            echo 'Head branch is in use by another open PR; leaving it untouched.'
+            exit 0
+          fi
+          sha=$(jq -er '.head.sha | select(test("^[0-9a-f]{40}$"))' <<< "$pr")
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          echo "number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+          echo 'eligible=true' >> "$GITHUB_OUTPUT"
+      - name: Squash the tested head
+        id: merge
+        if: steps.cleanup.outputs.eligible == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ steps.cleanup.outputs.number }}
+          HEAD_SHA: ${{ steps.cleanup.outputs.sha }}
+        run: |
+          set -euo pipefail
+          # Test already passed for HEAD_SHA. The merge API atomically checks that
+          # SHA and still enforces branch rules; no admin override or auto queue.
+          result=$(gh api --method PUT "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/merge" \
+            -f "sha=$HEAD_SHA" -f 'merge_method=squash')
+          jq -e '.merged == true' <<< "$result" >/dev/null
+          echo 'Merge confirmed. GitHub native automatic head-branch deletion handles cleanup.'
