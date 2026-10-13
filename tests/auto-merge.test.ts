@@ -21,20 +21,31 @@ function fixture() {
   return {
     repository: { delete_branch_on_merge: true, default_branch: 'main' },
     pr,
-    branch: { protected: false } as { protected?: boolean },
+    branch: { protected: false, commit: { sha } } as { protected?: boolean; commit: { sha: string } },
     pages: [[structuredClone(pr)]] as unknown[][],
+    refs: [{ ref: 'refs/heads/feature/test' }],
+    gitExit: 0,
     error: '',
     mergeResult: { merged: true, sha: 'b'.repeat(40) },
   };
 }
 type Fixture = ReturnType<typeof fixture>;
 
-function run(data: Fixture) {
+function run(data: Fixture, mode: 'merge' | 'cleanup' = 'merge') {
   const directory = mkdtempSync(join(tmpdir(), 'kinarium-auto-merge-'));
   const output = join(directory, 'output');
   const calls = join(directory, 'calls');
+  const gitCalls = join(directory, 'git-calls');
   writeFileSync(output, '');
   writeFileSync(calls, '');
+  writeFileSync(gitCalls, '');
+  writeFileSync(join(directory, 'git'), `#!/usr/bin/env node
+const fs = require('node:fs');
+const args = process.argv.slice(2);
+fs.appendFileSync(process.env.GIT_CALLS, JSON.stringify(args) + '\\n');
+if (args.includes('push')) process.exit(JSON.parse(process.env.FIXTURE).gitExit);
+if (args[0] !== 'init') process.exit(99);
+`, { mode: 0o755 });
   writeFileSync(join(directory, 'gh'), `#!/usr/bin/env node
 const fs = require('node:fs');
 const args = process.argv.slice(2);
@@ -49,6 +60,7 @@ else if (args.includes('--method')) process.exit(99);
 else if (route === 'repos/${repository}') response = data.repository;
 else if (route.endsWith('/pulls/42')) response = data.pr;
 else if (route.includes('/branches/')) response = data.branch;
+else if (route.includes('/git/matching-refs/')) response = data.refs;
 else if (route.endsWith('/pulls?state=open&per_page=100')) response = data.pages;
 else process.exit(98);
 process.stdout.write(JSON.stringify(response));
@@ -56,10 +68,11 @@ process.stdout.write(JSON.stringify(response));
   const env = {
     ...process.env, PATH: `${directory}:${process.env.PATH}`, GH_TOKEN: 'mock-only',
     GITHUB_REPOSITORY: repository, PR_NUMBER: '42', TESTED_SHA: sha, GITHUB_OUTPUT: output,
-    FIXTURE: JSON.stringify(data), CALLS: calls,
+    GITHUB_SERVER_URL: 'https://github.com', HEAD_SHA: sha,
+    FIXTURE: JSON.stringify(data), CALLS: calls, GIT_CALLS: gitCalls,
   };
   try {
-    const preflight = spawnSync('bash', ['-e', '-o', 'pipefail', '-c', scripts[0]], { env, encoding: 'utf8' });
+    const preflight = spawnSync('bash', ['-e', '-o', 'pipefail', '-c', scripts[mode === 'merge' ? 0 : 2]], { env, encoding: 'utf8' });
     const values = Object.fromEntries(readFileSync(output, 'utf8').trim().split('\n').map(line => line.split('=')));
     let mergeStatus: number | null = null;
     if (preflight.status === 0 && values.eligible === 'true') {
@@ -71,15 +84,16 @@ process.stdout.write(JSON.stringify(response));
     return {
       status: preflight.status, mergeStatus, output: preflight.stdout, values,
       calls: readFileSync(calls, 'utf8').trim().split('\n').filter(Boolean).map(line => JSON.parse(line) as string[]),
+      gitCalls: readFileSync(gitCalls, 'utf8').trim().split('\n').filter(Boolean).map(line => JSON.parse(line) as string[]),
     };
   } finally {
     rmSync(directory, { recursive: true, force: true });
   }
 }
 
-describe('safe native branch cleanup before auto-merge', () => {
+describe('safe auto-merge and branch cleanup', () => {
   it('preserves event/job guards, token scope, and avoids checkout or event-dependent cleanup', () => {
-    expect(scripts).toHaveLength(2);
+    expect(scripts).toHaveLength(3);
     expect(workflow).toContain('types: [opened, reopened, synchronize, ready_for_review]');
     expect(workflow).toContain("github.event.pull_request.user.login == 'imann24'");
     expect(workflow).toContain('github.event.pull_request.draft == false');
@@ -104,7 +118,7 @@ describe('safe native branch cleanup before auto-merge', () => {
     expect(testWorkflow).toContain('run: pnpm test');
   });
 
-  it('uses native deletion after an atomic squash merge of the validated tested head', () => {
+  it('requests an atomic squash merge of the validated tested head', () => {
     const result = run(fixture());
     expect(result.status).toBe(0);
     expect(result.mergeStatus).toBe(0);
@@ -113,13 +127,12 @@ describe('safe native branch cleanup before auto-merge', () => {
     ]);
     expect(result.calls).toContainEqual(['api', `repos/${repository}/branches/feature%2Ftest`]);
     expect(result.calls).toContainEqual(['api', '--paginate', '--slurp', `repos/${repository}/pulls?state=open&per_page=100`]);
-    // No delete API call and no gh --delete-branch: GitHub deletes only after merge.
+    // The merge step never deletes a branch before success is confirmed.
     expect(result.calls.flat()).not.toContain('--delete-branch');
     expect(result.calls.flat()).not.toContain('DELETE');
   });
 
   const rejected: [string, (data: Fixture) => void][] = [
-    ['native deletion disabled', d => { d.repository.delete_branch_on_merge = false; }],
     ['missing default branch', d => { d.repository.default_branch = ''; }],
     ['default head branch', d => { d.pr.head.ref = 'main'; d.pr.base.ref = 'release'; }],
     ['base head branch', d => { d.pr.head.ref = 'release'; d.pr.base.ref = 'release'; }],
@@ -164,6 +177,95 @@ describe('safe native branch cleanup before auto-merge', () => {
     const result = run(data);
     expect(result.mergeStatus).not.toBe(0);
     expect(result.calls.flat()).not.toContain('DELETE');
+  });
+
+  function mergedFixture() {
+    const data = fixture();
+    data.pr.merged = true;
+    data.pr.state = 'closed';
+    data.pages = [[]];
+    return data;
+  }
+
+  it.each([true, false])('deletes the exact merged head with a SHA lease (native deletion=%s)', nativeDeletion => {
+    const data = mergedFixture();
+    data.repository.delete_branch_on_merge = nativeDeletion;
+    const result = run(data, 'cleanup');
+    expect(result.status).toBe(0);
+    const push = result.gitCalls.find(call => call.includes('push'))!;
+    expect(push.slice(2)).toEqual([
+      '-c', 'credential.helper=', '-c', 'credential.helper=!gh auth git-credential',
+      'push', `--force-with-lease=refs/heads/feature/test:${sha}`,
+      `https://github.com/${repository}.git`, ':refs/heads/feature/test',
+    ]);
+    expect(workflow).toContain("if: steps.merge.outcome == 'success'");
+  });
+
+  const keepBranches: [string, (data: Fixture) => void][] = [
+    ['open PR', d => { d.pr.merged = false; d.pr.state = 'open'; }],
+    ['closed unmerged PR', d => { d.pr.merged = false; }],
+    ['different author', d => { d.pr.user.login = 'other'; }],
+    ['fork head', d => { d.pr.head.repo.full_name = 'other/kinarium'; }],
+    ['different merged head', d => { d.pr.head.sha = 'c'.repeat(40); }],
+    ['default head', d => { d.repository.default_branch = 'feature/test'; }],
+    ['base head', d => { d.pr.base.ref = 'feature/test'; }],
+    ['protected branch', d => { d.branch.protected = true; }],
+    ['unknown protection', d => { delete d.branch.protected; }],
+    ['new unmerged commits', d => { d.branch.commit.sha = 'd'.repeat(40); }],
+    ['already deleted', d => { d.refs = []; }],
+    ['only prefix matches', d => { d.refs = [{ ref: 'refs/heads/feature/test-other' }]; }],
+    ['open head reuse', d => { d.pages.push([{ ...d.pr, number: 99 }]); }],
+    ['open base reuse', d => { d.pages.push([{ base: { ref: 'feature/test' } }]); }],
+    ['metadata API failure', d => { d.error = '/pulls/42'; }],
+    ['protection API failure', d => { d.error = '/branches/'; }],
+    ['missing default metadata', d => { d.repository.default_branch = ''; }],
+  ];
+  it.each(keepBranches)('does not delete for %s', (_name, modify) => {
+    const data = mergedFixture();
+    modify(data);
+    const result = run(data, 'cleanup');
+    expect(result.gitCalls).toEqual([]);
+    expect(result.calls.flat()).not.toContain('DELETE');
+  });
+
+  it('surfaces a rejected SHA lease instead of reporting successful cleanup', () => {
+    const data = mergedFixture();
+    data.gitExit = 1;
+    const result = run(data, 'cleanup');
+    expect(result.status).not.toBe(0);
+    expect(result.output).not.toContain('Deleted the unchanged merged feature branch.');
+  });
+
+  it('proves a real Git SHA lease refuses deletion after a concurrent push', () => {
+    const directory = mkdtempSync(join(tmpdir(), 'kinarium-lease-'));
+    const remote = join(directory, 'remote.git');
+    const source = join(directory, 'source');
+    const cleanup = join(directory, 'cleanup');
+    const git = (...args: string[]) => spawnSync('git', args, { encoding: 'utf8' });
+    const ok = (...args: string[]) => {
+      const result = git(...args);
+      expect(result.status, result.stderr).toBe(0);
+      return result.stdout.trim();
+    };
+    try {
+      ok('init', '--bare', remote);
+      ok('init', source);
+      ok('init', cleanup);
+      const commit = (message: string) => ok('-C', source, '-c', 'user.name=Test', '-c', 'user.email=test@example.invalid', 'commit', '--allow-empty', '-m', message);
+      commit('merged content');
+      const mergedSha = ok('-C', source, 'rev-parse', 'HEAD');
+      ok('-C', source, 'push', remote, 'HEAD:refs/heads/feature');
+      commit('new unmerged content');
+      const newSha = ok('-C', source, 'rev-parse', 'HEAD');
+      ok('-C', source, 'push', remote, 'HEAD:refs/heads/feature');
+      const stale = git('-C', cleanup, 'push', `--force-with-lease=refs/heads/feature:${mergedSha}`, remote, ':refs/heads/feature');
+      expect(stale.status).not.toBe(0);
+      expect(ok('ls-remote', remote, 'refs/heads/feature')).toContain(newSha);
+      ok('-C', cleanup, 'push', `--force-with-lease=refs/heads/feature:${newSha}`, remote, ':refs/heads/feature');
+      expect(ok('ls-remote', remote, 'refs/heads/feature')).toBe('');
+    } finally {
+      rmSync(directory, { recursive: true, force: true });
+    }
   });
 
   const jobGuard = workflow.split('  enable-auto-merge:\n')[1].match(/    if: >-\n([\s\S]+?)    runs-on:/)![1].trim();
