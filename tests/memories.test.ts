@@ -73,7 +73,11 @@ describe('resident personal history', () => {
   });
   it('uses remembered disagreements in procedural dialogue', () => {
     const world = makeWorld();
-    for (const c of world.characters) c.memories = world.characters.filter(other => other !== c).map(other => ({ text: 'We disagreed.', minute: 480, kind: 'conflict', participantIds: [other.id], tone: 'tense', salience: 3 }));
+    for (const c of world.characters) c.memories = world.characters.filter(other => other !== c).map(other => {
+      const eventId = world.nextLog++;
+      world.history.push({ id: eventId, minute: 480, kind: 'conflict', characters: [c.id, other.id], text: 'A recorded disagreement.' });
+      return { text: 'We disagreed.', minute: 480, eventId, kind: 'conflict', participantIds: [other.id], tone: 'tense', salience: 3 };
+    });
     for (let i = 0; i < 100; i++) step(world);
     expect(world.history.some(e => e.conversation?.turns.some(t => t.text.includes('after our disagreement') || t.text.includes('still on my mind')))).toBe(true);
   });
