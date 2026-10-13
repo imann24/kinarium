@@ -19,6 +19,7 @@ import './theme.css';
 import ThemeControl from './ThemeControl';
 import { useJournalPanel } from './useJournalPanel';
 import './journal-panel.css';
+import { useFullscreenCanvas } from './useFullscreenCanvas';
 
 const icons = { soup: Soup, gift: Gift, moon: Moon, sprout: Sprout, zap: Zap, message: MessageCircle };
 const templateExamples = Object.fromEntries(Object.keys(TEMPLATES).map(templateId => [templateId, createWorld({ slug: 'example', name: 'A little world', templateId }, 0, 125)]));
@@ -63,6 +64,7 @@ function CreateWorld({ onClose }: { onClose: () => void }) {
 function World({ slug }: { slug: string }) {
   const fullscreen = useWorldFullscreen();
   const journalPanel = useJournalPanel();
+  useFullscreenCanvas(fullscreen.ref, fullscreen.isFullscreen, journalPanel.collapsed);
   const [profileScroll, setProfileScroll] = useState(0);
   useEffect(() => {
     if (profileScroll) document.querySelector('.world-sidebar')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
