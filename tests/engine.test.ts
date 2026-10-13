@@ -8,7 +8,7 @@ describe('the community engine', () => {
   it.each(Object.values(TEMPLATES))('runs $id through a full day and resumes saved state deterministically', template => {
     const a = createWorld({ slug: 'template-test', name: template.name, templateId: template.id }, 1_000, 42);
     expect(a.version).toBe(1);
-    expect(a.characters.map(c => c.name)).toEqual(template.initialNames.slice(0, 6));
+    expect(a.characters).toHaveLength(6);
     const b = JSON.parse(JSON.stringify(a));
     const activities = new Set<string>();
     for (let i = 0; i < 720; i++) {

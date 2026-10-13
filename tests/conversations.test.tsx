@@ -150,7 +150,7 @@ describe('thread presentation', () => {
     const html = renderToStaticMarkup(<ConversationThread entry={entry} characters={world.characters}/>);
     expect(html).toContain('open=""');
     expect(html).toContain('2 turns'); expect(html).toContain('In conversation');
-    expect(html).toContain('Milo'); expect(html).toContain('Juniper');
+    for (const character of world.characters.slice(0, 2)) expect(html).toContain(character.name);
     expect(html).toContain('AI dialogue');
     expect(html.indexOf(entry.conversation!.turns[0].text)).toBeLessThan(html.indexOf(replies[0].text));
   });

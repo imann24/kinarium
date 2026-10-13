@@ -22,17 +22,24 @@ const command = (slug, data, cookie, status) => request(`/worlds/${slug}/command
 try {
   const { value: list } = await request('/worlds'); assert.ok(list.worlds.some(w=>w.slug==='the-common-house'));
   const { value: templates } = await request('/templates');
-  for (const templateId of ['makers-house', 'harbor-house']) {
+  for (const templateId of templates.map(t => t.id)) {
     const template = templates.find(t => t.id === templateId); assert.ok(template, `${templateId} should be discoverable`);
     const fixture = `test-${templateId}-${suffix}`;
     const { value: created } = await request('/worlds', { name: template.name, slug: fixture, templateId, populationCap: 7 }, undefined, 201);
     assert.equal(created.templateId, templateId);
     const { value: snapshot } = await request(`/worlds/${fixture}`);
     assert.equal(snapshot.world.version, 1); assert.equal(snapshot.world.templateId, templateId);
-    assert.deepEqual(snapshot.world.characters.map(c => c.name), template.initialNames.slice(0, 6));
+    const identities = world => world.characters.map(({ id, name, trait, backstory }) => ({ id, name, trait, backstory }));
+    assert.equal(snapshot.world.characters.length, 6);
+    assert.equal(new Set(snapshot.world.characters.map(c => c.name)).size, 6);
+    for (const c of snapshot.world.characters) assert.ok(template.starterResidents.some(p => p.name === c.name && p.trait === c.trait && p.backstory === c.backstory));
+    const { value: reloaded } = await request(`/worlds/${fixture}`);
+    assert.deepEqual(identities(reloaded.world), identities(snapshot.world));
     await command(fixture, { type: 'add-character' });
     const { value: restored } = await request(`/worlds/${fixture}`);
-    assert.equal(restored.world.templateId, templateId); assert.equal(restored.world.characters[6].name, template.initialNames[6]);
+    assert.equal(restored.world.templateId, templateId); assert.equal(restored.world.characters[6].id, 'c7');
+    assert.deepEqual(identities(restored.world).slice(0, 6), identities(snapshot.world));
+    assert.equal(new Set(restored.world.characters.map(c => c.name)).size, 7);
   }
   await request('/worlds', { name: 'Unknown template', slug: `test-invalid-${suffix}`, templateId: 'missing' }, undefined, 400);
   console.log('PASS: template discovery, creation, persisted selection, template residents, and invalid-template rejection');

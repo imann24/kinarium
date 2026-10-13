@@ -24,7 +24,13 @@ export function createCharacter(s: WorldState, name?: string, trait?: Character[
   if (s.characters.length >= 200) throw new Error('This world has reached its archive limit of 200 characters.');
   const number = s.nextCharacter++;
   const names = [...TEMPLATES[s.templateId].initialNames, 'Wren', 'Ira', 'Luca', 'Sage', 'Nell', 'Bea', 'Kit', 'Ember'];
-  const resolvedName = name?.trim() || `${names[(number - 1) % names.length]}${number > names.length ? ` ${Math.ceil(number / names.length)}` : ''}`;
+  let resolvedName = name?.trim() || `${names[(number - 1) % names.length]}${number > names.length ? ` ${Math.ceil(number / names.length)}` : ''}`;
+  // Random starters may already use a later automatic name; include away residents.
+  if (!name?.trim()) {
+    const base = resolvedName;
+    let suffix = 2;
+    while (s.characters.some(c => c.name === resolvedName)) resolvedName = `${base} ${suffix++}`;
+  }
   const c: Character = {
     id: `c${number}`, name: resolvedName, trait: trait ?? pick(s, TRAITS), color: COLORS[(number - 1) % COLORS.length],
     backstory: backstory?.trim() || pick(s, [`${resolvedName} arrived with a well-worn notebook and a hope of finding somewhere to belong.`, `${resolvedName} used to live by the sea. They still open the window before making tea.`, `${resolvedName} has moved often, and is trying to learn what it means to stay.`, `${resolvedName} believes most problems can be solved by making something with your hands.`]),
@@ -45,7 +51,12 @@ export function createWorld(input: { slug: string; name: string; description?: s
     seed, nextCharacter: 1, characters: [], relationships: {}, history: [], nextLog: 1, ...metrics,
     elevatorFloor: 0, elevatorDirection: 1, elevatorPhase: 'stopped', cooldowns: {}, lastRitualDay: -1 };
   log(s, 'world', 'The doors open. A little world begins.');
-  for (let i = 0; i < Math.min(6, s.settings.populationCap); i++) createCharacter(s, TEMPLATES[templateId].initialNames[i], TRAITS[i % TRAITS.length]);
+  // Draw without replacement only at creation. Persist the resulting characters as usual.
+  const candidates = [...TEMPLATES[templateId].starterResidents];
+  for (let i = 0; i < Math.min(6, s.settings.populationCap); i++) {
+    const [profile] = candidates.splice(Math.floor(random(s) * candidates.length), 1);
+    createCharacter(s, profile.name, profile.trait, profile.backstory);
+  }
   return s;
 }
 function interact(s: WorldState, a: Character, b: Character) {
