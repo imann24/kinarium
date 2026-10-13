@@ -1,5 +1,6 @@
 import type { Character, WorldState } from '../simulation/types';
 import { TEMPLATES } from '../simulation/catalog';
+import { useBuildingMotion } from './useBuildingMotion';
 
 function Plant({ x, y, size = 1 }: { x: number; y: number; size?: number }) {
   return <g transform={`translate(${x} ${y}) scale(${size})`}><path d="M-10 0h20l-3 21H-7Z" fill="#bd8970"/><path d="M0 2v-38M0-13q-25-4-19-22Q0-34 0-13M0-23q23-4 18-24Q0-43 0-23" fill="#79936b" stroke="#637f59" strokeWidth="2"/></g>;
@@ -19,6 +20,7 @@ export function Person({ character, small = false }: { character: Pick<Character
 }
 export default function Building({ world, selected, onSelect, miniature = false }: { world: WorldState; selected?: string; onSelect?: (id: string) => void; miniature?: boolean }) {
   const people = world.characters.filter(c => !c.away);
+  const motion = useBuildingMotion(world, miniature);
   const template = TEMPLATES[world.templateId];
   const night = world.minute % 1440 >= 1200 || world.minute % 1440 < 360;
   return <svg className={`building ${miniature ? 'miniature' : ''}`} viewBox="0 0 920 630" role={onSelect ? 'group' : 'img'} aria-label={miniature ? `${template.name} template illustration` : `${world.name}, a three-floor house with ${people.length} residents`}>
@@ -49,15 +51,17 @@ export default function Building({ world, selected, onSelect, miniature = false 
     })}
     <rect x="707" y="112" width="101" height="418" fill="#b9b9a2"/>
     <path d="M722 114v416m71-416v416" stroke="#9d9f8b" strokeWidth="2"/>
-    <g style={{ transform: `translateY(${(2-world.elevatorFloor)*143}px)`, transition: 'transform 2.8s ease-in-out' }}><rect x="724" y="123" width="67" height="115" rx="3" fill="#dfdbc4" stroke="#9c9d87" strokeWidth="3"/><rect x="731" y="135" width="53" height="97" fill="#c8ccba"/><path d="M757 135v97" stroke="#9aab98" strokeWidth="2"/><rect x="747" y="126" width="21" height="6" rx="2" fill="#899780"/></g>
+    <g data-elevator-cabin style={{ transform: `translateY(${(2-motion.elevatorFloor)*143}px)` }}><rect x="724" y="123" width="67" height="115" rx="3" fill="#dfdbc4" stroke="#9c9d87" strokeWidth="3"/><rect x="731" y="135" width="53" height="97" fill="#c8ccba"/><path d="M757 135v97" stroke="#9aab98" strokeWidth="2"/><rect x="747" y="126" width="21" height="6" rx="2" fill="#899780"/></g>
     {[0,1,2].map(i => <g key={i}><path d={`M710 ${245+i*143}h97`} stroke="#a6a893" strokeWidth="5"/><circle cx="714" cy={206+i*143} r="3" fill="#efe3b9"/></g>)}
     <rect x="88" y="94" width="744" height="15" rx="3" fill="#7b8872"/><rect x="85" y="551" width="750" height="12" rx="3" fill="#9eaa8c"/>
     <path d="M317 92v-9h263v9" fill="#aab299"/><rect x="356" y="69" width="185" height="24" rx="3" fill="#e9e8d8"/>
     <text x="448" y="85" textAnchor="middle" fontSize="9" fill="#73806b" letterSpacing="3">A LITTLE LIFE TOGETHER</text>
     {people.map(c => {
-      const x = c.inElevator ? 757 : 135 + c.x * 5.85; const y = 236 + (2-c.floor)*143;
+      const position = motion.position(c.id);
+      const x = position?.x ?? (c.inElevator ? 757 : 135 + c.x * 5.85);
+      const y = 236 + (2-(position?.floor ?? c.floor))*143;
       const hasSpeech = !miniature && c.speech && (selected === c.id || people.filter(p => p.speech).at(-1)?.id === c.id);
-      return <g key={c.id} className={`resident-sprite ${selected === c.id ? 'selected' : ''}`} style={{ transform: `translate(${x}px, ${y}px)` }} role={onSelect ? 'button' : undefined} tabIndex={onSelect ? 0 : undefined} aria-label={`${c.name}, ${c.activity}`} onClick={() => onSelect?.(c.id)} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect?.(c.id); } }}>
+      return <g key={c.id} data-resident-id={c.id} data-aboard={position?.aboard ?? !!c.inElevator} className={`resident-sprite ${selected === c.id ? 'selected' : ''}`} style={{ transform: `translate(${x}px, ${y}px)` }} role={onSelect ? 'button' : undefined} tabIndex={onSelect ? 0 : undefined} aria-label={`${c.name}, ${c.activity}`} onClick={() => onSelect?.(c.id)} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect?.(c.id); } }}>
         {selected === c.id && <ellipse cy="0" rx="23" ry="8" fill="none" stroke="#566f4d" strokeWidth="2" strokeDasharray="3 3"/>}
         <Person character={c}/>
         {!miniature && <><rect x="-25" y="8" width="50" height="15" rx="7" fill="#f6f4e8" fillOpacity=".9"/><text y="19" textAnchor="middle" fontSize="9" fill="#555e4c">{c.name.slice(0, 10)}</text></>}

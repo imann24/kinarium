@@ -22,7 +22,7 @@ Vite proxies `/api` and WebSockets to port 8787. Server source changes reload au
 - `/`: searchable public world directory, open-door and persistent-mode filters, creation dialog, field guide.
 - `/w/<slug>`: one shared authoritative simulation, live anonymous observer presence, automatic reconnection.
 - Worlds start open by default; optionally protect entry with a password. Their names and descriptions remain public; snapshots, WebSockets, history, and commands require entry.
-- Three-floor common-house template with a working shared elevator and vector residents.
+- Three-floor common-house template with a shared elevator and vector residents. Travel and stopped ticks alternate; residents board and leave only while stopped. The renderer uses one eased cabin trajectory for all passengers and waits for arrival plus a pause before showing an exit, including when snapshots arrive close together.
 - Autonomous movement, energy/rest, mood, belonging, conversations, conflict, friendship, shared resources, evening rituals, and community degradation/recovery.
 - Pairwise affinity and trust; bounded personal memories; a durable, paginated world history.
 - Six extensible events with a shared 45-second world cooldown and a separate allowance of 3 events per player per world in any rolling 5-minute window: shared meal, gift, story night, common project, outage, rumor.
@@ -124,4 +124,4 @@ Integration tests exercise actual HTTP/WebSocket/SQLite/alarm behavior, includin
 
 Add an event to `EVENTS`; its controls and effects come from that registry. Add advanced behavior with a validated command or a deterministic simulation system. New templates should register a stable ID and versioned data in `TEMPLATES`; the current renderer is purpose-built for the three-floor house, so a template with different geometry also needs a renderer selected by its template ID. A future template generator should produce validated data and select a renderer, never execute generated code. Preserve old template IDs so existing worlds continue to load.
 
-The initial state is schema version 1. Add an explicit load-time state migration before changing persisted fields incompatibly. Add a new Wrangler migration only for Durable Object class/storage migrations. World password changes and owner roles are intentionally absent in this version.
+The initial state is schema version 1. Older snapshots without `elevatorPhase` resume from a stopped landing; the next simulation step writes the phase. Add an explicit load-time state migration before changing persisted fields incompatibly. Add a new Wrangler migration only for Durable Object class/storage migrations. World password changes and owner roles are intentionally absent in this version.

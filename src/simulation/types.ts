@@ -16,6 +16,8 @@ export interface WorldState {
   settings: WorldSettings; minute: number; lastTickAt: number; seed: number; nextCharacter: number;
   characters: Character[]; relationships: Record<string, Relationship>; history: LogEntry[]; nextLog: number;
   cohesion: number; tension: number; resources: number; elevatorFloor: number; elevatorDirection: number;
+  /** Missing in older snapshots; treated as stopped on their next step. */
+  elevatorPhase?: 'moving' | 'stopped';
   cooldowns: Record<string, number>; lastRitualDay: number;
 }
 export interface WorldSummary { slug: string; name: string; description: string; templateId: string; createdAt: number; population: number; populationCap: number; mode: TimeMode; protected: boolean; cohesion: number; }

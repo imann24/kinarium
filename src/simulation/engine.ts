@@ -41,7 +41,7 @@ export function createWorld(input: { slug: string; name: string; description?: s
   const s: WorldState = { version: 1, slug: input.slug, name: input.name, description: input.description || 'A small place to belong. Let’s see what grows here.', templateId, createdAt: now,
     settings: { mode: input.mode ?? 'fast-forward', populationCap: input.populationCap ?? 12 }, minute: 8 * 60, lastTickAt: now,
     seed, nextCharacter: 1, characters: [], relationships: {}, history: [], nextLog: 1, cohesion: 62, tension: 18, resources: 75,
-    elevatorFloor: 0, elevatorDirection: 1, cooldowns: {}, lastRitualDay: -1 };
+    elevatorFloor: 0, elevatorDirection: 1, elevatorPhase: 'stopped', cooldowns: {}, lastRitualDay: -1 };
   log(s, 'world', 'The doors open. A little world begins.');
   for (let i = 0; i < Math.min(6, s.settings.populationCap); i++) createCharacter(s, TEMPLATES[templateId].initialNames[i], TRAITS[i % TRAITS.length]);
   return s;
@@ -69,8 +69,13 @@ export function step(s: WorldState) {
   s.minute += MINUTES_PER_TICK;
   const people = activeCharacters(s);
   const template = TEMPLATES[s.templateId];
-  s.elevatorFloor += s.elevatorDirection;
-  if (s.elevatorFloor >= template.floors.length - 1 || s.elevatorFloor <= 0) s.elevatorDirection *= -1;
+  // A travel tick is followed by a complete stopped tick for boarding/exiting.
+  // Older saved worlds have no phase; resume them from a stopped landing.
+  if ((s.elevatorPhase ?? 'stopped') === 'stopped') {
+    s.elevatorPhase = 'moving';
+    s.elevatorFloor += s.elevatorDirection;
+    if (s.elevatorFloor >= template.floors.length - 1 || s.elevatorFloor <= 0) s.elevatorDirection *= -1;
+  } else s.elevatorPhase = 'stopped';
   const night = s.minute % 1440 < 360 || s.minute % 1440 > 1320;
   for (const c of people) {
     if ((c.speechUntil ?? 0) < s.minute) c.speech = undefined;
@@ -80,10 +85,10 @@ export function step(s: WorldState) {
     if (c.inElevator) {
       c.floor = s.elevatorFloor;
       c.activity = 'riding the elevator';
-      if (c.floor === c.destination) { c.inElevator = false; c.x = 84; c.activity = 'stepping out of the elevator'; }
+      if (s.elevatorPhase === 'stopped' && c.floor === c.destination) { c.inElevator = false; c.x = 84; c.activity = 'stepping out of the elevator'; }
     } else if (c.destination !== c.floor) {
       c.x = Math.min(94, c.x + 15); c.activity = 'waiting for the elevator';
-      if (c.x >= 90 && s.elevatorFloor === c.floor) { c.inElevator = true; c.activity = 'riding the elevator'; }
+      if (s.elevatorPhase === 'stopped' && c.x >= 90 && s.elevatorFloor === c.floor) { c.inElevator = true; c.activity = 'riding the elevator'; }
     } else if (random(s) < .12) {
       c.destination = night || c.energy < 20 ? 1 : Math.floor(random(s) * template.floors.length);
       c.activity = c.destination === c.floor ? template.floors[c.floor].purpose : 'heading to the elevator';

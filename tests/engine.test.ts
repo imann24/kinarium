@@ -39,10 +39,24 @@ describe('the community engine', () => {
     expect(() => applyCommand(a, { type: 'trigger-event', eventId: 'rumor' }, 1_001)).toThrow('settle');
     applyCommand(a, { type: 'trigger-event', eventId: 'rumor' }, 46_000); expect(a.tension).toBeGreaterThan(18);
   });
-  it('requires actual elevator travel between floors', () => {
+  it('only boards and exits during a stopped tick, with a full travel tick in between', () => {
     const a = world(1); const c = a.characters[0]; c.floor = 1; c.destination = 2; c.x = 94;
-    step(a); expect(c.inElevator).toBe(true); expect(c.floor).toBe(1);
-    step(a); expect(c.floor).toBe(2); expect(c.inElevator).toBe(false);
+    step(a); expect(a.elevatorPhase).toBe('moving'); expect(c.inElevator).toBeFalsy();
+    step(a); expect(a.elevatorPhase).toBe('stopped'); expect(c.inElevator).toBe(true); expect(c.floor).toBe(1);
+    step(a); expect(a.elevatorPhase).toBe('moving'); expect(c.floor).toBe(2); expect(c.inElevator).toBe(true);
+    step(a); expect(a.elevatorPhase).toBe('stopped'); expect(a.elevatorFloor).toBe(2); expect(c.inElevator).toBe(false);
+    expect(c.activity).toBe('stepping out of the elevator');
+  });
+  it('resumes older persisted elevator state and keeps all riders on the cabin floor', () => {
+    const a = world(1); delete a.elevatorPhase;
+    const c = a.characters[0]; c.floor = 0; c.destination = 2; c.inElevator = true;
+    for (let i = 0; i < 20; i++) {
+      const priorFloor = a.elevatorFloor;
+      step(a);
+      if (a.elevatorPhase === 'stopped') expect(a.elevatorFloor).toBe(priorFloor);
+      if (c.inElevator) expect(c.floor).toBe(a.elevatorFloor);
+      expect(a.elevatorFloor).toBeGreaterThanOrEqual(0); expect(a.elevatorFloor).toBeLessThanOrEqual(2);
+    }
   });
   it('keeps social metrics finite and bounded over a long difficult history', () => {
     const a = world(40); for (let i = 6; i < 40; i++) createCharacter(a);
