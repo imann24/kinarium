@@ -15,6 +15,8 @@ import { useWorldFullscreen } from './useWorldFullscreen';
 import { availableEvents, eventBudget, type PlayerEventBudget } from '../simulation/event-budget';
 import { api, ApiError } from './api';
 import './style.css';
+import './theme.css';
+import ThemeControl from './ThemeControl';
 import { useJournalPanel } from './useJournalPanel';
 import './journal-panel.css';
 
@@ -26,7 +28,7 @@ function Logo() { return <a href="/" className="brand" aria-label="Kinarium home
 function App() {
   const [guide, setGuide] = useState(false);
   const match = location.pathname.match(/^\/w\/([a-z0-9-]+)\/?$/);
-  return <><header className="site-header"><Logo/><nav><a href="/" className={!match ? 'active' : ''}>The worlds</a><button className="text-button" onClick={() => setGuide(true)}>Field guide <ArrowUpRight size={13}/></button><span className="header-note"><span className="status-dot"/> A little life, unfolding</span></nav></header>
+  return <><header className="site-header"><Logo/><nav><a href="/" className={!match ? 'active' : ''}>The worlds</a><button className="text-button" onClick={() => setGuide(true)}>Field guide <ArrowUpRight size={13}/></button><span className="header-note"><span className="status-dot"/> A little life, unfolding</span><ThemeControl/></nav></header>
     {match ? <World slug={match[1]}/> : location.pathname === '/' ? <Directory/> : <main className="empty-page"><h1>A path without a world.</h1><a href="/">Back to the directory</a></main>}
     {guide && <Modal title="A world with no finish line." eyebrow="THE FIELD GUIDE" onClose={() => setGuide(false)}><div className="guide-copy"><p>Kinarium is a small experiment in living together. There are no points to collect and no perfect way to play. The stories are the point.</p><h3>Watch a community become itself.</h3><p>Residents move, rest, talk, disagree, and remember. Relationships grow through repeated encounters. Shared resources, tension, and belonging influence what happens next.</p><h3>A nudge, not a remote control.</h3><p>Introduce someone new, let a resident take time away, or invite a moment from the event catalog. You can’t direct their lives. Away residents keep their memories and don’t use population space.</p><h3>One world, shared by everyone.</h3><p>Everyone in a world sees the same simulation and can change its settings. Passwords protect entry; there are no owner-only controls. Each player can introduce 3 events per world in any 5-minute window. Each allowance returns five minutes after use. All players also share a 45-second world cooldown.</p><h3>Two ways for time to pass.</h3><p><b>Always on:</b> the world keeps evolving when empty, in one-minute batches. <b>Catch-up:</b> it catches up when someone returns. After a long absence, only the most recent simulated day is replayed in detail.</p><p className="muted">Names, memories, and dialogue work without AI. A configured model may occasionally enrich a line of dialogue.</p></div></Modal>}
   </>;
