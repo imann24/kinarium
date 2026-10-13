@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { applyCommand, createWorld, relationship } from '../src/simulation/engine';
 import type { LogEntry } from '../src/simulation/types';
 import { bondKind, communityInsights, pairRecords, recentActivity } from '../src/client/community-insights';
-import CommunityInsights from '../src/client/CommunityInsights';
+import CommunityInsights, { insightLocation } from '../src/client/CommunityInsights';
 
 const world = (populationCap = 3) => createWorld({ slug: 'insights', name: 'Insights', populationCap }, 0, 42);
 const entry = (id: number, minute: number, kind: LogEntry['kind'] = 'conversation', characters = ['c1', 'c2']): LogEntry => ({ id, minute, kind, characters, text: `Moment ${id}` });
@@ -89,5 +89,26 @@ describe('community insights rendering', () => {
     const html = renderToStaticMarkup(<CommunityInsights world={w} onSelectResident={() => {}}/>);
     expect(html).toContain('Nobody is at home'); expect(html).toContain('No journal records');
     expect(html).toContain('No recorded encounters yet'); expect(html).not.toMatch(/NaN|Infinity/);
+  });
+});
+
+
+describe('dedicated insights view', () => {
+  it('restores shareable scope, connection filter and pair, with safe defaults', () => {
+    expect(insightLocation('?scope=all&connections=strained&pair=c1%3Ac3')).toEqual({ scope: 'all', filter: 'strained', selected: 'c1:c3' });
+    expect(insightLocation('?scope=unknown&connections=unknown')).toEqual({ scope: 'home', filter: 'all', selected: undefined });
+  });
+  it('draws relationship counts and activity bars from the same data as the text alternatives', () => {
+    const w = world(); w.minute = 1000;
+    Object.assign(relationship(w, 'c1', 'c2'), { encounters: 2, affinity: -40, trust: 30 });
+    w.history = [entry(50, 881), entry(51, 900), entry(52, 901, 'conflict')];
+    const html = renderToStaticMarkup(<CommunityInsights world={w} onSelectResident={() => {}}/>);
+    expect(html).toContain('All 3 possible pairs');
+    expect(html).toContain('Affinity -40');
+    expect(html).toContain('width:20%;left:30%');
+    expect(html).toContain('Last 2 hours: 2 conversations, 1 conflicts, partial history');
+    expect(html).toContain('width:50%');
+    expect(html).toContain('View activity as a table');
+    expect(html).toContain('Partial history');
   });
 });
