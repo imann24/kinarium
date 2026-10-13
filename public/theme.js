@@ -1,28 +1,34 @@
 // Run before the app and stylesheet paint; this is also the single theme source of truth.
 (() => {
   const key = 'kinarium-theme';
-  const media = window.matchMedia('(prefers-color-scheme: dark)');
-  const valid = value => ['light', 'dark'].includes(value) ? value : 'system';
-  const read = () => { try { return valid(localStorage.getItem(key)); } catch { return 'system'; } };
+  const valid = value => value === 'light' || value === 'dark';
+  const read = () => {
+    try { const saved = localStorage.getItem(key); if (valid(saved)) return saved; } catch { /* Storage may be unavailable. */ }
+    // Resolve missing or legacy System choices once; only light/dark are retained.
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  };
   let preference = read();
+  function save() {
+    try { localStorage.setItem(key, preference); } catch { /* Keep the in-memory choice when storage is blocked. */ }
+  }
   function apply() {
-    const theme = preference === 'system' ? (media.matches ? 'dark' : 'light') : preference;
-    document.documentElement.dataset.theme = theme;
-    document.documentElement.style.colorScheme = theme;
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#18211d' : '#f8f8f2');
+    document.documentElement.dataset.theme = preference;
+    document.documentElement.style.colorScheme = preference;
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', preference === 'dark' ? '#18211d' : '#f8f8f2');
     window.dispatchEvent(new Event('kinarium-theme-change'));
   }
   window.kinariumTheme = {
     getPreference: () => preference,
     setPreference(value) {
-      preference = valid(value);
-      try { if (preference === 'system') localStorage.removeItem(key); else localStorage.setItem(key, preference); } catch { /* Private browsing can disable storage. Keep the in-memory choice. */ }
+      if (!valid(value)) return;
+      preference = value;
+      save();
       apply();
     },
   };
-  media.addEventListener('change', () => { if (preference === 'system') apply(); });
   window.addEventListener('storage', event => {
-    if (event.key === key || event.key === null) { preference = read(); apply(); }
+    if (event.key === key || event.key === null) { preference = read(); save(); apply(); }
   });
+  save();
   apply();
 })();
