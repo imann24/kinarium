@@ -38,9 +38,10 @@ export function createCharacter(s: WorldState, name?: string, trait?: Character[
 export function createWorld(input: { slug: string; name: string; description?: string; mode?: WorldState['settings']['mode']; populationCap?: number; templateId?: string }, now = Date.now(), seed = 271828): WorldState {
   const templateId = input.templateId ?? 'common-house';
   if (!TEMPLATES[templateId]) throw new Error('Unknown world template.');
+  const metrics = TEMPLATES[templateId].initialMetrics ?? { cohesion: 62, tension: 18, resources: 75 };
   const s: WorldState = { version: 1, slug: input.slug, name: input.name, description: input.description || 'A small place to belong. Let’s see what grows here.', templateId, createdAt: now,
     settings: { mode: input.mode ?? 'fast-forward', populationCap: input.populationCap ?? 12 }, minute: 8 * 60, lastTickAt: now,
-    seed, nextCharacter: 1, characters: [], relationships: {}, history: [], nextLog: 1, cohesion: 62, tension: 18, resources: 75,
+    seed, nextCharacter: 1, characters: [], relationships: {}, history: [], nextLog: 1, ...metrics,
     elevatorFloor: 0, elevatorDirection: 1, elevatorPhase: 'stopped', cooldowns: {}, lastRitualDay: -1 };
   log(s, 'world', 'The doors open. A little world begins.');
   for (let i = 0; i < Math.min(6, s.settings.populationCap); i++) createCharacter(s, TEMPLATES[templateId].initialNames[i], TRAITS[i % TRAITS.length]);
@@ -92,7 +93,7 @@ export function step(s: WorldState) {
     } else if (random(s) < .12) {
       c.destination = night || c.energy < 20 ? 1 : Math.floor(random(s) * template.floors.length);
       c.activity = c.destination === c.floor ? template.floors[c.floor].purpose : 'heading to the elevator';
-    } else { c.x = clamp(c.x + (random(s) - .5) * 18, 8, 84); if (!c.speech) c.activity = night ? 'resting' : ['making tea', 'reading', 'tending the plants'][c.floor]; }
+    } else { c.x = clamp(c.x + (random(s) - .5) * 18, 8, 84); if (!c.speech) c.activity = night ? 'resting' : (template.floors[c.floor].activity ?? ['making tea', 'reading', 'tending the plants'][c.floor]); }
   }
   if (people.length > 1 && random(s) < .48) {
     const a = pick(s, people); const nearby = people.filter(b => b.id !== a.id && !b.inElevator && !a.inElevator && b.floor === a.floor && b.destination === b.floor && a.destination === a.floor);
