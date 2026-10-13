@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { useId, type CSSProperties } from 'react';
 import type { Character, WorldState } from '../simulation/types';
 import { TEMPLATES } from '../simulation/catalog';
 import { useBuildingMotion } from './useBuildingMotion';
@@ -63,7 +63,7 @@ export default function Building({ world, selected, onSelect, miniature = false 
   const night = world.minute % 1440 >= 1200 || world.minute % 1440 < 360;
   return <svg className={`building ${miniature ? 'miniature' : ''}`} viewBox="0 0 920 630" role={onSelect ? 'group' : 'img'} aria-label={miniature ? `${template.name} template illustration` : `${world.name}, ${template.name}, with ${people.length} residents`}>
     <defs>
-      <linearGradient id={skyId} x2="0" y2="1"><stop stopColor={night ? '#bfc9c8' : harbor ? '#d5e5e9' : template.id === 'makers-house' ? '#eee2da' : '#e7ecdf'}/><stop offset="1" stopColor="#f0eee2"/></linearGradient>
+      <linearGradient id={skyId} x2="0" y2="1"><stop stopColor={night ? 'var(--sky-night, #bfc9c8)' : harbor ? 'var(--sky-harbor, #d5e5e9)' : template.id === 'makers-house' ? 'var(--sky-makers, #eee2da)' : 'var(--sky-day, #e7ecdf)'}/><stop offset="1" stopColor="var(--sky-horizon, #f0eee2)"/></linearGradient>
       <pattern id={wallId} width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r=".6" fill="#8e9078" opacity=".12"/></pattern>
     </defs>
     <rect width="920" height="630" rx="16" fill={`url(#${skyId})`}/>
@@ -73,16 +73,16 @@ export default function Building({ world, selected, onSelect, miniature = false 
     {harbor && <g fill="none" stroke="#93b4bd" strokeWidth="3" opacity=".6"><path d="M0 518q25-9 50 0t50 0M822 518q25-9 50 0t50 0M0 536q25-9 50 0t50 0M822 536q25-9 50 0t50 0"/><path d="M35 300v-68l31 51H35" fill="#f4ead1" strokeWidth="2"/></g>}
     <ellipse cx="464" cy="579" rx="350" ry="19" fill="#a7b69b" opacity=".21"/>
     <rect x="97" y="100" width="726" height="457" rx="7" fill="#a9ad95"/>
-    <rect x="105" y="108" width="710" height="443" fill="#f2e7cf"/>
+    <rect x="105" y="108" width="710" height="443" fill="var(--house-frame, #f2e7cf)"/>
     {[2, 1, 0].map(floor => {
       const y = 112 + (2 - floor) * 143;
       return <g key={floor}>
-        <rect x="113" y={y} width="591" height="132" fill={template.floors[floor].color}/>
+        <rect x="113" y={y} width="591" height="132" className="building-room" style={{ '--room-color': template.floors[floor].color } as CSSProperties} fill={template.floors[floor].color}/>
         <rect x="113" y={y} width="591" height="132" fill={`url(#${wallId})`}/>
         <path d={`M113 ${y + 128}h591v8H113Z`} fill="#c6b399"/>
         <path d={`M113 ${y + 130}h591`} stroke="#af9f87"/>
-        {[157, 350, 560].map(x => <g key={x}><path d={`M${x} ${y + 89}v-47a27 27 0 0 1 54 0v47Z`} fill={night ? '#adbab7' : '#eef0dc'} stroke="#b7b394" strokeWidth="5"/><path d={`M${x + 27} ${y + 16}v73m-27-38h54`} stroke="#c2bda2" strokeWidth="3"/></g>)}
-        <text x="128" y={y + 18} fontSize="8" letterSpacing="1.4" fill="#7f7e67">0{floor + 1}</text>
+        {[157, 350, 560].map(x => <g key={x}><path d={`M${x} ${y + 89}v-47a27 27 0 0 1 54 0v47Z`} fill={night ? 'var(--window-night, #adbab7)' : 'var(--window-day, #eef0dc)'} stroke="#b7b394" strokeWidth="5"/><path d={`M${x + 27} ${y + 16}v73m-27-38h54`} stroke="#c2bda2" strokeWidth="3"/></g>)}
+        <text x="128" y={y + 18} fontSize="8" letterSpacing="1.4" fill="var(--scene-label, #7f7e67)">0{floor + 1}</text>
         {floor === 2 && template.id === 'common-house' && <g><Plant x={250} y={y + 107} size={1.1}/><Plant x={651} y={y + 104} size={1.2}/><rect x="320" y={y + 92} width="110" height="16" rx="3" fill="#9a9b72"/><path d={`M330 ${y + 108}v21m90-21v21`} stroke="#838467" strokeWidth="5"/><Plant x={339} y={y + 73} size={.65}/><Plant x={378} y={y + 73} size={.65}/><Plant x={413} y={y + 73} size={.5}/><path d={`M477 ${y + 124}v-27q20-12 38 0v27m-36-14h34`} fill="#c4ad83" stroke="#a78f6b" strokeWidth="3"/></g>}
         {floor === 1 && <g><rect x="262" y={y + 44} width="51" height="78" fill="#aa906d"/><path d={`M264 ${y + 71}h47m-47 26h47`} stroke="#dbc69f" strokeWidth="3"/>{[0,1,2,3,4].map(i => <rect key={i} x={269+i*8} y={y+51} width="5" height="18" rx="1" fill={['#d0b083','#82917b','#bd8772','#e4d5b5','#969998'][i]}/>)}<rect x="449" y={y + 93} width="88" height="29" rx="6" fill="#99a089"/><rect x="449" y={y + 84} width="88" height="26" rx="7" fill="#aab198"/><path d={`M452 ${y + 100}v17m82-17v17`} stroke="#7d8c71" strokeWidth="8" strokeLinecap="round"/><path d={`M600 ${y + 124}v-69m-17 3h34l-9-17h-16Z`} fill="#e8d7a7" stroke="#a89570" strokeWidth="2"/><Plant x={165} y={y + 109} size={.8}/><rect x="369" y={y + 35} width="34" height="25" fill="#e8debd" stroke="#ad9271" strokeWidth="3"/><circle cx="386" cy={y + 46} r="6" fill="#b4bb98"/></g>}
         {floor === 0 && template.id !== 'makers-house' && <g><rect x="135" y={y + 85} width="94" height="40" fill="#b4ae8c"/><rect x="132" y={y + 81} width="100" height="7" rx="2" fill="#8e8b70"/><path d={`M180 ${y + 89}v34m-39-23h29m20 0h29`} stroke="#8d9075"/><rect x="147" y={y + 67} width="18" height="15" rx="3" fill="#d4c5a1"/><path d={`M165 ${y + 70}q13 1 0 8`} fill="none" stroke="#d4c5a1" strokeWidth="3"/><ellipse cx="397" cy={y + 125} rx="95" ry="8" fill="#b9a078" opacity=".3"/><path d={`M336 ${y + 96}h117m-105 0v30m94-30v30`} stroke="#9a7f5a" strokeWidth="6" strokeLinecap="round"/><rect x="335" y={y + 91} width="120" height="8" rx="3" fill="#b49a73"/><rect x="370" y={y + 81} width="12" height="10" rx="2" fill="#efe1be"/><rect x="414" y={y + 81} width="12" height="10" rx="2" fill="#c8d0ac"/><path d={`M312 ${y + 126}v-32m-1 22h21m144 10v-32m-19 22h20`} stroke="#a49370" strokeWidth="4"/><Plant x={652} y={y + 103} size={1.2}/></g>}
@@ -102,14 +102,14 @@ export default function Building({ world, selected, onSelect, miniature = false 
       const y = 236 + (2-(position?.floor ?? c.floor))*143;
       const hasSpeech = !miniature && c.speech && (selected === c.id || people.filter(p => p.speech).at(-1)?.id === c.id);
       return <g key={c.id} data-resident-id={c.id} data-aboard={position?.aboard ?? !!c.inElevator} className={`resident-sprite ${selected === c.id ? 'selected' : ''}`} style={{ transform: `translate(${x}px, ${y}px)` }} role={onSelect ? 'button' : undefined} tabIndex={onSelect ? 0 : undefined} aria-label={`${c.name}, ${c.activity}`} onClick={() => onSelect?.(c.id)} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect?.(c.id); } }}>
-        {selected === c.id && <ellipse cy="0" rx="23" ry="8" fill="none" stroke="#566f4d" strokeWidth="2" strokeDasharray="3 3"/>}
+        {selected === c.id && <ellipse cy="0" rx="23" ry="8" fill="none" stroke="var(--scene-selection, #566f4d)" strokeWidth="2" strokeDasharray="3 3"/>}
         <Person character={c}/>
-        {!miniature && <><rect x="-25" y="8" width="50" height="15" rx="7" fill="#f6f4e8" fillOpacity=".9"/><text y="19" textAnchor="middle" fontSize="9" fill="#555e4c">{c.name.slice(0, 10)}</text></>}
-        {hasSpeech && <g className="speech"><rect x="-78" y="-89" width="156" height="24" rx="8" fill="#fffdf4" stroke="#dddcca"/><path d="m-4-65 5 6 5-6" fill="#fffdf4"/><text textAnchor="middle" y="-74" fontSize="9" fill="#58624d">{c.speech!.length > 31 ? `${c.speech!.slice(0, 29)}…` : c.speech}</text></g>}
+        {!miniature && <><rect x="-25" y="8" width="50" height="15" rx="7" fill="var(--scene-bubble, #f6f4e8)" fillOpacity=".9"/><text y="19" textAnchor="middle" fontSize="9" fill="var(--scene-text, #555e4c)">{c.name.slice(0, 10)}</text></>}
+        {hasSpeech && <g className="speech"><rect x="-78" y="-89" width="156" height="24" rx="8" fill="var(--scene-bubble, #fffdf4)" stroke="var(--scene-outline, #dddcca)"/><path d="m-4-65 5 6 5-6" fill="var(--scene-bubble, #fffdf4)"/><text textAnchor="middle" y="-74" fontSize="9" fill="var(--scene-text, #58624d)">{c.speech!.length > 31 ? `${c.speech!.slice(0, 29)}…` : c.speech}</text></g>}
       </g>;
     })}
     <Plant x={72} y={546} size={1.3}/><Plant x={851} y={548} size={1.1}/>
     <path d="M57 577h807" stroke="#bec5ad" strokeWidth="2" strokeLinecap="round"/>
-    <text x="460" y="608" textAnchor="middle" fontSize="10" fill="#829076" letterSpacing="1">{miniature ? 'THREE FLOORS. ROOM TO BECOME.' : 'EVERY LITTLE LIFE HAS A STORY. CLICK SOMEONE TO MEET THEM.'}</text>
+    <text x="460" y="608" textAnchor="middle" fontSize="10" fill="var(--scene-caption, #829076)" letterSpacing="1">{miniature ? 'THREE FLOORS. ROOM TO BECOME.' : 'EVERY LITTLE LIFE HAS A STORY. CLICK SOMEONE TO MEET THEM.'}</text>
   </svg>;
 }
