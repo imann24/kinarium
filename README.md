@@ -1,5 +1,7 @@
 # Kinarium
 
+[Play Kinarium](https://kinarium.isaiahbmann.workers.dev)
+
 A persistent, multiplayer community playground. No objectives or win state: the simulation, relationships, conversations, and accumulated history are the game.
 
 ## Run locally
