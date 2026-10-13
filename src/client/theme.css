@@ -31,6 +31,8 @@
   --focus: #d4e8ad;
   --sky-day: #30463e;
   --sky-night: #182a30;
+  --sky-harbor: #2d424a;
+  --sky-makers: #453d35;
   --sky-horizon: #26382f;
   --house-frame: #6d735d;
   --window-day: #a4b69a;
@@ -113,3 +115,5 @@
 :root[data-theme='light'] :is(.live-chip,.card-badge,.section-top h2 span,.tiny-star,.stage-footer i) { color:var(--secondary); }
 :root[data-theme='light'] :is(.presence-group>span,.presence-row>span) { color:#0b140d; }
 :root[data-theme='light'] :is(.fullscreen-toggle,.bond-card b span,.guide-copy b) { color:var(--secondary); }
+
+:root .template-preview p { color:var(--secondary); }
