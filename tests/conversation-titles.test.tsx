@@ -61,11 +61,11 @@ describe('grounded conversation titles', () => {
     expect(renderToStaticMarkup(<ConversationThread entry={entry} characters={world.characters}/>)).toContain(entry.conversation!.topic);
   });
   it('renders saved titles safely beside participants', () => {
-    const { world, entry } = fixture();
+    const { world, entry, a, b } = fixture();
     entry.conversation!.title = '<script>boats</script>';
     const html = renderToStaticMarkup(<ConversationThread entry={entry} characters={world.characters}/>);
     expect(html).toContain('&lt;script&gt;boats&lt;/script&gt;');
-    expect(html).toContain('Milo'); expect(html).toContain('Juniper');
+    expect(html).toContain(a.name); expect(html).toContain(b.name);
     expect(html).not.toContain('Company at the common table');
   });
 });

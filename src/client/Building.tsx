@@ -63,7 +63,9 @@ export default function Building({ world, selected, onSelect, miniature = false 
   const skyId = `${svgId}-sky`; const wallId = `${svgId}-wall`;
   const harbor = template.id === 'harbor-house';
   const night = world.minute % 1440 >= 1200 || world.minute % 1440 < 360;
-  return <svg className={`building ${miniature ? 'miniature' : ''}`} viewBox="0 0 920 630" role={onSelect ? 'group' : 'img'} aria-label={miniature ? `${template.name} template illustration` : `${world.name}, ${template.name}, with ${people.length} residents`}>
+  // The live frame trims only scenery margins; keep the sun, outside plants,
+  // resident speech, elevator and bottom caption inside it. Previews keep their original frame.
+  return <svg className={`building ${miniature ? 'miniature' : ''}`} viewBox={onSelect ? '32 24 856 594' : '0 0 920 630'} role={onSelect ? 'group' : 'img'} aria-label={miniature ? `${template.name} template illustration` : `${world.name}, ${template.name}, with ${people.length} residents`}>
     <defs>
       <linearGradient id={skyId} x2="0" y2="1"><stop stopColor={night ? 'var(--sky-night, #bfc9c8)' : harbor ? 'var(--sky-harbor, #d5e5e9)' : template.id === 'makers-house' ? 'var(--sky-makers, #eee2da)' : 'var(--sky-day, #e7ecdf)'}/><stop offset="1" stopColor="var(--sky-horizon, #f0eee2)"/></linearGradient>
       <pattern id={wallId} width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r=".6" fill="#8e9078" opacity=".12"/></pattern>
@@ -74,7 +76,7 @@ export default function Building({ world, selected, onSelect, miniature = false 
     <g opacity=".36" fill="#c4cfb8"><path d="M0 500V332l44-25 43 25v168M842 500V355l41-35 37 35v145"/><path d="M25 390h38v11H25m0 22h38v11H25m839-14h38v11h-38" fill="#aebda4"/></g>
     {harbor && <g fill="none" stroke="#93b4bd" strokeWidth="3" opacity=".6"><path d="M0 518q25-9 50 0t50 0M822 518q25-9 50 0t50 0M0 536q25-9 50 0t50 0M822 536q25-9 50 0t50 0"/><path d="M35 300v-68l31 51H35" fill="#f4ead1" strokeWidth="2"/></g>}
     <ellipse cx="464" cy="579" rx="350" ry="19" fill="#a7b69b" opacity=".21"/>
-    <rect x="97" y="100" width="726" height="457" rx="7" fill="#a9ad95"/>
+    <rect className="building-shell" x="97" y="100" width="726" height="457" rx="7" fill="#a9ad95"/>
     <rect x="105" y="108" width="710" height="443" fill="var(--house-frame, #f2e7cf)"/>
     {[2, 1, 0].map(floor => {
       const y = 112 + (2 - floor) * 143;
