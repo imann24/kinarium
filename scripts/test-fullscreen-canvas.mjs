@@ -46,6 +46,14 @@ try {
       overflow: document.documentElement.scrollWidth > innerWidth,
      }));
      assert(!geometry.overflow, 'No horizontal overflow');
+     if (width > 900) {
+      assert(geometry.canvasTop < 285, 'Compact desktop header leaves room for the world');
+      assert(scene.height >= height-460, 'Actual default canvas uses reclaimed header space');
+     }
+     assert(await page.locator('.journal-panel-toggle').evaluate(el => {
+      const r=el.getBoundingClientRect();
+      return r.height>=44 && r.left>=0 && r.right<=innerWidth && el.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2));
+     }), 'Journal action stays accessible and unobscured');
      assert(scene.scale > 0 && Math.abs(scene.scale-scene.scaleY)<.0001, 'Normal scene aspect ratio');
      if (geometry.canvasTop + geometry.controls + 177 <= height) assert(geometry.bottom <= height-15, 'Normal scene and controls fit');
      const scrollScale = scene.scale;

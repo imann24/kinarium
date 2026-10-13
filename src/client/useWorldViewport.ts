@@ -37,7 +37,7 @@ export function useWorldViewport(stageRef: RefObject<HTMLElement | null>, ready:
     if (page) observer.observe(page);
     if (heading) observer.observe(heading);
     if (header) observer.observe(header);
-    page?.querySelectorAll('.world-view-nav, .journal-panel-controls, .error-box').forEach(el => observer.observe(el));
+    page?.querySelectorAll('.world-view-nav, .journal-panel-controls, .world-view-controls, .error-box').forEach(el => observer.observe(el));
     window.addEventListener('resize', fit);
     window.visualViewport?.addEventListener('resize', fit);
     return () => {

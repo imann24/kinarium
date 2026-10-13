@@ -1,0 +1,72 @@
+/* World pages reserve more of the first screen for the scene, not header spacing. */
+.site-header.world-site-header {
+  height: 56px;
+  min-height: 56px;
+  padding: 0 32px;
+}
+.world-site-header .brand { font-size: 24px; }
+.world-site-header nav { gap: 24px; }
+.world-site-header nav a { height: 56px; }
+.world-site-header .text-button { min-height: 44px; }
+
+.world-page:not(.world-fullscreen) { padding: 12px 32px 20px; }
+.world-page:not(.world-fullscreen) .world-heading { margin-bottom: 8px; gap: 16px; }
+.world-page:not(.world-fullscreen) .world-heading h1 {
+  font-size: 28px;
+  line-height: 1.2;
+  margin: 4px 0;
+  gap: 10px;
+}
+.world-page:not(.world-fullscreen) .world-heading p { line-height: 1.5; }
+.world-page:not(.world-fullscreen) .world-heading-actions {
+  padding-top: 0;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+}
+.world-page .world-heading-actions .outline { min-height: 44px; }
+.world-page .presence-group { min-height: 44px; }
+
+/* Keep view navigation and the journal action on one row when they fit. */
+.world-view-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+.world-view-controls .world-view-nav {
+  flex: 1 1 auto;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.world-view-controls .world-view-nav a { min-height: 44px; padding: 10px 12px; }
+.world-view-controls .journal-panel-controls { margin: 0 0 0 auto; }
+
+@media(max-width:760px) {
+  .site-header.world-site-header { padding-right: 18px; padding-left: 18px; }
+  .world-page:not(.world-fullscreen) { padding: 10px 18px 20px; }
+  .world-page:not(.world-fullscreen) .world-heading { gap: 10px; align-items: flex-start; }
+  .world-page:not(.world-fullscreen) .world-heading h1 { font-size: 25px; max-width: none; }
+  .world-page:not(.world-fullscreen) .world-heading-actions { gap: 4px; flex-direction: column; }
+  .world-page:not(.world-fullscreen) .world-heading p { max-width: none; }
+  .world-page .back-link { min-height: 32px; }
+  .world-view-controls { gap: 6px 8px; }
+  .world-view-controls .world-view-nav { gap: 4px; }
+  .world-view-controls .world-view-nav a { padding: 10px 8px; font-size: 12px; }
+}
+@media(max-width:600px) {
+  .site-header.world-site-header { height: auto; min-height: 80px; padding-top: 4px; }
+  .world-site-header .brand { font-size: 22px; }
+  .world-site-header nav { gap: 20px; }
+  .world-site-header nav a { height: 44px; }
+}
+.world-page:not(.world-fullscreen) .world-heading > div:first-child { min-width: 0; }
+.world-page:not(.world-fullscreen) .world-heading h1 { overflow-wrap: anywhere; }
+.world-page:not(.world-fullscreen) .world-heading-actions { flex-shrink: 0; }
+@media(max-width:760px) {
+  .world-page .world-heading-actions .outline { min-width: 44px; }
+}
