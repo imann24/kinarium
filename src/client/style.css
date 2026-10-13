@@ -26,3 +26,7 @@
 @media(max-width:450px){.stage-toolbar-actions{gap:9px}.fullscreen-toggle span{display:none}.fullscreen-toggle{min-width:36px}.world-fullscreen .world-stage .building{max-height:none}}
 
 .template-preview{border:1px solid var(--line);border-radius:8px;background:var(--paper);padding:14px;margin:12px 0 22px}.template-preview .building{height:170px;max-width:290px;margin:0 auto 10px}.template-preview p{font-size:11px;line-height:1.8;color:#75806b}.template-preview ol{list-style:none;padding:0;margin:12px 0;display:flex;flex-wrap:wrap;gap:8px 14px}.template-preview li{display:flex;align-items:center;gap:6px;font-size:10px}.template-preview li span{width:10px;height:10px;border:1px solid #00000012;border-radius:50%;flex-shrink:0}.template-preview>small{color:var(--muted);font-size:10px}
+
+/* Fit the initial world view; fullscreen retains its own layout. */
+.world-page:not(.world-fullscreen) .world-stage{align-self:start}
+.world-page:not(.world-fullscreen) .world-stage .building{min-height:0;max-height:var(--world-canvas-height,none)}

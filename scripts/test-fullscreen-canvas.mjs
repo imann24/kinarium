@@ -13,7 +13,7 @@ const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PAT
 const results = [];
 try {
  for (const fallback of [false, true]) {
-  const page = await browser.newPage();
+  const page = await browser.newPage({colorScheme: fallback ? 'dark' : 'light'});
   const errors = []; page.on('pageerror', e => errors.push(e.message));
   if (fallback) await page.addInitScript(() => { Element.prototype.requestFullscreen = async () => { throw new Error('Fullscreen unavailable'); }; });
   if (baseline) await page.route(/\/src\/client\/useFullscreenCanvas\.ts(?:\?.*)?$/, route => route.fulfill({ contentType: 'application/javascript', body: 'export function useFullscreenCanvas() {}' }));
@@ -26,7 +26,7 @@ try {
    }
    for (const [width, height] of [[1440,900], [1280,800], [1920,1080], [768,1024], [390,844], [844,390]]) {
     await page.setViewportSize({width,height});
-    await page.goto(`${base}/w/${slug}`);
+    await page.goto(`${base}/w/${slug}`, {waitUntil:'domcontentloaded'});
     const toggle = page.locator('.journal-panel-toggle');
     await toggle.waitFor();
     if (await toggle.getAttribute('aria-expanded') === 'false') await toggle.click();
@@ -35,6 +35,32 @@ try {
      const footer = document.querySelector('.stage-footer').getBoundingClientRect();
      return {scale:m.a, scaleY:m.d, width:b.width, height:b.height, x:m.e, y:m.f, right:m.e+v.width*m.a, bottom:m.f+v.height*m.d, footerBottom:footer.bottom};
     });
+    await page.evaluate(() => document.fonts.ready);
+    await page.waitForTimeout(100);
+    const checkNormal = async () => {
+     const scene = await measure();
+     const geometry = await page.locator('.world-stage').evaluate(stage => ({
+      bottom: stage.getBoundingClientRect().bottom,
+      canvasTop: stage.querySelector('.building').getBoundingClientRect().top,
+      controls: stage.querySelector('.stage-footer').offsetHeight + stage.querySelector('.community-stats').offsetHeight,
+      overflow: document.documentElement.scrollWidth > innerWidth,
+     }));
+     assert(!geometry.overflow, 'No horizontal overflow');
+     assert(scene.scale > 0 && Math.abs(scene.scale-scene.scaleY)<.0001, 'Normal scene aspect ratio');
+     if (geometry.canvasTop + geometry.controls + 177 <= height) assert(geometry.bottom <= height-15, 'Normal scene and controls fit');
+     const scrollScale = scene.scale;
+     await page.evaluate(() => window.scrollTo(0,100)); await page.waitForTimeout(50);
+     assert(Math.abs((await measure()).scale-scrollScale)<.002, 'Scrolling must not resize the scene');
+     await page.evaluate(() => window.scrollTo(0,0));
+    };
+    if (!baseline) {
+     await checkNormal();
+     await toggle.click(); await page.waitForTimeout(100); await checkNormal();
+     await toggle.click(); await page.waitForTimeout(100);
+     await page.setViewportSize({width:width-40,height:height+40}); await page.waitForTimeout(100);
+     await page.setViewportSize({width,height}); await page.waitForTimeout(100); await checkNormal();
+     if (width===1440 || width===390) await page.screenshot({path:`${output}/normal-${templateId}-${width}-${fallback?'dark':'light'}.png`});
+    }
     const normal = await measure();
     await page.getByRole('button', {name:'Enter fullscreen',exact:true}).click();
     await page.locator('.world-fullscreen').waitFor();
