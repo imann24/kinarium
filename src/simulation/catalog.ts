@@ -11,6 +11,26 @@ export const TEMPLATES: Record<string, WorldTemplate> = {
     ],
     initialNames: ['Milo', 'Juniper', 'Cleo', 'Otis', 'Fern', 'Remy', 'Ada', 'Sol'],
   },
+  'makers-house': {
+    id: 'makers-house', name: 'The makers’ house', description: 'A busy workshop, a quiet retreat, and a studio full of unfinished ideas. Plenty of supplies; a few creative differences.',
+    floors: [
+      { name: 'The shared workshop', purpose: 'build something together', activity: 'sorting tools', color: '#e5c4a7' },
+      { name: 'The reading nook', purpose: 'rest with a sketchbook', activity: 'sketching ideas', color: '#e8dbc7' },
+      { name: 'The sunlit studio', purpose: 'make something useful', activity: 'mixing paints', color: '#dcd3df' },
+    ],
+    initialNames: ['Pip', 'Alma', 'Theo', 'Nia', 'Hugo', 'Esme', 'Jules', 'Ravi'],
+    initialMetrics: { cohesion: 54, tension: 26, resources: 88 },
+  },
+  'harbor-house': {
+    id: 'harbor-house', name: 'The harbor house', description: 'A seaside kitchen, a sheltered lounge, and a net-mending loft. Close-knit neighbors make the most of modest supplies.',
+    floors: [
+      { name: 'The dockside kitchen', purpose: 'share a pot of chowder', activity: 'brewing seaside tea', color: '#e9d7bb' },
+      { name: 'The sheltered lounge', purpose: 'rest out of the sea breeze', activity: 'reading tide charts', color: '#d6e1e1' },
+      { name: 'The net-mending loft', purpose: 'repair nets and supplies', activity: 'mending fishing nets', color: '#c6d8de' },
+    ],
+    initialNames: ['Marin', 'Iona', 'Finn', 'Pearl', 'Casper', 'Rosa', 'Ari', 'Mae'],
+    initialMetrics: { cohesion: 74, tension: 12, resources: 52 },
+  },
 };
 export interface EventDefinition { id: string; name: string; description: string; icon: string; tone: 'kind' | 'mixed' | 'disruptive'; cohesion: number; tension: number; resources: number; mood: number; text: string; }
 export const EVENTS: EventDefinition[] = [
