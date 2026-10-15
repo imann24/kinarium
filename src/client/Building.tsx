@@ -56,7 +56,7 @@ export function Person({ character, small = false }: { character: Pick<Character
     <path d="M-2-37q2 2 4 0" fill="none" stroke="#986f54" strokeWidth="1"/>
   </g>;
 }
-export default function Building({ world, selected, onSelect, miniature = false }: { world: WorldState; selected?: string; onSelect?: (id: string) => void; miniature?: boolean }) {
+export default function Building({ world, selected, onSelect, onOpenConversation, miniature = false }: { world: WorldState; selected?: string; onSelect?: (id: string) => void; miniature?: boolean; onOpenConversation?: (id: number) => void }) {
   const people = world.characters.filter(c => !c.away);
   const motion = useBuildingMotion(world, miniature);
   const template = TEMPLATES[world.templateId];
@@ -113,7 +113,8 @@ export default function Building({ world, selected, onSelect, miniature = false 
     })}
     {!miniature && people.filter(c => c.speech && (selected === c.id || people.filter(p => p.speech).at(-1)?.id === c.id)).map(c => {
       const position = motion.position(c.id);
-      return <SpeechBubble key={`${c.id}:${c.speech}`} text={c.speech!} name={c.name}
+      return <SpeechBubble key={`${c.id}:${c.speechConversationId}:${c.speech}`} text={c.speech!} name={c.name}
+        onOpenConversation={onOpenConversation && world.history.some(e => e.id === c.speechConversationId && e.conversation && e.characters.includes(c.id)) ? () => onOpenConversation(c.speechConversationId!) : undefined}
         x={position?.x ?? (c.inElevator ? 757 : 135 + c.x * 5.85)}
         y={236 + (2 - (position?.floor ?? c.floor)) * 143}/>;
     })}

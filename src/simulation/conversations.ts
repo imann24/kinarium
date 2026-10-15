@@ -28,7 +28,7 @@ function finish(world: WorldState, entry: LogEntry, interrupted = false) {
     const others = entry.characters.filter(other => other !== id).map(other => world.characters.find(p => p.id === other)?.name ?? other).join(' and ');
     rememberEvent(c, entry, `I ${thread.tone === 'tense' ? 'disagreed' : 'talked'} with ${others} about ${thread.topic.toLowerCase()}.${interrupted ? ' Our conversation was interrupted.' : ''} ${transcript}`, { tone: thread.tone, salience: thread.tone === 'tense' ? 3 : 1 });
     c.activity = 'reflecting on a conversation';
-    c.speech = undefined;
+    c.speech = undefined; c.speechConversationId = undefined;
   }
 }
 export function interruptConversations(world: WorldState, id: string) {
@@ -41,7 +41,7 @@ export function beginConversation(world: WorldState, a: Character, b: Character,
   const entry: LogEntry = { id: world.nextLog++, minute: world.minute, kind: positive ? 'conversation' : 'conflict', text: `${a.name} ${positive ? 'talks with' : 'has a disagreement with'} ${b.name}.${scene.eventText ? ` ${scene.eventText}` : ''}`, characters: [a.id, b.id], conversation: { repair: repair?.repair, generationAttempted: repair ? true : undefined, topic, sceneId: scene.id, fallbackTurns: scene.lines.slice(1), tone: positive ? 'warm' : 'tense', status: 'active', turns: [{ speakerId: a.id, text, minute: world.minute }], nextTurnAt: world.minute + TURN_INTERVAL, targetTurns: scene.lines.length } };
   entry.conversation!.title = conversationTitle(world, entry);
   world.history.push(entry);
-  a.speech = text; a.speechUntil = world.minute + TURN_INTERVAL;
+  a.speech = text; a.speechConversationId = entry.id; a.speechUntil = world.minute + TURN_INTERVAL;
   a.activity = `talking with ${b.name}`; b.activity = `listening to ${a.name}`;
   return entry;
 }
@@ -105,7 +105,7 @@ export function advanceConversations(world: WorldState) {
     thread.turns.push({ speakerId: speaker.id, text, minute: world.minute, ...(planned ? { generated: true } : {}) });
     if (planned) entry.generated = true;
     thread.nextTurnAt = world.minute + TURN_INTERVAL;
-    for (const c of people) { c!.speech = undefined; c!.activity = c === speaker ? `talking with ${people.find(p => p !== c)!.name}` : `listening to ${speaker.name}`; }
-    speaker.speech = text; speaker.speechUntil = thread.nextTurnAt;
+    for (const c of people) { c!.speech = undefined; c!.speechConversationId = undefined; c!.activity = c === speaker ? `talking with ${people.find(p => p !== c)!.name}` : `listening to ${speaker.name}`; }
+    speaker.speech = text; speaker.speechConversationId = entry.id; speaker.speechUntil = thread.nextTurnAt;
   }
 }

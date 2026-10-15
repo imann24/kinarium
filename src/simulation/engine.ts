@@ -97,7 +97,7 @@ export function step(s: WorldState) {
   } else s.elevatorPhase = 'stopped';
   const night = s.minute % 1440 < 360 || s.minute % 1440 > 1320;
   for (const c of people) {
-    if ((c.speechUntil ?? 0) < s.minute) c.speech = undefined;
+    if ((c.speechUntil ?? 0) < s.minute) { c.speech = undefined; c.speechConversationId = undefined; }
     Object.assign(c, residentDrift(c, s).next);
   }
   // Apply shared-condition drift consistently before any resident completes upkeep.
@@ -166,7 +166,7 @@ export function applyCommand(s: WorldState, command: Command, now: number) {
         interruptConversations(s, c.id);
         if (c.supplyTask) { log(s, 'upkeep', `${c.name} stops supply work before finishing; no supplies are added.`, [c.id]); delete c.supplyTask; }
       }
-      c.away = command.away; c.inElevator = false; c.destination = c.floor; c.x = Math.min(c.x, 84); c.speech = undefined; c.activity = c.away ? 'away for a while' : 'finding their feet again';
+      c.away = command.away; c.inElevator = false; c.destination = c.floor; c.x = Math.min(c.x, 84); c.speech = undefined; c.speechConversationId = undefined; c.activity = c.away ? 'away for a while' : 'finding their feet again';
       const departure = log(s, c.away ? 'departure' : 'arrival', `${c.name} ${c.away ? 'leaves for a while. Their place in the story remains.' : 'returns to the house. There is a familiar face at the door.'}`, [c.id]);
       rememberEvent(c, departure, c.away ? 'I took some time away from the house.' : 'I came back to the house.', { salience: 5 }); break;
     }

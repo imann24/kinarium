@@ -2,6 +2,12 @@
 button.expandable-text{cursor:pointer}
 button.expandable-text[aria-expanded=true]{cursor:text}
 .speech-box{pointer-events:none;overflow:visible;color:var(--scene-text,#58624d);font-size:9px}
-.speech-box .expandable-text{pointer-events:auto;width:100%;padding:6px 8px;border:1px solid var(--scene-outline,#dddcca);border-radius:8px;background:var(--scene-bubble,#fffdf4);line-height:1.4}
-.speech-box.expanded .expandable-text{max-height:396px;overflow:auto;font-size:12px}
+.speech-content{pointer-events:auto;max-height:396px;overflow:auto;padding:6px 8px;border:1px solid var(--scene-outline,#dddcca);border-radius:8px;background:var(--scene-bubble,#fffdf4);line-height:1.4}
+.speech-box .expandable-text{width:100%;padding:0;border:0;background:transparent;line-height:inherit}
+.speech-box.expanded .expandable-text{max-height:300px;overflow:auto;font-size:12px}
 .speech-box .expandable-text:focus-visible{outline:3px solid var(--scene-selection,#566f4d);outline-offset:2px}
+
+.speech-speaker{display:block;margin-bottom:6px;font-size:12px;overflow-wrap:anywhere}
+.speech-conversation{display:block;width:100%;margin-top:8px;padding:6px;border:1px solid currentColor;border-radius:4px;color:inherit;background:transparent;font-size:12px;cursor:pointer}
+.speech-unlinked{display:block;margin-top:8px;font-size:11px}
+.speech-conversation:focus-visible{outline:3px solid var(--scene-selection,#566f4d);outline-offset:2px}
