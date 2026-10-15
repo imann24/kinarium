@@ -3,10 +3,10 @@ import { gameTime } from '../simulation/engine';
 import type { Character, LogEntry } from '../simulation/types';
 import './conversation-thread.css';
 
-export default function ConversationThread({ entry, characters, onSelect }: { entry: LogEntry; characters: Character[]; onSelect?: (id: string) => void }) {
+export default function ConversationThread({ entry, characters, onSelect, expanded = false }: { entry: LogEntry; characters: Character[]; onSelect?: (id: string) => void; expanded?: boolean }) {
   const thread = entry.conversation!;
   const name = (id: string) => characters.find(c => c.id === id)?.name ?? 'Former resident';
-  return <details className="conversation-thread" open={thread.status === 'active' ? true : undefined}>
+  return <details className="conversation-thread" open={expanded || thread.status === 'active' ? true : undefined}>
     <summary><strong>{entry.characters.map(name).join(' & ')}</strong><span>{thread.title ?? thread.topic}</span><small>{thread.turns.length} turns · {thread.status === 'active' ? 'In conversation' : thread.status === 'interrupted' ? 'Interrupted' : 'At a pause'}</small></summary>
     <p className="conversation-outcome">{thread.repair ? `Repair attempt · ${thread.status === 'active' ? 'outcome pending' : thread.status === 'interrupted' ? 'interrupted; no repair reward' : thread.repair.accepted ? thread.repair.phase === 'follow-through' ? 'follow-through completed' : 'offer accepted; follow-through still needed' : 'request for space respected'}` : `Recorded outcome: ${thread.tone === 'tense' ? 'disagreement' : 'warm encounter'}`}</p>
     <ol aria-label={`Conversation between ${entry.characters.map(name).join(' and ')}`}>

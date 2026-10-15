@@ -7,9 +7,16 @@ const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PAT
 try {
   const page = await browser.newPage();
   const errors = []; page.on('pageerror', e => errors.push(e.message));
-  let snapshot;
-  await page.route('**/api/**', route => route.fulfill({ json: route.request().url().endsWith('/worlds') ? { worlds: [] } : snapshot }));
-  await page.routeWebSocket('**/socket?**', () => {});
+  let snapshot; let archive = []; let socket; let archiveError = false; const archiveRequests = [];
+  await page.route('**/api/**', route => {
+    const url = route.request().url();
+    if (url.includes('/history?')) {
+      archiveRequests.push(url);
+      return route.fulfill({ status: archiveError ? 503 : 200, json: archiveError ? { error: 'Offline' } : { entries: archive, nextCursor: null } });
+    }
+    return route.fulfill({ json: url.endsWith('/worlds') ? { worlds: [] } : snapshot });
+  });
+  await page.routeWebSocket('**/socket?**', ws => { socket = ws; });
   await page.goto(base);
   snapshot = await page.evaluate(async () => {
     const { createWorld } = await import('/src/simulation/engine.ts');
@@ -52,8 +59,28 @@ try {
     assert.equal(await text.getAttribute('aria-expanded'), 'true');
     assert.equal(await page.locator('.character-detail').count(), 0);
     assert(await page.locator('.speech-content').evaluate(el => el.scrollWidth <= el.clientWidth + 1));
-    const link = page.getByRole('button', { name: 'Open conversation in journal' });
+    const link = page.getByRole('button', { name: 'Open conversation', exact: true });
     await link.focus(); await page.keyboard.press(count % 2 ? 'Space' : 'Enter');
+    const dialog = page.getByRole('dialog');
+    await dialog.waitFor();
+    assert.equal(await toggle.getAttribute('aria-expanded'), 'false');
+    assert.equal(await page.locator('.sidebar-tabs button').filter({ hasText: 'Bonds' }).getAttribute('class'), 'active');
+    assert.equal(await dialog.locator('li').count(), 1);
+    assert.equal(await dialog.locator('li p').innerText(), snapshot.world.characters[0].speech);
+    assert.equal(await dialog.locator('.conversation-speaker b').innerText(), 'Cleo');
+    assert(await dialog.evaluate(el => { const r = el.getBoundingClientRect(); return r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight && el.scrollWidth <= el.clientWidth + 1; }));
+    if (width === 390 && mode === 'normal') await page.screenshot({ path: `/tmp/conversation-modal-${theme}.png` });
+    const close = dialog.getByRole('button', { name: 'Close conversation' });
+    assert(await close.evaluate(el => el === document.activeElement));
+    await page.keyboard.press('Shift+Tab');
+    assert(await dialog.getByRole('button', { name: 'View in journal' }).evaluate(el => el === document.activeElement));
+    await page.keyboard.press('Tab');
+    assert(await close.evaluate(el => el === document.activeElement));
+    await page.keyboard.press('Escape');
+    await dialog.waitFor({ state: 'hidden' });
+    assert(await link.evaluate(el => el === document.activeElement));
+    await page.keyboard.press('Enter');
+    await dialog.getByRole('button', { name: 'View in journal' }).click();
     const summary = page.locator(`[data-conversation-id="${id}"] summary`);
     await page.waitForFunction(id => document.activeElement?.closest(`[data-conversation-id="${id}"]`), id);
     assert.equal(await toggle.getAttribute('aria-expanded'), 'true');
@@ -65,19 +92,78 @@ try {
     await page.locator('.resident-sprite').first().focus(); await page.keyboard.press('Enter');
     await page.locator('.character-detail').waitFor();
     await link.click();
+    await page.getByRole('dialog').getByRole('button', { name: 'View in journal' }).click();
     await page.waitForFunction(id => document.activeElement?.closest(`[data-conversation-id="${id}"]`), id);
     if (mode !== 'normal') await page.getByRole('button', { name: 'Exit fullscreen', exact: true }).click();
     count++;
   }
-  for (const reference of [undefined, 999999, snapshot.world.history[0].id]) {
+  for (const reference of [undefined, snapshot.world.history[0].id]) {
     snapshot.world.characters[0].speechConversationId = reference;
     snapshot.world.characters[0].speech = 'Hi!';
     await page.goto(`${base}/w/speech-journal`);
     await page.locator('.speech-box .expandable-text').click();
     assert.equal(await page.locator('.speech-speaker').innerText(), 'Cleo');
-    assert.equal(await page.getByRole('button', { name: 'Open conversation in journal' }).count(), 0);
+    assert.equal(await page.getByRole('button', { name: 'Open conversation', exact: true }).count(), 0);
     assert.equal(await page.locator('.speech-unlinked').innerText(), 'No linked conversation');
   }
+  // Archive lookup must ignore a newer duplicate and any earlier fallback records.
+  snapshot.world.characters[0].speechConversationId = id;
+  archive = snapshot.world.history.filter(e => e.id === id);
+  snapshot.world.history = snapshot.world.history.filter(e => e.id !== id);
+  await page.goto(`${base}/w/speech-journal`);
+  await page.locator('.speech-box .expandable-text').click();
+  await page.getByRole('button', { name: 'Open conversation', exact: true }).click();
+  const modal = page.getByRole('dialog');
+  await modal.locator('.conversation-thread').waitFor();
+  assert.equal(await modal.locator('li p').innerText(), archive[0].conversation.turns[0].text);
+  await modal.getByRole('button', { name: 'View in journal' }).click();
+  await page.waitForFunction(id => document.activeElement?.closest(`[data-conversation-id="${id}"]`), id);
+  // Missing ID with unrelated archive results has an explicit empty state.
+  snapshot.world.characters[0].speechConversationId = 999999;
+  await page.goto(`${base}/w/speech-journal`);
+  await page.locator('.speech-box .expandable-text').click();
+  await page.getByRole('button', { name: 'Open conversation', exact: true }).click();
+  await modal.getByText('This conversation is no longer available in the journal.').waitFor();
+  assert.equal(await modal.locator('.conversation-thread').count(), 0);
+  await modal.getByRole('button', { name: 'Close conversation' }).click();
+  // Live updates retain the selected ID as the speaking resident changes/disappears.
+  snapshot.world.characters[0].speechConversationId = id;
+  snapshot.world.history.push(archive[0]);
+  await page.goto(`${base}/w/speech-journal`);
+  await page.locator('.speech-box .expandable-text').click();
+  await page.getByRole('button', { name: 'Open conversation', exact: true }).click();
+  const changed = structuredClone(snapshot);
+  const thread = changed.world.history.find(e => e.id === id).conversation;
+  thread.status = 'active';
+  thread.turns.push({ speakerId: changed.world.characters[1].id, text: 'A live reply in this exact conversation.', minute: changed.world.minute + 6 });
+  delete changed.world.characters[0].speech;
+  socket.send(JSON.stringify({ type: 'snapshot', ...changed }));
+  await modal.getByText('A live reply in this exact conversation.', { exact: true }).waitFor();
+  assert.equal(await modal.locator('li').count(), 2);
+  await modal.getByRole('button', { name: 'Close conversation' }).click();
+  assert(await toggleFocus(page));
+  // Direct archive navigation must not skip intervening journal pages.
+  snapshot.world.characters[0].speech = 'Hi!';
+  snapshot.world.history = [{ ...archive[0], id: 100 }];
+  archiveError = true;
+  await page.goto(`${base}/w/speech-journal`);
+  await page.locator('.speech-box .expandable-text').click();
+  await page.getByRole('button', { name: 'Open conversation', exact: true }).click();
+  await modal.getByRole('button', { name: 'Try again' }).waitFor();
+  archiveError = false;
+  await modal.getByRole('button', { name: 'Try again' }).click();
+  await modal.locator('.conversation-thread').waitFor();
+  await modal.getByRole('button', { name: 'View in journal' }).click();
+  await page.getByRole('button', { name: 'Earlier in the story' }).click();
+  await page.waitForTimeout(100);
+  assert.equal(new URL(archiveRequests.at(-1)).searchParams.get('before'), '100');
+  // Profile links within the full thread retain ordinary resident navigation.
+  await page.getByRole('button', { name: 'Open conversation', exact: true }).click();
+  await modal.getByRole('button', { name: "View Cleo's profile" }).click();
+  await page.locator('.character-detail').waitFor();
+  assert.equal(await page.locator('.character-heading h2').innerText(), 'Cleo');
   assert.deepEqual(errors, []);
-  console.log(`PASS ${count} linked scenarios (themes, mobile/desktop, native/fallback fullscreen), exact duplicate-text ID, repeated navigation, keyboard, no collapse, resident selection; 3 short/unlinked scenarios.`);
+  console.log(`PASS ${count} modal scenarios: themes, mobile/desktop, native/fallback fullscreen, duplicate-text ID, focus trap/return, Escape, close, journal navigation, no collapse, resident selection; plus unlinked, archived, missing and live-update cases.`);
 } finally { await browser.close(); }
+
+async function toggleFocus(page) { return page.locator('.journal-panel-toggle').evaluate(el => el === document.activeElement); }
