@@ -1,3 +1,4 @@
+import { separateStandingResidents } from './standing';
 import { residentDrift, residentStats, recordResidentChange } from './resident-state';
 import { contactWillingness, repairScene } from './repair';
 import { updateHouseDetails } from './house-details';
@@ -43,7 +44,8 @@ export function createCharacter(s: WorldState, name?: string, trait?: Character[
   c.destination = c.floor;
   for (const other of s.characters) relationship(s, c.id, other.id);
   s.characters.push(c); const arrival = log(s, 'arrival', `${c.name} arrives at the house. A new story begins.`, [c.id]);
-  rememberEvent(c, arrival, 'I arrived at the house, ready to begin a new chapter.', { salience: 5 }); return c;
+  rememberEvent(c, arrival, 'I arrived at the house, ready to begin a new chapter.', { salience: 5 });
+  separateStandingResidents(s); return c;
 }
 export function createWorld(input: { slug: string; name: string; description?: string; mode?: WorldState['settings']['mode']; populationCap?: number; templateId?: string }, now = Date.now(), seed = 271828): WorldState {
   const templateId = input.templateId ?? 'common-house';
@@ -110,6 +112,7 @@ export function step(s: WorldState) {
       c.activity = c.destination === c.floor ? template.floors[c.floor].purpose : 'heading to the elevator';
     } else { c.x = clamp(c.x + (random(s) - .5) * 18, 8, 84); if (!c.speech) c.activity = night ? 'resting' : (template.floors[c.floor].activity ?? ['making tea', 'reading', 'tending the plants'][c.floor]); }
   }
+  separateStandingResidents(s);
   if (people.length > 1 && random(s) < .48) {
     const a = pick(s, people); const nearby = people.filter(b => !isConversing(s, a.id) && !isConversing(s, b.id) && b.id !== a.id && !b.inElevator && !a.inElevator && b.floor === a.floor && b.destination === b.floor && a.destination === a.floor && inConversationRange(a, b) && a.energy >= 20 && b.energy >= 20);
     if (nearby.length) {
@@ -185,6 +188,7 @@ export function applyCommand(s: WorldState, command: Command, now: number) {
     }
     default: throw new Error('Unknown action.');
   }
+  separateStandingResidents(s);
 }
 export function summarize(s: WorldState, protectedWorld: boolean): WorldSummary {
   return { slug: s.slug, name: s.name, description: s.description, templateId: s.templateId, createdAt: s.createdAt, population: activeCharacters(s).length, populationCap: s.settings.populationCap, mode: s.settings.mode, protected: protectedWorld, cohesion: Math.round(s.cohesion) };
