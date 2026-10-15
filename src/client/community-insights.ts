@@ -1,13 +1,11 @@
 import type { Character, LogEntry, Relationship, WorldState } from '../simulation/types';
 
 export type InsightScope = 'home' | 'all';
-export type BondKind = 'close' | 'strained' | 'forming' | 'unmet';
+export { bondKind } from '../simulation/relationship-labels';
+import { bondKind, type BondKind } from '../simulation/relationship-labels';
+export type { BondKind } from '../simulation/relationship-labels';
 export interface InsightBond { relationship: Relationship; a: Character; b: Character; kind: BondKind; }
 
-// Match the existing Bonds view's thresholds. These are display groups, not diagnoses.
-export function bondKind(r: Relationship): BondKind {
-  return r.encounters === 0 ? 'unmet' : r.affinity > 35 ? 'close' : r.affinity < -20 ? 'strained' : 'forming';
-}
 const average = (values: number[]) => values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : null;
 
 /** Derive current-state statistics without mutating the authoritative simulation. */

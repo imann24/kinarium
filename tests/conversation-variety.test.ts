@@ -79,7 +79,8 @@ describe('procedural conversational variety', () => {
     applyCommand(world, { type: 'trigger-event', eventId: event.id }, 0);
     const first = beginConversation(world, a, b, false); finish(world);
     expect(first.conversation!.topic).toBe(event.name);
-    expect(first.text).toContain(event.text);
+    expect(first.text).toContain('They discuss an earlier event');
+    expect(first.text).not.toContain(event.text);
     const next = beginConversation(world, a, b, false);
     expect(next.conversation!.sceneId).not.toBe(first.conversation!.sceneId);
   });

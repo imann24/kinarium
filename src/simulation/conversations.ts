@@ -38,7 +38,7 @@ export function beginConversation(world: WorldState, a: Character, b: Character,
   const scene = repair ?? chooseConversationScene(world, a, b, positive);
   const { topic } = scene;
   const text = scene.lines[0];
-  const entry: LogEntry = { id: world.nextLog++, minute: world.minute, kind: positive ? 'conversation' : 'conflict', text: `${a.name} ${positive ? 'talks with' : 'works through a disagreement with'} ${b.name}.${scene.eventText ? ` ${scene.eventText}` : ''}`, characters: [a.id, b.id], conversation: { repair: repair?.repair, generationAttempted: repair ? true : undefined, topic, sceneId: scene.id, fallbackTurns: scene.lines.slice(1), tone: positive ? 'warm' : 'tense', status: 'active', turns: [{ speakerId: a.id, text, minute: world.minute }], nextTurnAt: world.minute + TURN_INTERVAL, targetTurns: scene.lines.length } };
+  const entry: LogEntry = { id: world.nextLog++, minute: world.minute, kind: positive ? 'conversation' : 'conflict', text: `${a.name} ${positive ? 'talks with' : 'has a disagreement with'} ${b.name}.${scene.eventText ? ` ${scene.eventText}` : ''}`, characters: [a.id, b.id], conversation: { repair: repair?.repair, generationAttempted: repair ? true : undefined, topic, sceneId: scene.id, fallbackTurns: scene.lines.slice(1), tone: positive ? 'warm' : 'tense', status: 'active', turns: [{ speakerId: a.id, text, minute: world.minute }], nextTurnAt: world.minute + TURN_INTERVAL, targetTurns: scene.lines.length } };
   entry.conversation!.title = conversationTitle(world, entry);
   world.history.push(entry);
   a.speech = text; a.speechUntil = world.minute + TURN_INTERVAL;
@@ -49,8 +49,14 @@ function fallback(entry: LogEntry, speaker: Character) {
   const thread = entry.conversation!;
   const scripted = thread.fallbackTurns?.[thread.turns.length - 1];
   if (scripted) return scripted;
-  const warm = !thread.topic.startsWith('Who gets a say');
+  const warm = thread.tone === 'warm';
   const space = thread.topic.replace('Who gets a say in ', '');
+  if (!warm) return [
+    'I still disagree, even if I want to understand your view.',
+    'What part do you think we are seeing differently?',
+    'I don’t think we have settled that. I would rather leave it open than pretend we agree.',
+    'We can pause here. A quieter ending does not mean this is resolved.',
+  ][Math.min(thread.turns.length - 1, 3)];
   if (/^(Last time you said|I’m still uneasy|Could we try again|Our disagreement|I remember our time)/.test(thread.turns[0].text)) {
     return [
       'Some of it still feels true. Talking about it didn’t make the feeling disappear.',

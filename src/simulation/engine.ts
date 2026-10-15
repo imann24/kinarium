@@ -1,3 +1,5 @@
+import { advanceSupplyWork, needsSupplyWork, supplyDemand } from './supplies';
+import { tensionFlow } from './community-dynamics';
 import { residentDrift, residentStats, recordResidentChange } from './resident-state';
 import { contactWillingness, repairScene } from './repair';
 import { updateHouseDetails } from './house-details';
@@ -97,7 +99,11 @@ export function step(s: WorldState) {
   for (const c of people) {
     if ((c.speechUntil ?? 0) < s.minute) c.speech = undefined;
     Object.assign(c, residentDrift(c, s).next);
+  }
+  // Apply shared-condition drift consistently before any resident completes upkeep.
+  for (const c of people) {
     if (isConversing(s, c.id)) continue;
+    if (advanceSupplyWork(s, c)) continue;
     if (c.inElevator) {
       c.floor = s.elevatorFloor;
       c.activity = 'riding the elevator';
@@ -106,12 +112,12 @@ export function step(s: WorldState) {
       c.x = Math.min(94, c.x + 15); c.activity = 'waiting for the elevator';
       if (s.elevatorPhase === 'stopped' && c.x >= 90 && s.elevatorFloor === c.floor) { c.inElevator = true; c.activity = 'riding the elevator'; }
     } else if (random(s) < .12) {
-      c.destination = night || c.energy < 20 ? 1 : Math.floor(random(s) * template.floors.length);
+      c.destination = night || c.energy < 20 ? 1 : needsSupplyWork(s, c) ? 2 : Math.floor(random(s) * template.floors.length);
       c.activity = c.destination === c.floor ? template.floors[c.floor].purpose : 'heading to the elevator';
     } else { c.x = clamp(c.x + (random(s) - .5) * 18, 8, 84); if (!c.speech) c.activity = night ? 'resting' : (template.floors[c.floor].activity ?? ['making tea', 'reading', 'tending the plants'][c.floor]); }
   }
   if (people.length > 1 && random(s) < .48) {
-    const a = pick(s, people); const nearby = people.filter(b => !isConversing(s, a.id) && !isConversing(s, b.id) && b.id !== a.id && !b.inElevator && !a.inElevator && b.floor === a.floor && b.destination === b.floor && a.destination === a.floor);
+    const a = pick(s, people); const nearby = people.filter(b => !a.supplyTask && !b.supplyTask && !isConversing(s, a.id) && !isConversing(s, b.id) && b.id !== a.id && !b.inElevator && !a.inElevator && b.floor === a.floor && b.destination === b.floor && a.destination === a.floor);
     if (nearby.length) {
       const weights = nearby.map(b => contactWillingness(relationship(s, a.id, b.id)));
       let draw = random(s) * weights.reduce((sum, weight) => sum + weight, 0);
@@ -120,9 +126,13 @@ export function step(s: WorldState) {
       else a.activity = `giving ${b.name} space`;
     }
   }
-  s.resources = clamp(s.resources - people.length * .008 + people.filter(c => c.floor === 2 && c.trait === 'practical').length * .12);
+  s.resources = clamp(s.resources - supplyDemand(s));
   // Scarcity and unresolved conflict can erode a community; high trust supports repair.
-  if (s.resources < 20) { s.tension = clamp(s.tension + .06); s.cohesion = clamp(s.cohesion - .04); }
+  if (people.length) {
+    const pressure = tensionFlow(s.resources, s.tension);
+    s.tension = clamp(s.tension + pressure.scarcity - pressure.easing);
+    if (s.resources < 20) s.cohesion = clamp(s.cohesion - .04);
+  }
   if (s.minute % 120 === 0) {
     for (const r of Object.values(s.relationships)) {
       if (s.minute - r.lastMinute > 720) { r.affinity *= .985; r.trust = clamp(r.trust - .2); }
@@ -152,7 +162,10 @@ export function applyCommand(s: WorldState, command: Command, now: number) {
       if (!c) throw new Error('That character could not be found.');
       if (c.away === command.away) return;
       if (!command.away && activeCharacters(s).length >= s.settings.populationCap) throw new Error('The house is full. Make some room before welcoming them back.');
-      if (command.away) interruptConversations(s, c.id);
+      if (command.away) {
+        interruptConversations(s, c.id);
+        if (c.supplyTask) { log(s, 'upkeep', `${c.name} stops supply work before finishing; no supplies are added.`, [c.id]); delete c.supplyTask; }
+      }
       c.away = command.away; c.inElevator = false; c.destination = c.floor; c.x = Math.min(c.x, 84); c.speech = undefined; c.activity = c.away ? 'away for a while' : 'finding their feet again';
       const departure = log(s, c.away ? 'departure' : 'arrival', `${c.name} ${c.away ? 'leaves for a while. Their place in the story remains.' : 'returns to the house. There is a familiar face at the door.'}`, [c.id]);
       rememberEvent(c, departure, c.away ? 'I took some time away from the house.' : 'I came back to the house.', { salience: 5 }); break;

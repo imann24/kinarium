@@ -1,3 +1,4 @@
+import { supplyMoodEffect } from './community-dynamics';
 import type { Character, ResidentStateChange, ResidentStats, WorldState } from './types';
 
 const bound = (value: number) => Math.max(0, Math.min(100, value));
@@ -7,15 +8,16 @@ export const residentStats = (c: Character): ResidentStats => ({ mood: c.mood, e
 export function residentDrift(c: Character, world: Pick<WorldState, 'minute' | 'resources' | 'tension'>) {
   const night = world.minute % 1440 < 360 || world.minute % 1440 > 1320;
   const belonging = bound(c.belonging - .025);
-  const supplies = world.resources < 20 ? -.2 : .035;
+  const supplies = supplyMoodEffect(world.resources);
+  const settling = (50 - c.mood) / 250;
   const connection = (belonging - 50) / 2000;
   const tension = -world.tension / 4000;
   const energy = night || c.floor === 1 ? 1.8 : -.35;
   const next = c.away ? residentStats(c) : {
-    mood: bound(c.mood + supplies + connection + tension),
+    mood: bound(c.mood + settling + supplies + connection + tension),
     energy: bound(c.energy + energy), belonging,
   };
-  return { next, supplies, connection, tension, energy, night };
+  return { next, settling, supplies, connection, tension, energy, night };
 }
 
 /** Call after a real discrete effect. Does not mutate stats, consume RNG, or infer causes. */

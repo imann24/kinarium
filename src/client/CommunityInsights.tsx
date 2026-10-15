@@ -1,3 +1,5 @@
+import SupplyStatus from './SupplyStatus';
+import { bondLabels as labels, relationshipLabel } from '../simulation/relationship-labels';
 import { useEffect, useMemo, useState } from 'react';
 import { gameTime } from '../simulation/engine';
 import type { WorldState } from '../simulation/types';
@@ -5,7 +7,6 @@ import { communityInsights, pairRecords, recentActivity, type BondKind, type Ins
 import './community-insights.css';
 import HouseNarrative from './HouseNarrative';
 
-const labels: Record<BondKind, string> = { close: 'Growing close', strained: 'Strained', forming: 'Getting acquainted', unmet: 'Yet to meet' };
 const kinds = Object.keys(labels) as BondKind[];
 
 export function insightLocation(search: string) {
@@ -48,6 +49,7 @@ export default function CommunityInsights({ world, onSelectResident }: { world: 
       <label className="insights-scope">Current statistics for<select value={scope} onChange={e => { setScope(e.target.value as InsightScope); setSelected(undefined); }}><option value="home">Residents at home</option><option value="all">Everyone, including away</option></select></label></div>
     <p className="insights-note">{data.residents.length} residents in this view · {world.characters.filter(c => c.away).length} away in the world. Scores describe the simulation now; they are not goals.</p>
     <HouseNarrative world={world}/>
+    <SupplyStatus world={world}/>
     <div className="insights-summary">
       <div><span>Average mood</span><strong>{score(data.mood)}</strong><Meter value={data.mood}/><small>{data.residents.length ? 'Equal weight per resident' : 'No residents in this view'}</small></div>
       <div><span>Average belonging</span><strong>{score(data.belonging)}</strong><Meter value={data.belonging}/><small>{data.residents.length ? 'Equal weight per resident' : 'No residents in this view'}</small></div>
@@ -60,10 +62,10 @@ export default function CommunityInsights({ world, onSelectResident }: { world: 
       {!data.possiblePairs && <p className="insights-empty">Welcome at least two residents to see the social fabric take shape.</p>}
     </section>
     <div className="insights-columns">
-      <section className="insights-panel"><h3>Between neighbors</h3><p className="insights-note">{data.close} growing close · {data.forming} getting acquainted · {data.strained} strained</p>
+      <section className="insights-panel"><h3>Between neighbors</h3><p className="insights-note">{data.close} close · {data.forming} other connections · {data.strained} strained</p>
         <label className="insights-filter">Explore connections<select value={filter} onChange={e => { setFilter(e.target.value as typeof filter); setSelected(undefined); }}><option value="all">All connections</option>{Object.entries(labels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
-        <p className="insights-note">Sorted by encounters. Growing close: affinity above 35; strained: below −20. Pairs without encounters stay “yet to meet,” even if shared events changed their scores.</p>
-        <div className="insights-bond-list" aria-label="Connections">{bonds.map(({ a, b, relationship: r, kind }) => <button key={`${a.id}:${b.id}`} className="insights-bond" aria-pressed={selected === `${a.id}:${b.id}`} onClick={() => setSelected(`${a.id}:${b.id}`)}><span><b>{a.name}{a.away ? ' (away)' : ''} & {b.name}{b.away ? ' (away)' : ''}</b><small>{labels[kind]} · {r.encounters} encounters</small></span><span>Affinity {Math.round(r.affinity)}<Meter value={r.affinity} affinity/><small>Trust {score(r.trust)}</small></span></button>)}{!bonds.length && <p className="insights-empty">{data.possiblePairs === 0 ? 'Connections need at least two residents in this view.' : 'No connections in this group yet.'}</p>}</div>
+        <p className="insights-note">Sorted by recorded encounters. Close requires affinity above 35 and trust at least 50. Unresolved conflict, pending repair, trust below 25 or affinity below −20 counts as strained. Ten or more encounters means familiar, not necessarily close. Shared events alone do not mean a pair has met.</p>
+        <div className="insights-bond-list" aria-label="Connections">{bonds.map(({ a, b, relationship: r, kind }) => <button key={`${a.id}:${b.id}`} className="insights-bond" aria-pressed={selected === `${a.id}:${b.id}`} onClick={() => setSelected(`${a.id}:${b.id}`)}><span><b>{a.name}{a.away ? ' (away)' : ''} & {b.name}{b.away ? ' (away)' : ''}</b><small>{relationshipLabel(r)} · {r.encounters} encounters</small></span><span>Affinity {Math.round(r.affinity)}<Meter value={r.affinity} affinity/><small>Trust {score(r.trust)}</small></span></button>)}{!bonds.length && <p className="insights-empty">{data.possiblePairs === 0 ? 'Connections need at least two residents in this view.' : 'No connections in this group yet.'}</p>}</div>
         {chosen ? <div className="insights-pair" aria-live="polite"><h4>{chosen.a.name} & {chosen.b.name}</h4><p className="insights-note">Affinity {Math.round(chosen.relationship.affinity)} (−100 to 100) · Trust {score(chosen.relationship.trust)}.<br/>{chosen.relationship.encounters ? `Last encounter: ${gameTime(chosen.relationship.lastMinute)}.` : 'No encounters recorded yet.'} Scores can also change through shared events and time.</p><div className="insights-profile-links">{[chosen.a, chosen.b].map(c => <button key={c.id} className="outline" onClick={() => onSelectResident(c.id)}>View {c.name}</button>)}</div><h4>Recent recorded moments</h4>{records.slice(0, 5).map(e => <article key={e.id}><small>{gameTime(e.minute)} · {e.kind}</small><p>{e.text}</p></article>)}{!records.length && <p className="insights-empty">No moments for this pair in the retained journal. Older encounters may exist.</p>}{records.length > 5 && <p className="insights-note">Showing the latest 5 of {records.length} retained moments for this pair.</p>}</div> : <p className="insights-note">Choose a connection to see both residents and its recent recorded moments.</p>}
       </section>
       <section className="insights-panel"><h3>A closer look at belonging</h3><p className="insights-note">Lowest current belonging first. Connections count people in this view they have met; these numbers do not explain how someone feels.</p><div className="insights-resident-list">{data.residentDetails.map(({ character: c, met }) => <button className="insights-resident" key={c.id} onClick={() => onSelectResident(c.id)}><span><b>{c.name}{c.away ? ' (away)' : ''}</b><small>{met} of {Math.max(0, data.residents.length - 1)} neighbors met</small></span><span>Belonging {score(c.belonging)}<Meter value={c.belonging}/><small>Mood {score(c.mood)}</small></span></button>)}{!data.residents.length && <p className="insights-empty">Nobody is at home. Include away residents to explore their saved relationships and feelings.</p>}</div></section>

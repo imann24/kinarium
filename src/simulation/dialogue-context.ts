@@ -20,7 +20,7 @@ export function memoryExcerpt(memory: Memory): string | undefined {
 /** Keep the subject and first response; let a disclosed state change the ending. */
 export function statefulProgression(lines: string[], a: Character, b: Character, positive: boolean): string[] {
   if (a.energy < 30) return [...lines.slice(0, 2), 'I’m running out of energy. Could we leave the rest of this for now?', positive ? 'Yes. There is no need to find an answer while you’re worn out.' : 'We can stop here without pretending we agree.'];
-  if (b.energy < 30) return [...lines.slice(0, 2), 'Would you like to keep exploring this, or is this enough for now?', 'I’m tired. I would rather pause than give an answer I haven’t thought through.', 'Then this can stay open. You don’t owe me a quick answer.'];
+  if (b.energy < 30) return [...lines.slice(0, 2), 'Would you like to keep exploring this, or is this enough for now?', 'I’m tired. I would rather pause than give an answer I haven’t thought through.', positive ? 'Then this can stay open. You don’t owe me a quick answer.' : 'We can pause, but our disagreement is still open.'];
   if (a.mood < 30) return [...lines.slice(0, 2), 'I’m having a hard time finding the words today. I don’t want that to come across as not caring.', positive ? 'We don’t have to make this cheerful. You can leave some of it unsaid.' : 'I hear that. I can give you room and still have a different view.'];
   if (b.mood < 30) return [...lines.slice(0, 2), 'How does talking about this feel to you right now?', 'Honestly, I’m feeling low. I don’t have much room for an upbeat answer.', positive ? 'You don’t have to make it upbeat for me. We can let the question rest.' : 'I won’t ask you to sound cheerful. The disagreement can wait.'];
   return lines;

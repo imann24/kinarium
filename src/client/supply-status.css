@@ -1,0 +1,14 @@
+.supply-status { margin: 24px 0; padding: 20px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--secondary); font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }
+.supply-heading { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; color: var(--text); }
+.supply-heading h3 { margin: 0; }
+.supply-meter { height: 16px; margin: 16px 0 8px; position: relative; background: var(--surface-soft); border: 1px solid var(--control-border); border-radius: 4px; overflow: hidden; }
+.supply-meter > span { display: block; height: 100%; background: #758969; }
+.supply-meter i { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--text); }
+.supply-meter .shortage-mark { left: 20%; }
+.supply-meter .upkeep-mark { left: 35%; border-left: 2px dashed var(--text); background: none; }
+.supply-scale { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; font-size: 11px; }
+.supply-worker { display: grid; gap: 6px; padding: 12px; background: var(--surface-soft); border-radius: 6px; }
+.supply-worker progress { width: 100%; accent-color: #758969; }
+.supply-latest small { display: block; }
+.supply-status summary { cursor: pointer; color: var(--text); }
+.supply-status summary:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }

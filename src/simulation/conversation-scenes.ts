@@ -54,7 +54,7 @@ export function chooseConversationScene(world: WorldState, a: Character, b: Char
     ], a.mood > 75 && b.mood > 60 ? 22 : a.trait === 'spirited' && a.mood > 60 ? 22 : 8);
   }
   add('decisions', `Who gets a say in ${space}`, [
-    `If we change ${space}, I want everyone to get a say. Would you find that frustrating?`,
+    positive ? `If we change ${space}, I want everyone to get a say. Would you find that frustrating?` : `I disagree about how we make decisions in ${space}. I want everyone to get a say.`,
     b.trait === 'spirited' ? 'A little, yes. I worry we would spend all our time debating and never try anything.' : 'I’d worry that asking everyone would mean nothing ever got decided.',
     positive ? 'What would make listening feel useful rather than like a delay?' : 'A quick decision can still leave someone feeling shut out. Speed is not the only thing at stake.',
     b.trait === 'practical' ? 'Knowing what is actually open for discussion. Otherwise it is hard to tell when enough has been said.' : 'A chance to disagree without having to win everyone over. I don’t need agreement on every detail.',
@@ -62,14 +62,14 @@ export function chooseConversationScene(world: WorldState, a: Character, b: Char
     'That leaves a real question: how would we know when someone has actually been heard?',
   ], positive ? 4 : 18);
   add('help', positive ? 'Help that leaves room for choice' : 'When help feels like interference', [
-    positive ? 'When you’re struggling with something, do you want help right away or space to try?' : 'I’m uneasy about the line between helping and taking over. Where is that line for you?',
+    positive ? 'When you’re struggling with something, do you want help right away or space to try?' : 'I disagree about where helping becomes taking over. Where is that line for you?',
     voice(b, { practical: 'Ask what I am trying to do first. A useful answer to the wrong problem isn’t much help.', curious: 'Give me a chance to work it out. Understanding the problem can matter as much as solving it.', reserved: 'Ask quietly. Being offered help in front of everyone can make me feel exposed.', spirited: 'Let me try my own way, even if it looks messy. I don’t enjoy being managed.', kind: 'An offer helps, but I want refusing it to feel possible too.' }),
     a.trait === 'kind' ? 'I can be so eager to ease a difficulty that I miss the wish to handle it alone.' : 'I’m not always sure how to tell patience from leaving someone to struggle.',
     (relationship?.trust ?? 50) < 35 ? 'I’m not ready to have you decide that for me. Please ask rather than assume.' : close && (relationship?.affinity ?? 0) < 0 ? 'I trust you to ask, even when we rub each other the wrong way. Trust doesn’t mean we like every suggestion.' : (relationship?.affinity ?? 0) < 0 ? 'I don’t always find our exchanges easy. Asking first would help me say what I actually want.' : close ? 'With you, I feel able to say no. That makes an offer easier to hear.' : 'There may not be a sign you can read from across the room. I would rather be asked.',
     positive ? 'A question leaves more choice than an assumption. That is worth remembering.' : 'I can see why you want that choice. I’m still uncomfortable with how easy it is to misread each other.',
   ], a.trait === 'kind' || (relationship?.trust ?? 50) < 35 ? 18 : 10);
   add('resources', positive ? 'Enough to share' : 'Fairness when supplies are limited', [
-    world.resources < 40 ? 'Supplies are low. What would make sharing feel fair without turning every need into an argument?' : 'Does sharing fairly mean equal amounts, or leaving more for whoever needs it most?',
+    !positive ? (world.resources < 40 ? 'Supplies are low, and I disagree about what sharing fairly means. How should we decide?' : 'I disagree about what sharing fairly means. Is it equal amounts, or more for whoever needs it most?') : world.resources < 40 ? 'Supplies are low. What would make sharing feel fair without turning every need into an argument?' : 'Does sharing fairly mean equal amounts, or leaving more for whoever needs it most?',
     voice(b, { practical: 'I want to know what is available before deciding. Fairness needs something concrete to work with.', kind: 'Equal amounts can hide very unequal needs. I’d want room to say that something isn’t enough.', curious: 'I wonder who gets to define a need. That seems like the difficult part.', reserved: 'I worry about having to explain myself in front of everyone just to ask for enough.', spirited: 'I dislike a rule that sounds fair but gives nobody room to use their judgment.' }),
     voice(a, { practical: 'How could we compare two urgent needs without making up facts about either?', curious: 'What would we need to understand before comparing two people’s needs?', reserved: 'What if someone finds it hard to explain their need in front of everybody?', spirited: 'Could a rule leave room for judgment when two people both need more?', kind: 'How could we hear both people without making either feel selfish for asking?' }),
     positive ? 'Then a rule alone may not settle it. They would still need a way to hear each other.' : 'That is where I get stuck. Someone can feel overlooked even when nobody means to be unfair.',
@@ -78,11 +78,11 @@ export function chooseConversationScene(world: WorldState, a: Character, b: Char
 
   if (a.belonging < 25 || b.belonging < 25) {
     add('belonging', 'Finding a place without performing', [
-      a.belonging < 25 ? 'I don’t quite feel part of things here. How much of yourself do you feel you have to explain to belong?' : 'Do you feel you can be yourself here, or does joining in take effort?',
-      b.belonging < 25 ? 'It takes effort. I’m not sure where I fit, and I don’t want to pretend otherwise.' : 'I don’t think anyone should have to explain everything about themselves to be welcome.',
+      !positive ? 'I disagree about how much someone should have to join in to belong. Being included should leave room to say no.' : a.belonging < 25 ? 'I don’t quite feel part of things here. How much of yourself do you feel you have to explain to belong?' : 'Do you feel you can be yourself here, or does joining in take effort?',
+      !positive ? 'I see that differently. I want people to join in sometimes, though I don’t know how much is fair to ask.' : b.belonging < 25 ? 'It takes effort. I’m not sure where I fit, and I don’t want to pretend otherwise.' : 'I don’t think anyone should have to explain everything about themselves to be welcome.',
       a.trait === 'practical' ? 'What would make joining in less work, without asking you to become someone else?' : 'Would an invitation help, or could it feel like another expectation?',
       b.trait === 'reserved' ? 'An invitation without an audience would help. I like room to answer quietly.' : 'Being able to say no and still feel included matters to me.',
-      'That leaves room for a choice. I wouldn’t want belonging to become a performance.',
+      positive ? 'That leaves room for a choice. I wouldn’t want belonging to become a performance.' : 'I still disagree about that expectation. We can leave it open without pretending it is settled.',
     ], 28);
   }
   // Consider each resident's own account independently; neither can read the
@@ -94,12 +94,12 @@ export function chooseConversationScene(world: WorldState, a: Character, b: Char
     const recalledLine = `I remember it this way: “${excerpt}”`;
     const perspective = memory.tone === 'tense' ? 'It still feels unsettled to me. I want room to explain it without having to win an argument.' : memory.tone === 'warm' ? 'It matters to me because I felt connected. I don’t want to assume it felt the same to you.' : 'I’m still deciding what it means to me. Remembering it doesn’t give me a simple answer.';
     add(`memory:${speaker.id}`, memory.kind === 'friendship' ? 'What a friendship means to us' : memory.tone === 'tense' ? 'What stayed unresolved' : 'Two perspectives on a shared moment', speakerIndex === 0 ? [
-      recalledLine, 'What part of that memory matters most to you now?', perspective,
-      'I can listen to how it stayed with you without claiming my experience was identical.',
+      positive ? recalledLine : `I disagree about what this means for us. ${recalledLine}`, positive ? 'What part of that memory matters most to you now?' : 'I see its meaning differently. What part matters most to you now?', perspective,
+      positive ? 'I can listen to how it stayed with you without claiming my experience was identical.' : 'I can listen to your account and still disagree about what should happen next.',
     ] : [
-      'Is there a moment between us you keep thinking about?', recalledLine,
+      positive ? 'Is there a moment between us you keep thinking about?' : 'I still disagree about what our past means for us. Is there a moment between us you keep thinking about?', recalledLine,
       'What part of it matters most to you now?', perspective,
-      'I’m glad you could tell me your side. I won’t assume that tells me everything.',
+      positive ? 'I’m glad you could tell me your side. I won’t assume that tells me everything.' : 'I understand your side better, but I still disagree about what it means for us.',
     ], memory.kind === 'friendship' ? 27 : 15);
   }
 
@@ -109,14 +109,14 @@ export function chooseConversationScene(world: WorldState, a: Character, b: Char
   if (previous?.conversation || recalled) {
     const quote = previous?.conversation?.turns.filter(t => t.speakerId === b.id && t.text.length <= 110 && !/[“”]/.test(t.text)).at(-1)?.text;
     add('revisit', previous?.conversation?.topic ?? 'Returning to a disagreement', [
-      quote ? `Last time you said, “${quote}” Would you put it the same way now?` : recalled || previous?.conversation?.tone === 'tense' ? 'Our disagreement is still on my mind. Is there a part you would want me to understand better?' : 'Our last conversation is still on my mind. Is there a part you would put differently now?',
+      !positive ? 'I still disagree with how we see this. Is there a part you would want me to understand better?' : quote ? `Last time you said, “${quote}” Would you put it the same way now?` : recalled || previous?.conversation?.tone === 'tense' ? 'Our disagreement is still on my mind. Is there a part you would want me to understand better?' : 'Our last conversation is still on my mind. Is there a part you would put differently now?',
       positive ? 'I might put it less firmly. The feeling matters to me, but I’m not sure my first words captured it.' : 'I still feel strongly about it. I don’t want a calmer conversation to be mistaken for agreement.',
       'Which matters more right now: finding an answer, or having room to explain your view?',
       b.trait === 'practical' ? 'An answer would help, but not one that skips over why we see it differently.' : 'Room to explain. I don’t think being understood has to mean being agreed with.',
       close ? 'I trust that we can leave something unresolved without losing the rest of our connection.' : 'I can listen without claiming we have settled it. That seems a more honest place to pause.',
     ], previous?.conversation?.tone === 'tense' || recalled ? 24 : 12);
   }
-  const event = [...world.history].reverse().find(e => e.kind === 'event' && world.minute - e.minute >= 0 && world.minute - e.minute < 120);
+  const event = [...world.history].reverse().find(e => e.kind === 'event' && e.characters.includes(a.id) && e.characters.includes(b.id) && world.minute - e.minute >= 0 && world.minute - e.minute < 120);
   const definition = EVENTS.find(e => e.text === event?.text);
   if (event && definition) {
     const questions: Record<string, string> = {
@@ -129,9 +129,9 @@ export function chooseConversationScene(world: WorldState, a: Character, b: Char
     };
     const opening = questions[definition.id];
     const reply = voice(b, EVENT_REPLIES[definition.id]);
-    scenes.push({ id: `event:${definition.id}`, topic: definition.name, eventText: event.text,
+    scenes.push({ id: `event:${definition.id}`, topic: definition.name, eventText: `They discuss an earlier event: ${definition.name}.`,
       relevance: pair.some(e => e.minute >= event.minute && e.conversation?.topic === definition.name) ? 8 : 100,
-      lines: [opening, reply, positive ? 'Would being able to ask a question make that easier?' : 'I’m not sure a question is enough when people are already on edge.',
+      lines: [positive ? opening : `${opening} I think we see this differently.`, reply, positive ? 'Would being able to ask a question make that easier?' : 'I’m not sure a question is enough when people are already on edge.',
         b.trait === 'reserved' ? 'Only if there is room not to answer immediately. I need time to find my words.' : 'It depends on whether the question leaves room for an answer nobody expected.',
         positive ? 'I’d like that room too. I don’t want us to rush past the complicated part.' : 'Then we may need to leave it complicated for now. I still see it differently.'] });
   }

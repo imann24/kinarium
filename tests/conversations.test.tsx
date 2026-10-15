@@ -86,7 +86,7 @@ describe('conversation lifecycle', () => {
     applyCommand(world, { type:'trigger-event', eventId:'power-outage' }, 0);
     const next = beginConversation(world, a, b, false);
     expect(next.conversation!.topic).toBe('The lights go out');
-    expect(next.text).toContain('The house goes dark');
+    expect(next.text).toContain('They discuss an earlier event: The lights go out.');
   });
   it('reveals accepted AI replies individually and retains legacy histories', () => {
     const { world, entry } = fixture();

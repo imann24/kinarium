@@ -35,7 +35,7 @@ describe('controlled dialogue influence (same seed and all other inputs fixed)',
     expect(practical.lines[0]).toBe(reserved.lines[0]);
   });
   it.each(EVENTS)('lets each personality answer the same $id question differently', event => {
-    const {world,b}=fixture();world.history.push({id:world.nextLog++,minute:world.minute,kind:'event',characters:[],text:event.text});
+    const {world,b}=fixture();world.history.push({id:world.nextLog++,minute:world.minute,kind:'event',characters:world.characters.slice(0,2).map(c=>c.id),text:event.text});
     const answers=TRAITS.map(trait=>{b.trait=trait;const chosen=scene(world);expect(chosen.topic).toBe(event.name);return chosen.lines[1];});
     expect(new Set(answers).size).toBe(TRAITS.length);
     expect(answers.every(answer=>answer.length<=220)).toBe(true);
@@ -51,7 +51,7 @@ describe('controlled dialogue influence (same seed and all other inputs fixed)',
   it.each([0,1])('lets resident %i energy change pace and end the same topic coherently', index => {
     const { world }=fixture(); const baseline=scene(world); const tired=copy(world); tired.characters[index].energy=15;
     // Force the same recorded event, so state cannot pass solely by selecting a new topic.
-    const event={id:world.nextLog++,minute:60,kind:'event' as const,characters:[],text:'An unmarked care package arrives. For a moment, everyone feels a little more looked after.'};
+    const event={id:world.nextLog++,minute:60,kind:'event' as const,characters:world.characters.slice(0,2).map(c=>c.id),text:'An unmarked care package arrives. For a moment, everyone feels a little more looked after.'};
     world.history.push(event); tired.history.push(event); tired.nextLog=world.nextLog;
     const restedScene=scene(world), tiredScene=scene(tired);
     expect(tiredScene.topic).toBe(restedScene.topic);

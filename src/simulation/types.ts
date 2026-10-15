@@ -1,6 +1,6 @@
 export type TimeMode = 'persistent' | 'fast-forward';
 export type Trait = 'kind' | 'curious' | 'reserved' | 'spirited' | 'practical';
-export type LogKind = 'arrival' | 'departure' | 'conversation' | 'conflict' | 'friendship' | 'event' | 'ritual' | 'world';
+export type LogKind = 'arrival' | 'departure' | 'conversation' | 'conflict' | 'friendship' | 'event' | 'ritual' | 'upkeep' | 'world';
 export interface Memory {
   text: string; minute: number;
   /** Optional so existing saved memories stay intact, without invented provenance. */
@@ -15,6 +15,9 @@ export interface Character {
   mood: number; energy: number; belonging: number; memories: Memory[];
   /** Actual bounded deltas from recent discrete effects; absent in older saves. */
   stateChanges?: ResidentStateChange[];
+  /** Optional saved work state; no migration or work is invented for old saves. */
+  supplyTask?: { startedAt: number; completeAt: number; amount: number };
+  nextSupplyAt?: number;
   speech?: string; speechUntil?: number;
 }
 export interface Relationship { a: string; b: string; affinity: number; trust: number; encounters: number; lastMinute: number; lastRepairMinute?: number; repairedConflictId?: number; unresolvedConflict?: { id: number; minute: number; topic: string }; repairCommitment?: { conflictId: number; initiatorId: string }; }

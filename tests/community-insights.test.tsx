@@ -32,7 +32,7 @@ describe('community insight calculations', () => {
     const r = relationship(w, 'c1', 'c2'); r.affinity = 80;
     expect(bondKind(r)).toBe('unmet');
     expect(communityInsights(w)).toMatchObject({ trust: null, encounters: 0, notMet: 3 });
-    r.encounters = 1;
+    r.encounters = 1; r.trust = 60;
     for (const [affinity, kind] of [[35, 'forming'], [35.1, 'close'], [-20, 'forming'], [-20.1, 'strained']] as const) {
       r.affinity = affinity; expect(bondKind(r)).toBe(kind);
     }

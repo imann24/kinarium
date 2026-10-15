@@ -14,18 +14,18 @@ export default function ResidentState({ character: c, world }: { character: Char
   // The next step increments the clock before applying drift; movement happens afterwards.
   const drift = residentDrift(c, { ...world, minute: world.minute + 2 });
   const recent = (c.stateChanges ?? []).filter(change => change.minute <= world.minute && world.minute - change.minute <= 1440).slice(-3).reverse();
-  const moodPressure = drift.supplies + drift.connection + drift.tension;
+  const moodPressure = drift.settling + drift.supplies + drift.connection + drift.tension;
   return <section className="resident-state" aria-label="What affects these values">
     <h4>What affects these values</h4>
     {c.away ? <p>While away, mood, energy and belonging are paused.</p> : <>
       <p>Between encounters, under current conditions:</p>
       <dl>
-        <div><dt>Mood · {direction(c.mood, moodPressure)}</dt><dd>{drift.supplies < 0 ? 'Scarce supplies push mood down' : 'Available supplies support mood'}; {drift.connection < 0 ? 'lower belonging adds downward pressure' : drift.connection > 0 ? 'higher belonging adds support' : 'belonging adds no pressure'}{drift.tension < 0 ? '; house tension pushes down.' : '; no house tension pressure.'}</dd></div>
+        <div><dt>Mood · {direction(c.mood, moodPressure)}</dt><dd>Mood gradually settles toward 50. Shared supplies: {Math.round(world.resources)}/100. {drift.supplies < 0 ? 'Scarce supplies push mood down' : 'Available supplies support mood'}; {drift.connection < 0 ? 'lower belonging adds downward pressure' : drift.connection > 0 ? 'higher belonging adds support' : 'belonging adds no pressure'}{drift.tension < 0 ? '; house tension pushes down.' : '; no house tension pressure.'}</dd></div>
         <div><dt>Energy · {direction(c.energy, drift.energy)}</dt><dd>{drift.night ? 'Nighttime restores energy.' : c.floor === 1 ? 'Being on the rest floor restores energy.' : 'Daytime outside the rest floor uses energy.'} Energy does not directly change mood.</dd></div>
         <div><dt>Belonging · {direction(c.belonging, -.025)}</dt><dd>Slowly fades over time. Warm encounters can raise it; disagreements can lower it.</dd></div>
       </dl>
-      <details><summary>Ongoing effects in numbers</summary><p>Next 2 simulated minutes, before movement or encounters. Values stay within 0–100.</p><ul>
-        <li>Mood: supplies {signed(drift.supplies)}, belonging {signed(drift.connection)}, tension {signed(drift.tension)}. Net pressure {signed(moodPressure)}; change after limits {signed(drift.next.mood - c.mood)}.</li>
+      <details><summary>Ongoing effects in numbers</summary><p>Next 2 simulated minutes, before other actions change conditions. Values stay within 0–100.</p><ul>
+        <li>Mood: settling {signed(drift.settling)}, supplies {signed(drift.supplies)}, belonging {signed(drift.connection)}, tension {signed(drift.tension)}. Net pressure {signed(moodPressure)}; change after limits {signed(drift.next.mood - c.mood)}.</li>
         <li>Energy: {signed(drift.energy)}; change after limits {signed(drift.next.energy - c.energy)}.</li>
         <li>Belonging: −0.025; change after limits {signed(drift.next.belonging - c.belonging)}.</li>
       </ul></details>

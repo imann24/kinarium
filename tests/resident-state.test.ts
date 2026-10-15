@@ -43,7 +43,7 @@ describe('resident state attribution', () => {
       step(world);
       for (const resident of world.characters) for (const change of resident.stateChanges ?? []) observed.set(`${resident.id}:${change.eventId}`, change);
     }
-    const changes = [...observed.values()];
+    const changes = [...observed.values()].filter(c => c.cause.startsWith('Warm encounter') || c.cause.startsWith('Disagreement'));
     expect(changes.some(c => c.cause.startsWith('Warm encounter'))).toBe(true);
     expect(changes.some(c => c.cause.startsWith('Disagreement'))).toBe(true);
     for (const c of changes) {
