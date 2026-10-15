@@ -27,6 +27,10 @@ try {
     await thread.waitFor();
     assert.match(await thread.innerText(), /4 residents/);
     for (const c of snapshot.world.characters) assert((await thread.locator('summary').innerText()).includes(c.name));
+    await thread.locator('..').locator('.journal-open-conversation').click();
+    await page.getByRole('dialog').waitFor();
+    assert.match(await page.getByRole('dialog').innerText(), /4 residents/);
+    await page.keyboard.press('Escape');
     await page.locator('.speech-box .expandable-text').click();
     const link = page.getByRole('button', { name: /^Open conversation among/ });
     for (const c of snapshot.world.characters) assert((await link.innerText()).includes(c.name));
