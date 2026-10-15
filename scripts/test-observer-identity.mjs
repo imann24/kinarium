@@ -7,7 +7,7 @@ const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PAT
 const errors = [];
 const open = p => p.getByRole('button', { name: 'Your observer name and online players' }).click();
 const self = p => p.locator('.presence-row').filter({ hasText: 'You ·' });
-const close = p => p.getByRole('button', { name: 'Close', exact: true }).click();
+const close = p => p.getByRole('button', { name: 'Close dialog', exact: true }).click();
 const rename = async (p, name) => { await p.getByLabel('Your observer name', { exact: true }).fill(name); await p.getByRole('button', { name: 'Save name' }).click(); await open(p); };
 const until = async (check) => { for (let n = 0; n < 100; n++) { if (await check()) return; await new Promise(r => setTimeout(r, 100)); } assert.fail('Timed out waiting for observer state'); };
 try {
