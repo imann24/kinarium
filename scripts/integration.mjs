@@ -102,8 +102,8 @@ try {
   console.log('PASS: password verification, protected snapshots/history/actions/sockets, authorized connection, history cursor');
   console.log('Checking unoccupied persistent mode; waiting for its one-minute alarm…');
   await delay(65_000);
-  const after = (await request(`/worlds/${locked}/history`,undefined,cookie)).value.entries;
-  assert.ok(after.some(e=>e.minute>privateState.world.minute),'History should advance without a visitor or snapshot read');
+  const after = (await request(`/worlds/${locked}/history`,undefined,cookie)).value;
+  assert.ok(after.worldMinute > privateState.world.minute,'Simulation clock should advance without a visitor or snapshot read');
   console.log('PASS: persistent mode evolves with no connected visitors');
   // Leave fixtures in economical fast-forward mode.
   await command(locked,{type:'settings',mode:'fast-forward',populationCap:12},cookie);

@@ -214,7 +214,8 @@ export class WorldRoom extends DurableObject<Env> {
         const before = Number(url.searchParams.get('before') || Number.MAX_SAFE_INTEGER);
         if (!Number.isSafeInteger(before) || before < 1) throw new Error('Invalid history cursor.');
         const entries = this.ctx.storage.sql.exec<{ payload: string }>('SELECT payload FROM history WHERE id < ? ORDER BY id DESC LIMIT 100', before).toArray().map(row => JSON.parse(row.payload));
-        return json({ entries, nextCursor: entries.length === 100 ? entries.at(-1).id : null });
+        // Report the current persisted clock without advancing the world on a history read.
+        return json({ entries, nextCursor: entries.length === 100 ? entries.at(-1).id : null, worldMinute: this.data.world.minute });
       }
       if (url.pathname.endsWith('/commands') && request.method === 'POST') {
         if (this.limited(`command:${ip}`, 60)) return json({ error: 'A little too much at once. Try again in a minute.' }, 429);
