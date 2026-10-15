@@ -186,6 +186,15 @@ Memory callbacks require participant/event metadata, reject future or contradict
 
 After these influence changes, the existing 360-encounter variety sample yields 246 distinct transcripts summed within fixed-pair sequences and 66 adjacent repeated topics (intentional callbacks), versus 210 and 90 in PR #28.
 
+### Resident state explanations
+
+Resident profiles show ongoing mood, energy and belonging factors separately from recorded direct changes. `residentDrift` in `src/simulation/resident-state.ts` is shared by the engine and display: it preserves the existing step order (clock, drift, movement, encounters), including post-decay belonging in the mood calculation. The display projects the next drift step under current conditions, not future encounters. It distinguishes downward/upward pressure from actual changes at 0 or 100. Energy has no direct mood effect.
+
+`Character.stateChanges` is optional version-1 data: at most eight actual discrete-effect deltas, each with simulation minute, factual cause label and source event ID. The profile shows up to three from the past simulated day. No history, memory text, dialogue or fictional background is used to invent attribution for old saves; older journal entries may be archived independently. Routine drift is calculated, not accumulated into this event list.
+
+Integration contract for new behavior: capture `residentStats(character)` before a discrete stat effect, apply the effect using the engine's bounds, then call `recordResidentChange(character, before, world.minute, factualCause, sourceEvent.id)`. Record only actual participants, once per event per resident. The helper records deltas only; it does not apply effects, draw randomness or infer repair. A successful repair should receive its own factual label and real event ID rather than be inferred from a warm conversation. Any new ongoing stat factors must be added to the shared drift calculation and its UI labels together.
+
+With Vite running, `PLAYWRIGHT_MODULE=<path-to-playwright/index.mjs> node tests/resident-state.browser.mjs` checks the resident sidebar and insights modal, legacy saves, away residents, limit behavior, keyboard disclosures and light/dark layouts at 1440/390/320px using local mocked transport and real simulation fixtures. It never contacts the live world.
 ### Avoidance and repair
 
 Trust weights both nearby partner selection and willingness to start an encounter.
@@ -212,3 +221,5 @@ Twenty seeded kind pairs can complete repair over three simulated days; this is
 an achievable path, not a guarantee for every temperament or distressed world.
 `tests/repair.browser.mjs` checks the local journal at 1440/390/320px without live
 world requests, using the same Playwright configuration as other browser tests.
+
+Repair integration: completed repair currently changes relationship scores and house tension, not resident mood, energy or belonging directly. It therefore adds no direct resident-stat record; the new tension value is reflected in ongoing mood pressure. Ordinary encounter and house-event records retain their existing effects.
