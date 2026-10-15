@@ -1,3 +1,5 @@
+import './resident-stacks.css';
+import { residentStacks } from './resident-stacks';
 import { useId, type CSSProperties } from 'react';
 import type { Character, WorldState } from '../simulation/types';
 import { TEMPLATES } from '../simulation/catalog';
@@ -59,6 +61,12 @@ export function Person({ character, small = false }: { character: Pick<Character
 export default function Building({ world, selected, onSelect, onOpenConversation, miniature = false }: { world: WorldState; selected?: string; onSelect?: (id: string) => void; miniature?: boolean; onOpenConversation?: (id: number) => void }) {
   const people = world.characters.filter(c => !c.away);
   const motion = useBuildingMotion(world, miniature);
+  const positions = people.map(c => {
+    const position = motion.position(c.id);
+    return { id: c.id, x: position?.x ?? (c.inElevator ? 757 : 135 + c.x * 5.85),
+      y: 236 + (2 - (position?.floor ?? c.floor)) * 143, aboard: position?.aboard ?? !!c.inElevator };
+  });
+  const stacks = residentStacks(positions);
   const template = TEMPLATES[world.templateId];
   const svgId = useId();
   const skyId = `${svgId}-sky`; const wallId = `${svgId}-wall`;
@@ -101,14 +109,18 @@ export default function Building({ world, selected, onSelect, onOpenConversation
     <rect x="88" y="94" width="744" height="15" rx="3" fill="#7b8872"/><rect x="85" y="551" width="750" height="12" rx="3" fill="#9eaa8c"/>
     <path d="M317 92v-9h263v9" fill="#aab299"/><rect x="356" y="69" width="185" height="24" rx="3" fill="#e9e8d8"/>
     <text x="448" y="85" textAnchor="middle" fontSize="9" fill="#52604b" letterSpacing={template.id === 'common-house' ? 3 : 1}>{template.id === 'common-house' ? 'A LITTLE LIFE TOGETHER' : template.name.toUpperCase()}</text>
-    {people.map(c => {
-      const position = motion.position(c.id);
-      const x = position?.x ?? (c.inElevator ? 757 : 135 + c.x * 5.85);
-      const y = 236 + (2-(position?.floor ?? c.floor))*143;
-      return <g key={c.id} data-resident-id={c.id} data-aboard={position?.aboard ?? !!c.inElevator} className={`resident-sprite ${selected === c.id ? 'selected' : ''}`} style={{ transform: `translate(${x}px, ${y}px)` }} role={onSelect ? 'button' : undefined} tabIndex={onSelect ? 0 : undefined} aria-label={`${c.name}, ${c.activity}`} onClick={() => onSelect?.(c.id)} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect?.(c.id); } }}>
+    {people.map((c, index) => {
+      const { x, y, aboard } = positions[index];
+      const stacked = stacks.get(c.id) ?? 0;
+      const stackLabel = stacked ? `, ${stacked} additional resident${stacked === 1 ? '' : 's'} at the same position` : '';
+      return <g key={c.id} data-resident-id={c.id} data-aboard={aboard} className={`resident-sprite ${selected === c.id ? 'selected' : ''}`} style={{ transform: `translate(${x}px, ${y}px)` }} role={onSelect ? 'button' : undefined} tabIndex={onSelect ? 0 : undefined} aria-label={`${c.name}, ${c.activity}${stackLabel}`} onClick={() => onSelect?.(c.id)} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect?.(c.id); } }}>
         {selected === c.id && <ellipse cy="0" rx="23" ry="8" fill="none" stroke="var(--scene-selection, #566f4d)" strokeWidth="2" strokeDasharray="3 3"/>}
         <Person character={c}/>
-        {!miniature && <><rect x="-25" y="8" width="50" height="15" rx="7" fill="var(--scene-bubble, #f6f4e8)" fillOpacity=".9"/><text y="19" textAnchor="middle" fontSize="9" fill="var(--scene-text, #555e4c)">{c.name.slice(0, 10)}</text></>}
+        {!miniature && <g className="resident-name-tag" style={{ '--name-tag-shift': `${Math.min(0, 710 - x)}px` } as CSSProperties}><rect x="-25" y="8" width="50" height="15" rx="7" fill="var(--scene-bubble, #f6f4e8)" fillOpacity=".9"/><text y="19" textAnchor="middle" fontSize="9" fill="var(--scene-text, #555e4c)">{c.name.slice(0, 10)}</text>{stacked > 0 && <g data-stack-count={stacked} aria-label={`${stacked} additional resident${stacked === 1 ? '' : 's'} at the same position`}>
+          <title>{`${c.name} and ${stacked} additional resident${stacked === 1 ? '' : 's'} at the same position`}</title>
+          <rect x="27" y="8" width={stacked < 10 ? 22 : 28} height="15" rx="7" fill="var(--scene-bubble, #f6f4e8)"/>
+          <text x={stacked < 10 ? 38 : 41} y="19" textAnchor="middle" fontSize="10" fontWeight="700" fill="var(--scene-text, #555e4c)">+{stacked}</text>
+        </g>}</g>}
       </g>;
     })}
     {!miniature && people.map(c => {

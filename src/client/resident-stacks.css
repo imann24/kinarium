@@ -1,0 +1,5 @@
+/* Keep name and count readable when the full house is fitted to a phone.
+   Move right-edge labels inward so cabin occupants do not lose their badge. */
+@media (max-width: 600px) {
+  .resident-name-tag { transform: translate(var(--name-tag-shift), -12px) scale(3); }
+}
