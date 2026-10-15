@@ -206,7 +206,14 @@ export class WorldRoom extends DurableObject<Env> {
         const visitor = this.visitor(request);
         const playerId = (url.searchParams.get('player') || '').slice(0, 50);
         const name = (url.searchParams.get('name') || 'Wandering observer').slice(0, 24);
-        server.serializeAttachment({ id: playerId || crypto.randomUUID(), name, color: ['#718564', '#b77b59', '#7396a1', '#ab8299'][name.length % 4], playerKey: visitor.id });
+        const presence = { id: playerId || crypto.randomUUID(), name, color: ['#718564', '#b77b59', '#7396a1', '#ab8299'][name.length % 4] };
+        // A reconnect can overlap the old socket, and one observer can have
+        // several tabs. Keep their names consistent regardless of socket order.
+        for (const ws of this.ctx.getWebSockets()) {
+          const attached = ws.deserializeAttachment() as Presence & { playerKey?: string };
+          if (attached?.id === presence.id) ws.serializeAttachment({ ...attached, ...presence });
+        }
+        server.serializeAttachment({ ...presence, playerKey: visitor.id });
         this.ctx.acceptWebSocket(server); this.broadcast(); await this.schedule();
         return new Response(null, { status: 101, webSocket: client, headers: visitor.headers });
       }
