@@ -8,6 +8,7 @@ const config = { LLM_ALLOWED_MODELS: ' model-a, model-b, model-a, ,bad model', L
 function fixture() {
   const world = createWorld({slug:'models',name:'Models'}, 0, 42);
   world.characters[0].model = 'model-a'; world.characters[1].model = 'model-b';
+  world.characters.slice(0, 2).forEach(c => Object.assign(c, { x: 10, floor: 0, destination: 0 }));
   const entry = beginConversation(world, world.characters[0], world.characters[1], false);
   return {world, entry};
 }

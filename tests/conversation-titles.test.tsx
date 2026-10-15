@@ -8,6 +8,7 @@ import ConversationThread from '../src/client/ConversationThread';
 function fixture() {
   const world = createWorld({ slug: 'titles', name: 'Titles' }, 0, 42);
   const [a, b] = world.characters;
+  a.x = b.x = 10; a.floor = b.floor = a.destination = b.destination = 0;
   a.floor = b.floor = 0;
   const entry = beginConversation(world, a, b, true);
   return { world, a, b, entry };

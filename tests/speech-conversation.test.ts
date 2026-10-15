@@ -5,6 +5,7 @@ import { beginConversation, advanceConversations, TURN_INTERVAL } from '../src/s
 function fixture() {
   const world = createWorld({ slug: 'speech-link', name: 'Speech', populationCap: 2 }, 0, 42);
   const [a, b] = world.characters;
+  a.x = b.x = 10; a.floor = b.floor = a.destination = b.destination = 0;
   a.floor = b.floor = a.destination = b.destination = 0;
   const entry = beginConversation(world, a, b, true);
   return { world, a, b, entry };

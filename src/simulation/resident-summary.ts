@@ -67,7 +67,7 @@ export function buildResidentSummary(character: Character, characters: Character
   const supported = timeline.filter(episode => episode.kind);
   const tension = supported.find(episode => episode.kind === 'conflict' && minute - episode.minute <= 1440
     && !supported.some(later => later.minute > episode.minute && social(later.kind)
-      && later.memories.some(m => m.participantIds?.some(id => episode.memories[0].participantIds?.includes(id)))));
+      && later.memories.some(m => m.participantIds?.length === 1 && m.participantIds.some(id => episode.memories[0].participantIds?.includes(id)))));
   const used = new Set<string>(tension ? [tension.signature] : []);
   const usedText = new Set<string>(tension ? [tension.text] : []);
   const story: HistoryEpisode[] = [];

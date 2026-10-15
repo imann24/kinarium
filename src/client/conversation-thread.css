@@ -7,3 +7,5 @@
 .conversation-thread li { padding: 7px 0; }
 .conversation-speaker { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px; font-size: 11px; }
 .conversation-thread li p { margin: 5px 0; overflow-wrap: anywhere; }
+
+.conversation-thread summary strong { overflow-wrap: anywhere; }

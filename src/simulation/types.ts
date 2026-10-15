@@ -25,6 +25,8 @@ export interface Character {
 export interface Relationship { a: string; b: string; affinity: number; trust: number; encounters: number; lastMinute: number; lastRepairMinute?: number; repairedConflictId?: number; unresolvedConflict?: { id: number; minute: number; topic: string }; repairCommitment?: { conflictId: number; initiatorId: string }; }
 export interface ConversationTurn { speakerId: string; text: string; minute: number; generated?: boolean; }
 export interface Conversation {
+  /** Absent in persisted legacy pairs. */
+  proximity?: boolean; joinedAtTurn?: Record<string, number>;
   topic: string; title?: string; tone: 'warm' | 'tense'; status: 'active' | 'finished' | 'interrupted';
   turns: ConversationTurn[]; nextTurnAt: number; targetTurns: number;
   /** Saved procedural arc; absent in legacy threads. Never treated as revealed dialogue. */

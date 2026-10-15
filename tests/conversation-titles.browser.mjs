@@ -17,6 +17,7 @@ try {
     const { beginConversation, interruptConversations } = await import('/src/simulation/conversations.ts');
     const world = createWorld({ slug: 'title-browser', name: 'Conversation titles' }, Date.now(), 42);
     const [a, b] = world.characters;
+    a.x = b.x = 10; a.floor = b.floor = a.destination = b.destination = 0;
     for (const text of ['I miss sketching boats by the harbor.', 'Drawing helps me find a little quiet.']) {
       const entry = beginConversation(world, a, b, true);
       entry.conversation.turns.push({ speakerId: b.id, text, minute: world.minute, generated: true });
