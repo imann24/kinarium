@@ -16,6 +16,8 @@ export interface Character {
   /** Actual bounded deltas from recent discrete effects; absent in older saves. */
   stateChanges?: ResidentStateChange[];
   speech?: string; speechUntil?: number;
+  /** Journal entry that produced this utterance; absent for legacy/unlinked speech. */
+  speechConversationId?: number;
 }
 export interface Relationship { a: string; b: string; affinity: number; trust: number; encounters: number; lastMinute: number; lastRepairMinute?: number; repairedConflictId?: number; unresolvedConflict?: { id: number; minute: number; topic: string }; repairCommitment?: { conflictId: number; initiatorId: string }; }
 export interface ConversationTurn { speakerId: string; text: string; minute: number; generated?: boolean; }
