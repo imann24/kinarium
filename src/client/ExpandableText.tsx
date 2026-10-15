@@ -24,7 +24,7 @@ export function SpeechBubble({ text, name, x, y, onOpenConversation }: { text: s
     <div className="speech-content">
       {expanded && <strong className="speech-speaker">{name}</strong>}
       <ExpandableText text={text} label={`${name}'s speech`} expandable onExpand={() => setExpanded(true)}/>
-      {expanded && (onOpenConversation ? <button type="button" className="speech-conversation" onClick={onOpenConversation}>Open conversation in journal</button> : <small className="speech-unlinked">No linked conversation</small>)}
+      {expanded && (onOpenConversation ? <button type="button" className="speech-conversation" onClick={onOpenConversation}>Open conversation</button> : <small className="speech-unlinked">No linked conversation</small>)}
     </div>
   </foreignObject>;
 }

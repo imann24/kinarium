@@ -114,7 +114,7 @@ export default function Building({ world, selected, onSelect, onOpenConversation
     {!miniature && people.filter(c => c.speech && (selected === c.id || people.filter(p => p.speech).at(-1)?.id === c.id)).map(c => {
       const position = motion.position(c.id);
       return <SpeechBubble key={`${c.id}:${c.speechConversationId}:${c.speech}`} text={c.speech!} name={c.name}
-        onOpenConversation={onOpenConversation && world.history.some(e => e.id === c.speechConversationId && e.conversation && e.characters.includes(c.id)) ? () => onOpenConversation(c.speechConversationId!) : undefined}
+        onOpenConversation={onOpenConversation && Number.isSafeInteger(c.speechConversationId) && c.speechConversationId! > 0 && c.speechConversationId! < Number.MAX_SAFE_INTEGER && !world.history.some(e => e.id === c.speechConversationId && (!e.conversation || !e.characters.includes(c.id))) ? () => onOpenConversation(c.speechConversationId!) : undefined}
         x={position?.x ?? (c.inElevator ? 757 : 135 + c.x * 5.85)}
         y={236 + (2 - (position?.floor ?? c.floor)) * 143}/>;
     })}
