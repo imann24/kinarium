@@ -18,6 +18,8 @@ export interface Character {
   /** Optional saved work state; no migration or work is invented for old saves. */
   supplyTask?: { startedAt: number; completeAt: number; amount: number };
   nextSupplyAt?: number;
+  /** Display-only cached history; optional for legacy saves. */
+  residentSummary?: import('./resident-summary').SavedResidentSummary;
   speech?: string; speechUntil?: number;
   /** Journal entry that produced this utterance; absent for legacy/unlinked speech. */
   speechConversationId?: number;

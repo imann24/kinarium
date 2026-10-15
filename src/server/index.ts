@@ -1,3 +1,4 @@
+import { refreshResidentSummaries } from '../simulation/resident-summary';
 import { deployedVersion } from './build-version';
 import { HouseDetailsConflict } from '../simulation/house-details';
 import { DurableObject } from 'cloudflare:workers';
@@ -116,6 +117,7 @@ export class WorldRoom extends DurableObject<Env> {
       for (const entry of data.world.history) if (entry.id > data.persistedLog || entry.conversation) this.ctx.storage.sql.exec('INSERT INTO history(id,payload) VALUES(?,?) ON CONFLICT(id) DO UPDATE SET payload=excluded.payload WHERE history.payload != excluded.payload', entry.id, JSON.stringify(entry));
       data.persistedLog = data.world.nextLog - 1;
       data.world.history = data.world.history.slice(-80);
+      refreshResidentSummaries(data.world, Date.now());
       this.ctx.storage.sql.exec('INSERT INTO state(id,payload) VALUES(1,?) ON CONFLICT(id) DO UPDATE SET payload=excluded.payload', JSON.stringify(data));
     });
   }

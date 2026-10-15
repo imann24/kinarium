@@ -1,12 +1,17 @@
+import { useMemo } from 'react';
 import CharacterText from './CharacterText';
 import type { Character, LogEntry } from '../simulation/types';
 import { gameTime } from '../simulation/engine';
 import { MEMORY_LIMIT } from '../simulation/memories';
-import { buildResidentSummary, type HistoryEpisode } from '../simulation/resident-summary';
+import { buildResidentSummary, residentSummaryInput, type HistoryEpisode } from '../simulation/resident-summary';
 import './personal-history.css';
 
 export default function PersonalHistory({ character, characters, onSelect, minute, events }: { character: Character; characters: Character[]; onSelect: (id: string) => void; minute: number; events: LogEntry[] }) {
-  const summary = buildResidentSummary(character, characters, events, minute);
+  const cached = character.residentSummary?.version === 1 ? character.residentSummary : undefined;
+  const input = residentSummaryInput(character, characters, events, minute);
+  // Legacy/offline fixtures get one local projection per relevant input change.
+  const summary = useMemo(() => cached?.value ?? buildResidentSummary(character, characters, events, minute), [cached, input]);
+  const pending = !!cached && cached.input !== input;
   const renderText = (episode: HistoryEpisode) => <CharacterText text={episode.text} characters={characters} participants={episode.memories[0].participantIds} onSelect={onSelect}/>;
   function originals(episode: HistoryEpisode) {
     return <>{episode.memories.map((memory, index) => <div className="history-source" key={memory.eventId ?? `legacy-${index}`}>
@@ -20,6 +25,7 @@ export default function PersonalHistory({ character, characters, onSelect, minut
   }
   return <section className="personal-history" aria-label={`${character.name}’s personal history`}>
     <h4>Story so far</h4><p className="history-note">Highlights from retained memories.</p>
+    <p className="history-note" aria-label="Summary freshness">{cached ? `Updated ${gameTime(cached.minute)}. ${pending ? 'New memories or context are waiting for the next refresh. ' : ''}` : 'Local summary. '}Changed summaries refresh at most once per real-time minute while the world is active, or when it next resumes. Original records are preserved.</p>
     {summary.story.length ? <><p className="history-story">{summary.story.map((episode, index) => <span key={episode.key}>{index > 0 ? ' ' : ''}{renderText(episode)}</span>)}</p><details className="history-sources"><summary>Story sources</summary>{summary.story.map(episode => <div key={episode.key}>{originals(episode)}</div>)}</details></>
       : <p className="history-note">{summary.timeline.length ? 'Their retained moments are preserved below in their original words.' : 'Their lived history will grow as they take part in the world.'}</p>}
     {!!summary.defining.length && <><h4>Defining moments</h4><ul className="history-highlights">{summary.defining.map(episode => <li key={episode.key}><p>{renderText(episode)}</p>{sources(episode)}</li>)}</ul></>}

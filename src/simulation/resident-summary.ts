@@ -1,5 +1,5 @@
 import { EVENTS } from './catalog';
-import type { Character, LogEntry, Memory } from './types';
+import type { Character, LogEntry, Memory, WorldState } from './types';
 
 export interface HistoryEpisode {
   key: string;
@@ -88,4 +88,41 @@ export function buildResidentSummary(character: Character, characters: Character
     if (defining.length === 3) break;
   }
   return { story, defining, tension, timeline };
+}
+
+/** Real time, independent of simulation speed, presence and resident activity. */
+export const RESIDENT_SUMMARY_INTERVAL_MS = 60_000;
+export interface SavedResidentSummary {
+  version: 1;
+  input: string;
+  updatedAt: number;
+  minute: number;
+  value: ResidentSummary;
+}
+
+/** Only inputs used by the projection: no needs, movement, planned dialogue or unrelated events. */
+export function residentSummaryInput(character: Character, characters: Character[], events: LogEntry[], minute: number): string {
+  const ids = new Set(character.memories.map(m => m.eventId));
+  const participants = new Set(character.memories.flatMap(m => m.participantIds ?? []));
+  return JSON.stringify([
+    character.id, character.memories,
+    characters.filter(c => participants.has(c.id)).map(c => [c.id, c.name]),
+    events.filter(e => ids.has(e.id)).map(e => [e.id, e.minute, e.characters, e.text, e.conversation?.topic, e.conversation?.status]),
+    // Time matters only at a visibility or recent-tension boundary.
+    character.memories.map(m => [m.minute <= minute, m.kind === 'conflict' && minute - m.minute <= 1440]),
+  ]);
+}
+
+/** Called at persistence boundaries, never from render or dialogue generation. */
+export function refreshResidentSummaries(world: WorldState, now: number): void {
+  for (const character of world.characters) {
+    const cached = character.residentSummary;
+    if (cached?.version === 1 && now >= cached.updatedAt && now - cached.updatedAt < RESIDENT_SUMMARY_INTERVAL_MS) continue;
+    const input = residentSummaryInput(character, world.characters, world.history, world.minute);
+    if (cached?.version === 1 && cached.input === input) continue;
+    character.residentSummary = {
+      version: 1, input, updatedAt: now, minute: world.minute,
+      value: structuredClone(buildResidentSummary(character, world.characters, world.history, world.minute)),
+    };
+  }
 }
