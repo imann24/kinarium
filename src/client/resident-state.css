@@ -1,0 +1,12 @@
+.resident-state { margin: 18px 0 24px; color: var(--secondary); font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
+.resident-state h4 { color: var(--text); margin-bottom: 10px; }
+.resident-state dl { margin: 0; }
+.resident-state dl > div { margin: 10px 0; }
+.resident-state dt { color: var(--text); font-weight: 600; }
+.resident-state dd { margin: 2px 0 0; }
+.resident-state details { border-top: 1px solid var(--line); padding: 9px 0; }
+.resident-state summary { color: var(--text); cursor: pointer; }
+.resident-state summary:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
+.resident-state ul { padding-left: 18px; }
+.resident-state-events li { margin-bottom: 12px; }
+.resident-state-events strong, .resident-state-events small, .resident-state-events span { display: block; }
