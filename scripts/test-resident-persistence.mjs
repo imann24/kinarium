@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import WebSocket from 'ws';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
 import { mkdtemp, rm } from 'node:fs/promises';
@@ -12,9 +13,9 @@ const port = 8791;
 const origin = `http://127.0.0.1:${port}`;
 let server;
 let output = '';
-async function start() {
+async function start(vars = []) {
   output = '';
-  server = spawn(process.execPath, ['node_modules/wrangler/wrangler-dist/cli.js', 'dev', '--env', 'local', '--port', String(port), '--inspector-port', '0', '--persist-to', storage], {
+  server = spawn(process.execPath, ['node_modules/wrangler/wrangler-dist/cli.js', 'dev', '--env', 'local', '--port', String(port), '--inspector-port', '0', '--persist-to', storage, ...vars.flatMap(value => ['--var', value])], {
     env: { ...process.env, XDG_CONFIG_HOME: join(storage, 'config'), WRANGLER_SEND_METRICS: 'false' },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
@@ -71,6 +72,34 @@ try {
     assert.equal(added.characters.at(-1).id, 'c7');
     assert.equal(new Set(added.characters.map(c => c.name)).size, 7);
   }
+  // Change only local runtime bindings, keeping the exact same persisted worlds.
+  // env.local has no AI binding, so even cloudflare provider selection cannot infer.
+  await stop();
+  const allowed = ['@cf/meta/llama-3.1-8b-instruct-fp8','@cf/meta/llama-3.2-3b-instruct','@cf/mistralai/mistral-small-3.1-24b-instruct'];
+  await start(['LLM_PROVIDER:cloudflare', `LLM_ALLOWED_MODELS:${allowed.map(id=>id.slice(1)).join(',')}`, `LLM_DEFAULT_MODEL:${allowed[1].slice(1)}`]);
+  const expectedModels = { allowed, defaultModel:allowed[1] };
+  for (const {slug} of saved) {
+    const snapshot = await request(`/worlds/${slug}`);
+    assert.deepEqual(snapshot.models,expectedModels);
+    // Model configuration is never loaded from the old persisted snapshot.
+    assert.equal(snapshot.world.characters[0].model,'@cf/meta/llama-3.1-8b-instruct-fp8-fast');
+  }
+  const slug = saved[0].slug;
+  const ws = new WebSocket(`${origin.replace('http','ws')}/api/worlds/${slug}/socket?name=Config-check&player=config-check`, {headers:{Origin:origin}});
+  try {
+    const receive = () => new Promise((resolve,reject) => {
+      const timeout = setTimeout(()=>reject(new Error('No model configuration snapshot')),5000);
+      ws.once('message',bytes=>{clearTimeout(timeout);resolve(JSON.parse(bytes.toString()));});
+      ws.once('error',error=>{clearTimeout(timeout);reject(error);});
+    });
+    assert.deepEqual((await receive()).models,expectedModels);
+    const broadcast = receive();
+    const updated = await request(`/worlds/${slug}/commands`,{type:'set-model',characterId:'c1',model:allowed[2]});
+    assert.deepEqual(updated.models,expectedModels);
+    assert.equal(updated.world.characters[0].model,allowed[2]);
+    assert.deepEqual((await broadcast).models,expectedModels);
+  } finally { ws.close(); }
+  console.log('PASS: changed local runtime configuration reaches existing Durable Objects, HTTP snapshots, command responses and WebSocket broadcasts without resetting saved worlds.');
   console.log('PASS: all template identities, away state, model selections, memories and ID counters survive a real SQLite runtime restart; later introductions remain unique.');
 } finally {
   await stop();

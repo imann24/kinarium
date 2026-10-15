@@ -19,10 +19,16 @@ export const DEFAULT_CLOUDFLARE_MODEL = '@cf/meta/llama-3.1-8b-instruct-fp8-fast
 
 /** Explicit lists fail closed; omitted lists preserve existing installations. */
 export function modelOptions(config: LLMConfig) {
+  // Workers AI requires @cf/...; tolerate the common dashboard copy/paste omission.
+  // Compatible-provider identifiers are opaque and must never be rewritten.
+  const normalize = (value: string) => {
+    const trimmed = value.trim();
+    return (config.LLM_PROVIDER || 'cloudflare') === 'cloudflare' && trimmed.startsWith('cf/') ? `@${trimmed}` : trimmed;
+  };
   const valid = (value: string) => /^[\w@][\w@./:-]{0,199}$/.test(value);
-  const legacy = config.LLM_MODEL?.trim() || ((config.LLM_PROVIDER || 'cloudflare') === 'cloudflare' ? DEFAULT_CLOUDFLARE_MODEL : '');
-  const allowed = [...new Set((config.LLM_ALLOWED_MODELS === undefined ? legacy : config.LLM_ALLOWED_MODELS).split(',').map(s => s.trim()).filter(s => valid(s)))];
-  const requested = (config.LLM_DEFAULT_MODEL ?? legacy).trim();
+  const legacy = normalize(config.LLM_MODEL ?? '') || ((config.LLM_PROVIDER || 'cloudflare') === 'cloudflare' ? DEFAULT_CLOUDFLARE_MODEL : '');
+  const allowed = [...new Set((config.LLM_ALLOWED_MODELS === undefined ? legacy : config.LLM_ALLOWED_MODELS).split(',').map(normalize).filter(s => valid(s)))];
+  const requested = normalize(config.LLM_DEFAULT_MODEL ?? legacy);
   return { allowed, defaultModel: allowed.includes(requested) ? requested : allowed[0] ?? null };
 }
 export function resolveModel(config: LLMConfig, selection?: string) {

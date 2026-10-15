@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { modelOptions, resolveModel, validateModelSelection, enrichConversation, conversationCallCount, isLLMConfigured } from '../src/server/llm';
@@ -20,6 +21,28 @@ describe('model configuration and selection', () => {
     expect(modelOptions({LLM_MODEL:' legacy '})).toEqual({allowed:['legacy'],defaultModel:'legacy'});
     expect(modelOptions({...config,LLM_ALLOWED_MODELS:' ,bad model, '}).defaultModel).toBeNull();
     expect(isLLMConfigured({...config,LLM_ALLOWED_MODELS:'',AI:{run:vi.fn()}})).toBe(false);
+  });
+  it('ships canonical production model IDs and an allowed default', () => {
+    const wrangler = JSON.parse(readFileSync(new URL('../wrangler.jsonc', import.meta.url),'utf8').replace(/^\s*\/\/.*$/gm,''));
+    const ids = wrangler.vars.LLM_ALLOWED_MODELS.split(',');
+    expect(ids).toHaveLength(3);
+    expect(ids.every((id: string)=>id.startsWith('@cf/'))).toBe(true);
+    expect(ids).toContain(wrangler.vars.LLM_DEFAULT_MODEL);
+    expect(wrangler.env.local.vars.LLM_PROVIDER).toBe('disabled');
+  });
+  it('canonicalizes Cloudflare configuration before deduplication and default matching', () => {
+    const a = '@cf/meta/llama-3.1-8b-instruct-fp8';
+    const b = '@cf/meta/llama-3.2-3b-instruct';
+    const options = {LLM_PROVIDER:'cloudflare',LLM_ALLOWED_MODELS:` ${a.slice(1)}, ${a}, ${b.slice(1)} `,LLM_DEFAULT_MODEL:` ${b.slice(1)} `};
+    expect(modelOptions(options)).toEqual({allowed:[a,b],defaultModel:b});
+    expect(modelOptions({LLM_MODEL:a.slice(1)})).toEqual({allowed:[a],defaultModel:a});
+    expect(modelOptions({...options,LLM_PROVIDER:'openai-compatible'})).toEqual({allowed:[a.slice(1),a,b.slice(1)],defaultModel:b.slice(1)});
+  });
+  it('passes canonical configured IDs to Workers AI', async () => {
+    const {world,entry} = fixture();
+    const run = vi.fn().mockResolvedValue({response:'invalid'});
+    await enrichConversation({AI:{run},LLM_ALLOWED_MODELS:'cf/meta/llama-3.2-3b-instruct',LLM_DEFAULT_MODEL:'cf/meta/llama-3.2-3b-instruct'},world,entry);
+    expect(run.mock.calls[0][0]).toBe('@cf/meta/llama-3.2-3b-instruct');
   });
   it('validates client values and persists choices through snapshot serialization', () => {
     expect(validateModelSelection(config,'')).toBeUndefined();
