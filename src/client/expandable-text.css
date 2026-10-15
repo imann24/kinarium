@@ -1,0 +1,7 @@
+.expandable-text{display:block;max-width:100%;min-width:0;margin:0;text-align:left;white-space:pre-wrap;overflow-wrap:anywhere;color:inherit}
+button.expandable-text{cursor:pointer}
+button.expandable-text[aria-expanded=true]{cursor:text}
+.speech-box{pointer-events:none;overflow:visible;color:var(--scene-text,#58624d);font-size:9px}
+.speech-box .expandable-text{pointer-events:auto;width:100%;padding:6px 8px;border:1px solid var(--scene-outline,#dddcca);border-radius:8px;background:var(--scene-bubble,#fffdf4);line-height:1.4}
+.speech-box.expanded .expandable-text{max-height:396px;overflow:auto;font-size:12px}
+.speech-box .expandable-text:focus-visible{outline:3px solid var(--scene-selection,#566f4d);outline-offset:2px}
