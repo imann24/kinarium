@@ -185,3 +185,30 @@ Memory callbacks require participant/event metadata, reject future or contradict
 `tests/dialogue-influence.test.ts` holds seeds and unrelated inputs fixed while independently varying both speakers’ traits, energy, mood, belonging, relationships and memory content. Both configured AI paths receive derived delivery cues and simulated energy (no added raw history/backstory or provider); exhausted multi-turn responses are capped at three replies, with procedural fallback on rejection. Prompt tests use mocks, so they verify instructions/data and enforced pacing, not live-model semantic obedience. State is a tendency, not a guarantee that every changed value changes every line.
 
 After these influence changes, the existing 360-encounter variety sample yields 246 distinct transcripts summed within fixed-pair sequences and 66 adjacent repeated topics (intentional callbacks), versus 210 and 90 in PR #28.
+
+### Avoidance and repair
+
+Trust weights both nearby partner selection and willingness to start an encounter.
+At trust 0, willingness is 12%; at 30 it is 64.8%; at 50 or more it is 100%.
+These are conditional on the existing location, travel and conversation checks,
+not per-tick encounter rates. The nonzero floor leaves opportunities to reconnect.
+
+Finished disagreements retain their topic and source event on the relationship,
+even when the snapshot's recent history is archived. After at least 120 simulated
+minutes, rested residents can offer to listen. The response depends on the other
+resident's temperament, mood, trust and community tension. A refusal is respected,
+gives no trust, and starts another cooling period. An accepted offer earns only
+one trust point; the same resident must later follow through by asking for and
+respecting a choice before earning seven more. Affinity remains separate, so this
+need not make them friends. Another conflict cancels the pending commitment.
+Interrupted repair earns nothing; saved arcs resume normally. Repair dialogue is
+procedural so AI cannot replace the action or response that earns the outcome.
+Only revealed dialogue enters memories, and the completed history entry explains
+the consequence. All new persisted fields are optional for existing worlds.
+
+`tests/repair.test.ts` compares 30 seeded low/high-trust runs and exercises refusal,
+interruption, delayed follow-through, new conflict, archival and save continuity.
+Twenty seeded kind pairs can complete repair over three simulated days; this is
+an achievable path, not a guarantee for every temperament or distressed world.
+`tests/repair.browser.mjs` checks the local journal at 1440/390/320px without live
+world requests, using the same Playwright configuration as other browser tests.
