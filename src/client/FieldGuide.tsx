@@ -1,0 +1,19 @@
+/** Keep this guide aligned with shipped controls and the server conversation policy. */
+export default function FieldGuide() {
+  return <div className="guide-copy">
+    <p>Watch a shared community unfold, then give it a nudge. There is no score to win.</p>
+    <h3>Meet someone.</h3>
+    <p>Select a resident in the house or open Residents. Their profile shows mood, energy and belonging; open “What affects these values” for current pressures and recorded changes. Traits and state shape encounters and dialogue. Background describes life before the house; Story so far and its sources draw on retained memories, not a complete lifetime.</p>
+    <h3>Follow a conversation.</h3>
+    <p>Select a speech bubble to expand it, then choose “Open conversation” for that exact thread. The dialog follows revealed turns and offers “View in journal”; it does not jump to another exchange. Some speech has no linked conversation. Dismiss a bubble with ×; use Escape to close a dialog.</p>
+    <p>Dialogue starts with built-in lines. When AI is configured and an observer is connected, an eligible early conversation can receive one generated continuation of 3–7 turns, revealed over time. Exhausted participants get a shorter continuation. Generated turns are marked “AI dialogue.” Traits, state, relationships and relevant memories inform the writing; generated words do not themselves change world state.</p>
+    <details><summary>AI availability and limits</summary><p>The checked-in server configuration uses Cloudflare Workers AI. Operators can configure an OpenAI-compatible provider; ordinary local development disables AI. Each world allows up to 240 requests per UTC day by default (configurable), at least 8 seconds apart, with one attempt per thread and a 6-second request timeout. Missing configuration, exhausted limits, failed or rejected responses leave built-in dialogue available. AI is not guaranteed for every conversation.</p></details>
+    <h3>Read the world’s history.</h3>
+    <p>Use Journal filters, expand conversations and load older entries. Select linked resident names to open profiles. Bonds shows encounters between residents currently at home; affinity and trust are different measures. Open Insights to explore community statistics, connection groups and recent recorded moments. Choose “Everyone, including away” to inspect saved relationships. Retained records and summaries may be incomplete.</p>
+    <h3>Make room for change.</h3>
+    <p>Introduce someone within the population cap, or open a profile to let them take time away. Confirm the departure; welcome them back from Residents → Away when there is room. Their memories and relationships stay saved. Choose an event to influence the house: each observer gets 3 events per world in a rolling 5-minute window, with a shared 45-second cooldown. The allowance display shows when another event is available.</p>
+    <h3>Share the controls.</h3>
+    <p>Open the “here” player list to change your observer name and see who is connected. Observers are people watching, not residents. Everyone admitted to a world can change it; passwords protect entry, with no owner-only controls. World settings lets you edit the house name and description, population cap and time mode. Use the journal toggle, fullscreen and theme controls to make watching comfortable.</p>
+    <p><b>Always on:</b> the empty world advances in one-minute batches. <b>Catch-up:</b> it advances when someone returns. After a long absence, only the most recent simulated day is replayed in detail.</p>
+  </div>;
+}
