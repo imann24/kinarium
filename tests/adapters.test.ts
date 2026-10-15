@@ -19,6 +19,12 @@ describe('provider boundary', () => {
     expect(run.mock.calls[0][2].signal).toBeInstanceOf(AbortSignal);
     expect(fetch).not.toHaveBeenCalled();
   });
+  it('normalizes Workers AI chat-completion output without using reasoning text', async () => {
+    const run = vi.fn().mockResolvedValue({choices:[{message:{content:'A quiet thought.', reasoning_content:'internal'}}]});
+    expect(await enrichDialogue({AI:{run}},world,entry)).toBe('A quiet thought.');
+    run.mockResolvedValue({choices:[{message:{reasoning_content:'internal'}}]});
+    expect(await enrichDialogue({AI:{run}},world,entry)).toBeNull();
+  });
   it('accepts a different Cloudflare model without changing the simulation', async () => {
     const run = vi.fn().mockResolvedValue({response:'Hello.'});
     await enrichDialogue({AI:{run},LLM_MODEL:'@cf/meta/llama-3.2-3b-instruct'},world,entry);

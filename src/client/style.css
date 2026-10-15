@@ -30,3 +30,4 @@
 /* Fit the initial world view; fullscreen retains its own layout. */
 .world-page:not(.world-fullscreen) .world-stage{align-self:start}
 .world-page:not(.world-fullscreen) .world-stage .building{min-height:0;max-height:var(--world-canvas-height,none)}
+.model-selection select{display:block;width:100%;min-height:44px;margin-top:8px;background:var(--paper);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:8px}.model-selection select:focus-visible{outline:3px solid var(--green);outline-offset:2px}.model-selection p{font-size:12px;line-height:1.6}
