@@ -9,3 +9,20 @@
 .conversation-thread li p { margin: 5px 0; overflow-wrap: anywhere; }
 
 .conversation-thread summary strong { overflow-wrap: anywhere; }
+
+/* One native disclosure header owns the journal record's metadata and summary. */
+.journal-conversation{margin-top:0}
+.journal-conversation>summary{position:relative;display:block;list-style:none;padding:0 0 5px 15px;border-radius:3px}
+.journal-conversation>summary::-webkit-details-marker{display:none}
+.journal-conversation>summary::before{content:'▸';position:absolute;left:0;top:22px;font-size:12px}
+.journal-conversation[open]>summary::before{content:'▾'}
+.journal-conversation>summary:focus-visible{outline:2px solid var(--focus,#566f4d);outline-offset:4px}
+.journal-conversation>summary span,.journal-conversation>summary small{margin-left:0}
+.journal-conversation>summary .entry-meta{display:flex;gap:8px}
+.journal-conversation>summary .journal-conversation-title{display:block;margin:3px 0;line-height:1.5}
+.journal-conversation-description{font-size:12px;line-height:1.7;overflow-wrap:anywhere}
+.journal-conversation>summary small{margin-top:4px}
+.conversation-participants{display:flex;flex-wrap:wrap;gap:5px 12px;margin:8px 0;font-size:12px}
+
+.journal-open-conversation{display:flex;align-items:center;gap:4px;margin:7px 0 0 15px;padding:4px 0;background:transparent;border:0;color:var(--secondary,#566f4d);font-size:11px;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.journal-open-conversation:focus-visible{outline:2px solid var(--focus,#566f4d);outline-offset:4px}

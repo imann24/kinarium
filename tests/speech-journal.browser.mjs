@@ -119,6 +119,12 @@ try {
   assert.equal(await modal.locator('li p').innerText(), archive[0].conversation.turns[0].text);
   await modal.getByRole('button', { name: 'View in journal' }).click();
   await page.waitForFunction(id => document.activeElement?.closest(`[data-conversation-id="${id}"]`), id);
+  const archivedTrigger = page.locator(`[data-conversation-id="${id}"] .journal-open-conversation`);
+  await archivedTrigger.click();
+  await modal.locator('.conversation-thread').waitFor();
+  assert.equal(await modal.locator('li p').innerText(), archive[0].conversation.turns[0].text);
+  await modal.getByRole('button', { name: 'Close conversation' }).click();
+  assert(await archivedTrigger.evaluate(el => el === document.activeElement));
   // Missing ID with unrelated archive results has an explicit empty state.
   snapshot.world.characters[0].speechConversationId = 999999;
   await page.goto(`${base}/w/speech-journal`);

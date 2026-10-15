@@ -1,0 +1,73 @@
+import assert from 'node:assert/strict';
+const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
+const base = process.env.BASE_URL || 'http://127.0.0.1:5173';
+assert(['localhost', '127.0.0.1'].includes(new URL(base).hostname));
+const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium', args: ['--no-sandbox'] });
+try {
+  const page = await browser.newPage({hasTouch:true}); const errors = []; let snapshot;
+  page.on('pageerror', e => errors.push(e.message));
+  await page.route('**/api/**', route => route.fulfill({ json: route.request().url().endsWith('/worlds') ? { worlds: [] } : snapshot }));
+  await page.routeWebSocket('**/socket?**', () => {});
+  await page.goto(base);
+  snapshot = await page.evaluate(async () => {
+    const { createWorld } = await import('/src/simulation/engine.ts');
+    const world = createWorld({ slug:'journal-header',name:'Journal headers',populationCap:4 },Date.now(),42);
+    world.characters.forEach((c,i)=> { c.name=['Otis','Fern','Alexandra','Benjamin'][i]; c.speech=undefined; });
+    const text='Otis talks with Fern. They agree to try asking first; the disagreement is not erased.';
+    const entry={id:world.nextLog++,minute:world.minute,kind:'conversation',text,characters:world.characters.slice(0,2).map(c=>c.id),conversation:{title:'An attempt to repair',topic:'Asking first',status:'finished',tone:'warm',turns:[{speakerId:world.characters[0].id,text:'I can try asking first next time.',minute:world.minute},{speakerId:world.characters[1].id,text:'Thank you. I would appreciate that.',minute:world.minute+6}],nextTurnAt:0,targetTurns:2}};
+    world.history.push(entry);
+    const group=structuredClone(entry);group.id=world.nextLog++;group.text='Otis, Fern, Alexandra, Benjamin gather to talk about the garden.';group.characters=world.characters.map(c=>c.id);group.conversation.title='A shared garden';group.conversation.status='active';world.history.push(group);
+    return {world,presence:[],serverNow:Date.now(),targetId:entry.id};
+  });
+  let count=0;
+  for(const theme of ['light','dark']) for(const width of [320,1440]) for(const mode of ['normal','native','fallback']) {
+    await page.setViewportSize({width,height:900});await page.goto(`${base}/w/journal-header`);
+    const article=page.locator(`[data-conversation-id="${snapshot.targetId}"]`);await article.waitFor();
+    await page.evaluate(theme=>document.documentElement.dataset.theme=theme,theme);
+    if(mode==='fallback')await page.evaluate(()=>{Element.prototype.requestFullscreen=async()=>{throw new Error('Unavailable');};});
+    if(mode!=='normal'){await page.getByRole('button',{name:'Enter fullscreen',exact:true}).click();await page.locator('.world-fullscreen').waitFor();}
+    const summary=article.locator('summary'),thread=article.locator('details');
+    assert.equal(await summary.count(),1);assert.equal(await article.locator(':scope > p').count(),0);
+    assert.equal(await summary.locator('.entry-meta').count(),1);
+    assert.equal(await summary.locator('button,a').count(),0);
+    assert.equal(await summary.locator('.journal-conversation-title').innerText(),'An attempt to repair');
+    assert.match(await summary.innerText(),/Day 1 · 08:00/);assert.match(await summary.innerText(),/conversation/i);
+    assert.match(await summary.innerText(),/disagreement is not erased/);
+    assert.equal(await thread.evaluate(el=>el.open),false);
+    const open = article.getByRole('button',{name:'Open conversation: An attempt to repair',exact:true});
+    assert.equal(await open.evaluate(el=>el.closest('summary')!==null),false);
+    await open.focus();await page.keyboard.press('Enter');
+    const modal=page.getByRole('dialog');await modal.waitFor();
+    assert.equal(await thread.evaluate(el=>el.open),false,'Opening modal does not toggle accordion');
+    assert.equal(await modal.locator('li').count(),2);
+    await modal.locator('h2').click();assert(await modal.isVisible(),'Inside clicks do not dismiss');
+    const box=await modal.boundingBox();
+    const inside={x:box.x+box.width/2,y:box.y+Math.min(100,box.height/2)};
+    const outside={x:2,y:2};
+    await page.mouse.move(inside.x,inside.y);await page.mouse.down();await page.mouse.move(outside.x,outside.y,{steps:5});await page.mouse.up();
+    assert(await modal.isVisible(),'Selection/drag from inside to backdrop stays open');
+    await page.mouse.move(outside.x,outside.y);await page.mouse.down();await page.mouse.move(inside.x,inside.y,{steps:5});await page.mouse.up();
+    assert(await modal.isVisible(),'Backdrop-to-inside drag stays open');
+    if(width===320)await page.touchscreen.tap(outside.x,outside.y);else await page.mouse.click(outside.x,outside.y);
+    await modal.waitFor({state:'hidden'});
+    assert(await open.evaluate(el=>el===document.activeElement),'Return focus to actual journal trigger');
+    await page.keyboard.press('Space');await modal.waitFor();await page.keyboard.press('Escape');await modal.waitFor({state:'hidden'});
+    assert(await open.evaluate(el=>el===document.activeElement));
+    await summary.focus();await page.keyboard.press('Enter');assert.equal(await thread.evaluate(el=>el.open),true);
+    assert.equal(await thread.locator('li').count(),2);
+    assert.equal(await thread.getByRole('group',{name:'Conversation participants'}).getByRole('button').count(),2);
+    await summary.focus();await page.keyboard.press('Space');assert.equal(await thread.evaluate(el=>el.open),false);
+    await summary.locator('.journal-conversation-description').click();assert.equal(await thread.evaluate(el=>el.open),true);
+    assert(await article.evaluate(el=>el.scrollWidth<=el.clientWidth+1));
+    assert(await page.locator('.journal-scroll').evaluate(el=>el.scrollWidth<=el.clientWidth+1), 'No horizontal clipping inside journal scroll area');
+    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+    if(mode==='normal'&&width===320)await page.locator('.world-sidebar').screenshot({path:`/tmp/journal-entry-${theme}.png`});
+    await thread.getByRole('group',{name:'Conversation participants'}).getByRole('button',{name:"View Fern's profile"}).click();
+    await page.locator('.character-detail').waitFor();assert.equal(await page.locator('.character-heading h2').innerText(),'Fern');
+    await page.getByRole('button',{name:'Journal',exact:true}).click();
+    assert.equal(await page.locator('.kind-arrival details').count(),0);
+    if(mode!=='normal')await page.getByRole('button',{name:'Exit fullscreen',exact:true}).click();
+    count++;
+  }
+  assert.deepEqual(errors,[]);console.log(`PASS ${count} cohesive journal scenarios: one header, preserved repair context/metadata, mouse/Enter/Space, exact-thread modal, backdrop click/tap and drag guards, focus return, profile navigation, ordinary events, mobile/desktop light/dark native/fallback fullscreen.`);
+} finally {await browser.close();}

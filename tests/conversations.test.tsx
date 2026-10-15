@@ -167,3 +167,25 @@ describe('thread presentation', () => {
     expect(html).not.toContain('<script>'); expect(html).toContain('&lt;script&gt;');
   });
 });
+
+
+describe('cohesive journal thread header', () => {
+  it('puts the record summary, title, timestamp and kind in one native disclosure', () => {
+    const { world, entry } = fixture();
+    entry.text = 'Otis talks with Fern. They agree to try asking first; the disagreement is not erased.';
+    entry.conversation!.title = 'An attempt to repair';
+    entry.conversation!.status = 'finished';
+    const html = renderToStaticMarkup(<ConversationThread journal entry={entry} characters={world.characters} onSelect={() => {}}/>);
+    const header = html.match(/<summary>(.*?)<\/summary>/s)![1];
+    expect(html.match(/<summary>/g)).toHaveLength(1);
+    expect(html.split(entry.text)).toHaveLength(2);
+    expect(html.split('An attempt to repair')).toHaveLength(2);
+    expect(header).toContain(entry.text);
+    expect(header).toContain('Day 1 · 08:00');
+    expect(header).toContain(entry.kind);
+    expect(header).toContain('At a pause');
+    expect(header).not.toContain('<button');
+    expect(html).toContain('aria-label="Conversation participants"');
+    for (const c of world.characters) expect(html).toContain(`View ${c.name}&#x27;s profile`);
+  });
+});
