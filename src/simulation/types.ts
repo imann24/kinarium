@@ -10,6 +10,7 @@ export interface Memory {
 export interface ResidentStats { mood: number; energy: number; belonging: number; }
 export interface ResidentStateChange extends ResidentStats { minute: number; cause: string; eventId: number; }
 export interface Character {
+  model?: string;
   id: string; name: string; color: string; trait: Trait; backstory: string;
   floor: number; x: number; destination: number; inElevator?: boolean; activity: string; away: boolean;
   mood: number; energy: number; belonging: number; memories: Memory[];
@@ -46,10 +47,11 @@ export interface WorldState {
 }
 export interface WorldSummary { slug: string; name: string; description: string; templateId: string; createdAt: number; population: number; populationCap: number; mode: TimeMode; protected: boolean; cohesion: number; }
 export interface Presence { id: string; name: string; color: string; }
-export interface Snapshot { world: WorldState; presence: Presence[]; protected: boolean; serverNow: number; playerEvents: import('./event-budget').PlayerEventBudget; }
+export interface Snapshot { models?: { allowed: string[]; defaultModel: string | null }; world: WorldState; presence: Presence[]; protected: boolean; serverNow: number; playerEvents: import('./event-budget').PlayerEventBudget; }
 export type Command =
   | { type: 'house-details'; name: string; description: string; expectedRevision: number }
   | { type: 'add-character'; name?: string; trait?: Trait; backstory?: string }
+  | { type: 'set-model'; characterId: string; model?: string }
   | { type: 'set-away'; characterId: string; away: boolean }
   | { type: 'trigger-event'; eventId: string }
   | { type: 'settings'; mode: TimeMode; populationCap: number };

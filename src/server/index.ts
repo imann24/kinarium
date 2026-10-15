@@ -6,7 +6,7 @@ import { activeCharacters, advance, applyCommand, createWorld, summarize, TICK_M
 import { TEMPLATES, TRAITS } from '../simulation/catalog';
 import type { Command, LogEntry, Presence, Snapshot, TimeMode, WorldState, WorldSummary } from '../simulation/types';
 import { body, digest, equal, json, passwordHash, string, validOrigin } from './security';
-import { enrichConversation, isLLMConfigured, type LLMConfig } from './llm';
+import { enrichConversation, isLLMConfigured, modelOptions, validateModelSelection, conversationCallCount, type LLMConfig } from './llm';
 import { applyConversationPlan, dailyConversationLimit } from './conversation-policy';
 import { availableEvents, consumeEvent, eventBudget } from '../simulation/event-budget';
 
@@ -142,7 +142,7 @@ export class WorldRoom extends DurableObject<Env> {
     const unique = new Map<string, Presence>();
     for (const ws of this.ctx.getWebSockets()) { const p = ws.deserializeAttachment() as Presence; if (p) unique.set(p.id, { id: p.id, name: p.name, color: p.color }); }
     const now = Date.now();
-    return { world: this.data!.world, protected: !!this.data!.password, presence: [...unique.values()], serverNow: now, playerEvents: eventBudget(this.playerEvents(playerId), now) };
+    return { models: modelOptions(this.env), world: this.data!.world, protected: !!this.data!.password, presence: [...unique.values()], serverNow: now, playerEvents: eventBudget(this.playerEvents(playerId), now) };
   }
   private broadcast() {
     for (const ws of this.ctx.getWebSockets()) {
@@ -255,6 +255,7 @@ export class WorldRoom extends DurableObject<Env> {
         const trait = input.trait; if (trait !== undefined && !TRAITS.includes(trait as typeof TRAITS[number])) throw new Error('Unknown personality.');
         return { type: input.type, name: string(input.name, 30), trait: trait as typeof TRAITS[number] | undefined, backstory: string(input.backstory, 500) };
       }
+      case 'set-model': return { type: input.type, characterId: string(input.characterId, 30), model: validateModelSelection(this.env, input.model) };
       case 'set-away': if (typeof input.away !== 'boolean') throw new Error('Specify whether the character is away.'); return { type: input.type, characterId: string(input.characterId, 30), away: input.away };
       case 'trigger-event': return { type: input.type, eventId: string(input.eventId, 40) };
       case 'house-details': return { type: input.type, name: input.name as string, description: input.description as string, expectedRevision: input.expectedRevision as number };
@@ -273,15 +274,19 @@ export class WorldRoom extends DurableObject<Env> {
     if (this.data.llmCalls >= limit || Date.now() - this.data.lastLLM < 8_000) return;
     const entry = this.data.world.history.find(e => e.conversation?.status === 'active' && !e.conversation.generationAttempted && e.conversation.turns.length < 4);
     if (!entry) return;
-    // Reserve once per thread before I/O. Failed requests never create retry storms.
+    const calls = conversationCallCount(this.env, this.data.world, entry);
+    if (this.data.llmCalls + calls > limit) return;
+    const selections = entry.characters.map(id => this.data!.world.characters.find(c => c.id === id)?.model);
+    // Reserve every possible request before I/O. Failed requests never create retry storms.
     entry.conversation!.generationAttempted = true;
     const turnCount = entry.conversation!.turns.length;
-    this.data.llmCalls++; this.data.lastLLM = Date.now(); this.save();
+    this.data.llmCalls += calls; this.data.lastLLM = Date.now(); this.save();
     this.generatingConversation = true;
     try {
       const turns = await enrichConversation(this.env, structuredClone(this.data.world), structuredClone(entry));
       const current = this.data.world.history.find(e => e.id === entry.id);
       // Commands can replace the world while inference is in flight; never apply a stale plan.
+      if (entry.characters.some((id, i) => this.data!.world.characters.find(c => c.id === id)?.model !== selections[i])) return;
       if (!applyConversationPlan(current, turnCount, turns)) return;
       this.save(); this.broadcast();
     } finally { this.generatingConversation = false; }

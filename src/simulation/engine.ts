@@ -147,6 +147,14 @@ export function applyCommand(s: WorldState, command: Command, now: number) {
   switch (command.type) {
     case 'house-details': updateHouseDetails(s, command); break;
     case 'add-character': createCharacter(s, command.name, command.trait, command.backstory); break;
+    case 'set-model': {
+      const c = s.characters.find(c => c.id === command.characterId);
+      if (!c) throw new Error('That character could not be found.');
+      c.model = command.model;
+      // Already revealed turns remain historical; discard pending text from the old model.
+      for (const entry of s.history) if (entry.characters.includes(c.id) && entry.conversation?.status === 'active') delete entry.conversation.planned;
+      break;
+    }
     case 'set-away': {
       const c = s.characters.find(c => c.id === command.characterId);
       if (!c) throw new Error('That character could not be found.');
