@@ -92,3 +92,64 @@ describe('compact resident history', () => {
     expect(html).not.toMatch(/<details[^>]*\sopen(?:[\s=>])/);
   });
 });
+
+ describe('saved summary refresh policy', () => {
+  it('initializes legacy/empty residents, preserves inputs and skips unrelated or unchanged updates', async () => {
+    const { refreshResidentSummaries } = await import('../src/simulation/resident-summary');
+    const { world, resident } = fixture();
+    const memories = structuredClone(resident.memories); const history = structuredClone(world.history);
+    refreshResidentSummaries(world, 1000);
+    const cached = resident.residentSummary!;
+    expect(cached.value.timeline).toEqual([]);
+    resident.mood = 1; resident.away = true; world.minute += 2;
+    refreshResidentSummaries(world, 100_000);
+    expect(resident.residentSummary).toBe(cached);
+    expect(resident.memories).toEqual(memories); expect(world.history).toEqual(history);
+  });
+  it('throttles changes at 60 seconds, including away residents and paused simulation time', async () => {
+    const { refreshResidentSummaries } = await import('../src/simulation/resident-summary');
+    const { world, resident, add } = fixture(); world.minute = 600;
+    refreshResidentSummaries(world, 1000); const cached = resident.residentSummary;
+    resident.away = true; add(90, 'friendship');
+    refreshResidentSummaries(world, 60_999); expect(resident.residentSummary).toBe(cached);
+    refreshResidentSummaries(world, 61_000); expect(resident.residentSummary).not.toBe(cached);
+    expect(resident.residentSummary!.value.story[0].text).toContain('friends');
+    expect(cached!.value.timeline).toEqual([]);
+  });
+  it('persists freshness across save/load and catches up once after inactivity', async () => {
+    const { refreshResidentSummaries } = await import('../src/simulation/resident-summary');
+    const { world, add } = fixture(); world.minute = 600; add(90, 'arrival');
+    refreshResidentSummaries(world, 1000);
+    const loaded = JSON.parse(JSON.stringify(world)); const cached = loaded.characters[0].residentSummary;
+    refreshResidentSummaries(loaded, 1_000_000); expect(loaded.characters[0].residentSummary).toBe(cached);
+    loaded.characters[0].memories.push({ text: 'An earlier memory', minute: 100 });
+    refreshResidentSummaries(loaded, 1_000_000);
+    expect(loaded.characters[0].residentSummary.updatedAt).toBe(1_000_000);
+    expect(loaded.characters[0].residentSummary.value.timeline).toHaveLength(2);
+  });
+  it('refreshes relevant names, provenance and tension expiry but ignores planned dialogue', async () => {
+    const { refreshResidentSummaries } = await import('../src/simulation/resident-summary');
+    const { world, resident, add } = fixture(); world.minute = 600; add(90, 'conflict');
+    refreshResidentSummaries(world, 0); expect(resident.residentSummary!.value.tension).toBeDefined();
+    world.characters[1].name = 'Renamed'; refreshResidentSummaries(world, 60_000);
+    expect(resident.residentSummary!.value.tension!.text).toContain('Renamed');
+    world.minute = 3000; refreshResidentSummaries(world, 120_000);
+    expect(resident.residentSummary!.value.tension).toBeUndefined();
+    world.history.push({ id: 90, minute: 590, kind: 'conflict', text: 'Talk', characters: [resident.id], conversation: { topic: 'Tea', status: 'active', tone: 'tense', turns: [], nextTurnAt: 600, targetTurns: 3 } });
+    refreshResidentSummaries(world, 180_000); expect(resident.residentSummary!.value.timeline).toEqual([]);
+    const cached = resident.residentSummary;
+    world.history.at(-1)!.conversation!.planned = [{ speakerId: resident.id, text: 'SECRET' }];
+    refreshResidentSummaries(world, 240_000); expect(resident.residentSummary).toBe(cached);
+    world.history.at(-1)!.conversation!.status = 'finished';
+    refreshResidentSummaries(world, 240_000); expect(resident.residentSummary!.value.timeline).toHaveLength(1);
+    expect(JSON.stringify(resident.residentSummary)).not.toContain('SECRET');
+  });
+  it('shows pending freshness and legacy/empty copy without replacing source records', async () => {
+    const { refreshResidentSummaries } = await import('../src/simulation/resident-summary');
+    const { world, resident, add } = fixture(); world.minute = 600; add(90, 'arrival');
+    refreshResidentSummaries(world, 0); add(91, 'friendship');
+    const html = renderToStaticMarkup(<PersonalHistory character={resident} characters={world.characters} onSelect={() => {}} minute={world.minute} events={world.history}/>);
+    expect(html).toContain('waiting for the next refresh'); expect(html).toContain('real-time minute');
+    expect(resident.memories).toHaveLength(2);
+  });
+});

@@ -223,3 +223,23 @@ an achievable path, not a guarantee for every temperament or distressed world.
 world requests, using the same Playwright configuration as other browser tests.
 
 Repair integration: completed repair currently changes relationship scores and house tension, not resident mood, energy or belonging directly. It therefore adds no direct resident-stat record; the new tension value is reflected in ongoing mood pressure. Ordinary encounter and house-event records retain their existing effects.
+
+### Resident memory summaries
+
+The existing **Story so far**, defining moments, recent tension and retained-history
+projection is deterministic and display-only. No model/provider requests are made;
+memories, archived history and dialogue recall/influence remain unchanged.
+Each resident's projection and input fingerprint are saved with the world. Missing
+legacy caches initialize on the next save. At persistence boundaries, a changed
+projection refreshes no more than once per **60,000 milliseconds of real time**.
+Unchanged inputs do not regenerate or advance the freshness timestamp. Inputs are
+retained memories, referenced participants' names, referenced event provenance and
+topic/status, plus memory visibility and one-simulated-day tension expiry boundaries.
+Movement, needs, presence, unrelated events and planned dialogue do not invalidate it.
+Away residents use the same policy. Inactive catch-up worlds do no background work;
+changes refresh on the first eligible save after resuming. Existing occupied ticks
+and unoccupied persistent-world alarms supply the cadence; no new timer is created.
+Profiles show the simulated time of the last summary and flag pending input changes.
+During the throttle window disclosures show the last summarized records; authoritative
+original memories and archived history are never rewritten. Legacy/offline snapshots
+without a cache use a memoized local projection until a server save supplies one.
