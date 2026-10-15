@@ -15,6 +15,8 @@ export interface Character {
   mood: number; energy: number; belonging: number; memories: Memory[];
   /** Actual bounded deltas from recent discrete effects; absent in older saves. */
   stateChanges?: ResidentStateChange[];
+  /** Display-only cached history; optional for legacy saves. */
+  residentSummary?: import('./resident-summary').SavedResidentSummary;
   speech?: string; speechUntil?: number;
   /** Journal entry that produced this utterance; absent for legacy/unlinked speech. */
   speechConversationId?: number;
