@@ -1,3 +1,4 @@
+import { deployedVersion } from './build-version';
 import { HouseDetailsConflict } from '../simulation/house-details';
 import { DurableObject } from 'cloudflare:workers';
 import { activeCharacters, advance, applyCommand, createWorld, summarize, TICK_MS } from '../simulation/engine';
@@ -30,6 +31,7 @@ export default {
       } catch (error) { return json({ error: error instanceof Error ? error.message : 'Invalid JSON.' }, 400); }
     }
     try {
+      if (url.pathname === '/api/version' && request.method === 'GET') return deployedVersion(request, env.ASSETS);
       if (url.pathname === '/api/worlds' && ['GET', 'POST'].includes(request.method)) return directory(env).fetch(request);
       if (url.pathname === '/api/templates' && request.method === 'GET') return json(Object.values(TEMPLATES));
       const match = url.pathname.match(/^\/api\/worlds\/([a-z0-9-]{1,48})(?:\/(unlock|socket|commands|history))?$/);
