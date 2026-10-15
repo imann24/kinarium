@@ -1,3 +1,4 @@
+import { residentDrift, residentStats, recordResidentChange } from './resident-state';
 import { updateHouseDetails } from './house-details';
 import { advanceConversations, beginConversation, isConversing, interruptConversations } from './conversations';
 import { memoryInfluence, rememberEvent } from './memories';
@@ -61,6 +62,7 @@ export function createWorld(input: { slug: string; name: string; description?: s
   return s;
 }
 function interact(s: WorldState, a: Character, b: Character) {
+  const beforeA = residentStats(a), beforeB = residentStats(b);
   const r = relationship(s, a.id, b.id);
   const scarcity = s.resources < 25 ? .15 : 0;
   const kindness = (a.trait === 'kind' || b.trait === 'kind') ? .13 : 0;
@@ -71,7 +73,9 @@ function interact(s: WorldState, a: Character, b: Character) {
   a.mood = clamp(a.mood + (positive ? 3 : -5)); b.mood = clamp(b.mood + (positive ? 3 : -5));
   a.belonging = clamp(a.belonging + (positive ? 2 : -3)); b.belonging = clamp(b.belonging + (positive ? 2 : -3));
   s.cohesion = clamp(s.cohesion + (positive ? .5 : -.9)); s.tension = clamp(s.tension + (positive ? -.5 : 1.2));
-  beginConversation(s, a, b, positive);
+  const encounter = beginConversation(s, a, b, positive);
+  recordResidentChange(a, beforeA, s.minute, `${positive ? 'Warm encounter' : 'Disagreement'} with ${b.name}`, encounter.id);
+  recordResidentChange(b, beforeB, s.minute, `${positive ? 'Warm encounter' : 'Disagreement'} with ${a.name}`, encounter.id);
   if (previous < 35 && r.affinity >= 35) { const t = `${a.name} and ${b.name} are becoming real friends.`; const friendship = log(s, 'friendship', t, [a.id, b.id]); rememberEvent(a, friendship, `I’m becoming friends with ${b.name}.`, { tone: 'warm', salience: 5 }); rememberEvent(b, friendship, `I’m becoming friends with ${a.name}.`, { tone: 'warm', salience: 5 }); }
 }
 export function step(s: WorldState) {
@@ -89,9 +93,7 @@ export function step(s: WorldState) {
   const night = s.minute % 1440 < 360 || s.minute % 1440 > 1320;
   for (const c of people) {
     if ((c.speechUntil ?? 0) < s.minute) c.speech = undefined;
-    c.energy = clamp(c.energy + (night || c.floor === 1 ? 1.8 : -.35));
-    c.belonging = clamp(c.belonging - .025);
-    c.mood = clamp(c.mood + (s.resources < 20 ? -.2 : .035) + (c.belonging - 50) / 2000 - s.tension / 4000);
+    Object.assign(c, residentDrift(c, s).next);
     if (isConversing(s, c.id)) continue;
     if (c.inElevator) {
       c.floor = s.elevatorFloor;
@@ -154,7 +156,7 @@ export function applyCommand(s: WorldState, command: Command, now: number) {
       s.cohesion = clamp(s.cohesion + event.cohesion); s.tension = clamp(s.tension + event.tension); s.resources = clamp(s.resources + event.resources);
       const people = activeCharacters(s);
       const occasion = log(s, 'event', event.text, people.map(c => c.id));
-      for (const c of people) { c.mood = clamp(c.mood + event.mood); rememberEvent(c, occasion, `I was here for ${event.name.toLowerCase()}. ${event.text}`, { tone: event.mood > 0 ? 'warm' : event.mood < 0 ? 'tense' : 'neutral', salience: 3 }); if (event.tone === 'kind') c.destination = 0; }
+      for (const c of people) { const before = residentStats(c); c.mood = clamp(c.mood + event.mood); recordResidentChange(c, before, s.minute, event.name, occasion.id); rememberEvent(c, occasion, `I was here for ${event.name.toLowerCase()}. ${event.text}`, { tone: event.mood > 0 ? 'warm' : event.mood < 0 ? 'tense' : 'neutral', salience: 3 }); if (event.tone === 'kind') c.destination = 0; }
       for (let i = 0; i < people.length; i++) for (let j = i + 1; j < people.length; j++) { const r = relationship(s, people[i].id, people[j].id); r.affinity = clamp(r.affinity + (event.tone === 'kind' ? 3 : -2), -100, 100); r.trust = clamp(r.trust + (event.tone === 'kind' ? 2 : -2)); }
       break;
     }

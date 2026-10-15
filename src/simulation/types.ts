@@ -7,10 +7,14 @@ export interface Memory {
   eventId?: number; kind?: LogKind; participantIds?: string[];
   tone?: 'warm' | 'tense' | 'neutral'; salience?: number;
 }
+export interface ResidentStats { mood: number; energy: number; belonging: number; }
+export interface ResidentStateChange extends ResidentStats { minute: number; cause: string; eventId: number; }
 export interface Character {
   id: string; name: string; color: string; trait: Trait; backstory: string;
   floor: number; x: number; destination: number; inElevator?: boolean; activity: string; away: boolean;
   mood: number; energy: number; belonging: number; memories: Memory[];
+  /** Actual bounded deltas from recent discrete effects; absent in older saves. */
+  stateChanges?: ResidentStateChange[];
   speech?: string; speechUntil?: number;
 }
 export interface Relationship { a: string; b: string; affinity: number; trust: number; encounters: number; lastMinute: number; }
