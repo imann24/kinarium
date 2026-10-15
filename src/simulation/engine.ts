@@ -1,4 +1,5 @@
 import { residentDrift, residentStats, recordResidentChange } from './resident-state';
+import { contactWillingness, repairScene } from './repair';
 import { updateHouseDetails } from './house-details';
 import { advanceConversations, beginConversation, isConversing, interruptConversations } from './conversations';
 import { memoryInfluence, rememberEvent } from './memories';
@@ -64,6 +65,8 @@ export function createWorld(input: { slug: string; name: string; description?: s
 function interact(s: WorldState, a: Character, b: Character) {
   const beforeA = residentStats(a), beforeB = residentStats(b);
   const r = relationship(s, a.id, b.id);
+  const repair = repairScene(s, a, b, r, random(s));
+  if (repair) { beginConversation(s, a, b, true, repair); return; }
   const scarcity = s.resources < 25 ? .15 : 0;
   const kindness = (a.trait === 'kind' || b.trait === 'kind') ? .13 : 0;
   const positive = random(s) > clamp(.19 + s.tension / 240 + scarcity - kindness - r.affinity / 400 - (memoryInfluence(a, b.id, s.minute) + memoryInfluence(b, a.id, s.minute)) / 2, .06, .87);
@@ -109,7 +112,13 @@ export function step(s: WorldState) {
   }
   if (people.length > 1 && random(s) < .48) {
     const a = pick(s, people); const nearby = people.filter(b => !isConversing(s, a.id) && !isConversing(s, b.id) && b.id !== a.id && !b.inElevator && !a.inElevator && b.floor === a.floor && b.destination === b.floor && a.destination === a.floor);
-    if (nearby.length) interact(s, a, pick(s, nearby));
+    if (nearby.length) {
+      const weights = nearby.map(b => contactWillingness(relationship(s, a.id, b.id)));
+      let draw = random(s) * weights.reduce((sum, weight) => sum + weight, 0);
+      const b = nearby[weights.findIndex(weight => (draw -= weight) < 0)] ?? nearby[nearby.length - 1];
+      if (random(s) < contactWillingness(relationship(s, a.id, b.id))) interact(s, a, b);
+      else a.activity = `giving ${b.name} space`;
+    }
   }
   s.resources = clamp(s.resources - people.length * .008 + people.filter(c => c.floor === 2 && c.trait === 'practical').length * .12);
   // Scarcity and unresolved conflict can erode a community; high trust supports repair.

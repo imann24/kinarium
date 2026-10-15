@@ -195,3 +195,31 @@ Resident profiles show ongoing mood, energy and belonging factors separately fro
 Integration contract for new behavior: capture `residentStats(character)` before a discrete stat effect, apply the effect using the engine's bounds, then call `recordResidentChange(character, before, world.minute, factualCause, sourceEvent.id)`. Record only actual participants, once per event per resident. The helper records deltas only; it does not apply effects, draw randomness or infer repair. A successful repair should receive its own factual label and real event ID rather than be inferred from a warm conversation. Any new ongoing stat factors must be added to the shared drift calculation and its UI labels together.
 
 With Vite running, `PLAYWRIGHT_MODULE=<path-to-playwright/index.mjs> node tests/resident-state.browser.mjs` checks the resident sidebar and insights modal, legacy saves, away residents, limit behavior, keyboard disclosures and light/dark layouts at 1440/390/320px using local mocked transport and real simulation fixtures. It never contacts the live world.
+### Avoidance and repair
+
+Trust weights both nearby partner selection and willingness to start an encounter.
+At trust 0, willingness is 12%; at 30 it is 64.8%; at 50 or more it is 100%.
+These are conditional on the existing location, travel and conversation checks,
+not per-tick encounter rates. The nonzero floor leaves opportunities to reconnect.
+
+Finished disagreements retain their topic and source event on the relationship,
+even when the snapshot's recent history is archived. After at least 120 simulated
+minutes, rested residents can offer to listen. The response depends on the other
+resident's temperament, mood, trust and community tension. A refusal is respected,
+gives no trust, and starts another cooling period. An accepted offer earns only
+one trust point; the same resident must later follow through by asking for and
+respecting a choice before earning seven more. Affinity remains separate, so this
+need not make them friends. Another conflict cancels the pending commitment.
+Interrupted repair earns nothing; saved arcs resume normally. Repair dialogue is
+procedural so AI cannot replace the action or response that earns the outcome.
+Only revealed dialogue enters memories, and the completed history entry explains
+the consequence. All new persisted fields are optional for existing worlds.
+
+`tests/repair.test.ts` compares 30 seeded low/high-trust runs and exercises refusal,
+interruption, delayed follow-through, new conflict, archival and save continuity.
+Twenty seeded kind pairs can complete repair over three simulated days; this is
+an achievable path, not a guarantee for every temperament or distressed world.
+`tests/repair.browser.mjs` checks the local journal at 1440/390/320px without live
+world requests, using the same Playwright configuration as other browser tests.
+
+Repair integration: completed repair currently changes relationship scores and house tension, not resident mood, energy or belonging directly. It therefore adds no direct resident-stat record; the new tension value is reflected in ongoing mood pressure. Ordinary encounter and house-event records retain their existing effects.

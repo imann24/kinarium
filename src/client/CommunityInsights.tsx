@@ -3,6 +3,7 @@ import { gameTime } from '../simulation/engine';
 import type { WorldState } from '../simulation/types';
 import { communityInsights, pairRecords, recentActivity, type BondKind, type InsightScope } from './community-insights';
 import './community-insights.css';
+import HouseNarrative from './HouseNarrative';
 
 const labels: Record<BondKind, string> = { close: 'Growing close', strained: 'Strained', forming: 'Getting acquainted', unmet: 'Yet to meet' };
 const kinds = Object.keys(labels) as BondKind[];
@@ -46,6 +47,7 @@ export default function CommunityInsights({ world, onSelectResident }: { world: 
     <div className="insights-heading"><div><p className="eyebrow">NOTICING LIFE TOGETHER</p><h2 id="insights-title">A community, in focus.</h2><p>Current feelings, familiar faces, and the moments on record.</p></div>
       <label className="insights-scope">Current statistics for<select value={scope} onChange={e => { setScope(e.target.value as InsightScope); setSelected(undefined); }}><option value="home">Residents at home</option><option value="all">Everyone, including away</option></select></label></div>
     <p className="insights-note">{data.residents.length} residents in this view · {world.characters.filter(c => c.away).length} away in the world. Scores describe the simulation now; they are not goals.</p>
+    <HouseNarrative world={world}/>
     <div className="insights-summary">
       <div><span>Average mood</span><strong>{score(data.mood)}</strong><Meter value={data.mood}/><small>{data.residents.length ? 'Equal weight per resident' : 'No residents in this view'}</small></div>
       <div><span>Average belonging</span><strong>{score(data.belonging)}</strong><Meter value={data.belonging}/><small>{data.residents.length ? 'Equal weight per resident' : 'No residents in this view'}</small></div>

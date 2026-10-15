@@ -37,8 +37,13 @@ describe('resident state attribution', () => {
   });
   it('records warm and tense encounter effects with their actual event IDs', () => {
     const world = createWorld({ slug: 'test', name: 'Test' }, 0, 42);
-    for (let i = 0; i < 720; i++) step(world);
-    const changes = world.characters.flatMap(c => c.stateChanges ?? []);
+    world.tension = 70; world.resources = 10;
+    const observed = new Map<string, NonNullable<typeof world.characters[number]['stateChanges']>[number]>();
+    for (let i = 0; i < 720; i++) {
+      step(world);
+      for (const resident of world.characters) for (const change of resident.stateChanges ?? []) observed.set(`${resident.id}:${change.eventId}`, change);
+    }
+    const changes = [...observed.values()];
     expect(changes.some(c => c.cause.startsWith('Warm encounter'))).toBe(true);
     expect(changes.some(c => c.cause.startsWith('Disagreement'))).toBe(true);
     for (const c of changes) {
