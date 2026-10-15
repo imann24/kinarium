@@ -33,9 +33,10 @@
     }
   ],
   "vars": {
-    "LLM_PROVIDER": "cloudflare",
-    "LLM_MODEL": "@cf/meta/llama-3.1-8b-instruct-fp8-fast",
-    "LLM_DAILY_CALL_LIMIT": "240"
+    "LLM_ALLOWED_MODELS": "cf/meta/llama-3.1-8b-instruct-fp8,cf/meta/llama-3.2-3b-instruct,cf/mistralai/mistral-small-3.1-24b-instruct",
+    "LLM_DAILY_CALL_LIMIT": "240",
+    "LLM_DEFAULT_MODEL": "cf/meta/llama-3.1-8b-instruct-fp8",
+    "LLM_PROVIDER": "cloudflare"
   },
   "observability": {
     "enabled": true
