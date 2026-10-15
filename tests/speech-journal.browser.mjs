@@ -141,7 +141,7 @@ try {
   await modal.getByText('A live reply in this exact conversation.', { exact: true }).waitFor();
   assert.equal(await modal.locator('li').count(), 2);
   await modal.getByRole('button', { name: 'Close conversation' }).click();
-  assert(await toggleFocus(page));
+  assert(await page.getByRole('button', { name: 'Open conversation', exact: true }).evaluate(el => el === document.activeElement));
   // Direct archive navigation must not skip intervening journal pages.
   snapshot.world.characters[0].speech = 'Hi!';
   snapshot.world.history = [{ ...archive[0], id: 100 }];
@@ -165,5 +165,3 @@ try {
   assert.deepEqual(errors, []);
   console.log(`PASS ${count} modal scenarios: themes, mobile/desktop, native/fallback fullscreen, duplicate-text ID, focus trap/return, Escape, close, journal navigation, no collapse, resident selection; plus unlinked, archived, missing and live-update cases.`);
 } finally { await browser.close(); }
-
-async function toggleFocus(page) { return page.locator('.journal-panel-toggle').evaluate(el => el === document.activeElement); }
