@@ -40,7 +40,7 @@ async function request(path, body) {
   assert.ok(response.ok, await response.clone().text());
   return response.json();
 }
-const identities = world => world.characters.map(({ id, name, trait, backstory, color, away }) => ({ id, name, trait, backstory, color, away }));
+const identities = world => world.characters.map(({ id, name, trait, backstory, color, away, model }) => ({ id, name, trait, backstory, color, away, model }));
 try {
   await start();
   const templates = await request('/templates');
@@ -49,7 +49,13 @@ try {
     const slug = `test-restart-${template.id}`;
     await request('/worlds', { slug, name: template.name, templateId: template.id, mode: 'fast-forward' });
     await request(`/worlds/${slug}/commands`, { type: 'set-away', characterId: 'c1', away: true });
+    const snapshot = await request(`/worlds/${slug}`);
+    assert.ok(snapshot.models.allowed.length);
+    const rejected = await fetch(`${origin}/api/worlds/${slug}/commands`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({type:'set-model',characterId:'c1',model:'not-allowed'}) });
+    assert.equal(rejected.status,400);
+    await request(`/worlds/${slug}/commands`, {type:'set-model',characterId:'c1',model:snapshot.models.defaultModel});
     const { world } = await request(`/worlds/${slug}`);
+    assert.equal(world.characters[0].model,snapshot.models.defaultModel);
     saved.push({ slug, world });
   }
   await stop();
@@ -65,7 +71,7 @@ try {
     assert.equal(added.characters.at(-1).id, 'c7');
     assert.equal(new Set(added.characters.map(c => c.name)).size, 7);
   }
-  console.log('PASS: all template identities, away state, memories and ID counters survive a real SQLite runtime restart; later introductions remain unique.');
+  console.log('PASS: all template identities, away state, model selections, memories and ID counters survive a real SQLite runtime restart; later introductions remain unique.');
 } finally {
   await stop();
   await rm(storage, { recursive: true, force: true });
