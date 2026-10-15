@@ -243,3 +243,18 @@ Profiles show the simulated time of the last summary and flag pending input chan
 During the throttle window disclosures show the last summarized records; authoritative
 original memories and archived history are never rewritten. Legacy/offline snapshots
 without a cache use a memoized local projection until a server save supplies one.
+
+### Expanded speech reading time
+
+Expanded speech stays available for **45 seconds of real browser time from expansion**,
+independent of simulation speed or paused/stale snapshots. This replaces the usual
+roughly 12-second simulation turn window for text the observer has opened. A subtle
+remaining-time bar uses the same monotonic deadline as automatic dismissal. The ×
+button (or Escape while focused in the bubble) dismisses the utterance, without
+collapsing it or showing it again on the next snapshot. A new utterance from the same
+resident starts as a fresh preview, including repeated text with a new turn deadline.
+Opening the exact conversation modal remains independent: speech expiry never closes
+that modal or moves its focus. Unexpanded speech keeps its normal simulation lifetime.
+
+Browser regression: `tests/speech-dismissal.browser.mjs` uses local snapshots and a
+controlled browser clock to check progress, expiry, replacement, dismissal, and focus.

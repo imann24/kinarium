@@ -23,7 +23,7 @@ try {
    window.selections=0;
    createRoot(host).render(React.createElement(Building,{world,onSelect:()=>window.selections++}));
   },{theme});
-  const bubble=page.locator('.speech-box button');
+  const bubble=page.locator('.speech-box .expandable-text');
   await bubble.waitFor();
   assert.equal(await bubble.getAttribute('aria-expanded'),'false');
   if(key==='click') await bubble.click(); else {await bubble.focus();await page.keyboard.press(key);}

@@ -2,7 +2,7 @@ import { useId, type CSSProperties } from 'react';
 import type { Character, WorldState } from '../simulation/types';
 import { TEMPLATES } from '../simulation/catalog';
 import { useBuildingMotion } from './useBuildingMotion';
-import { SpeechBubble } from './ExpandableText';
+import ResidentSpeech from './ResidentSpeech';
 
 function Plant({ x, y, size = 1 }: { x: number; y: number; size?: number }) {
   return <g transform={`translate(${x} ${y}) scale(${size})`}><path d="M-10 0h20l-3 21H-7Z" fill="#bd8970"/><path d="M0 2v-38M0-13q-25-4-19-22Q0-34 0-13M0-23q23-4 18-24Q0-43 0-23" fill="#79936b" stroke="#637f59" strokeWidth="2"/></g>;
@@ -111,10 +111,11 @@ export default function Building({ world, selected, onSelect, onOpenConversation
         {!miniature && <><rect x="-25" y="8" width="50" height="15" rx="7" fill="var(--scene-bubble, #f6f4e8)" fillOpacity=".9"/><text y="19" textAnchor="middle" fontSize="9" fill="var(--scene-text, #555e4c)">{c.name.slice(0, 10)}</text></>}
       </g>;
     })}
-    {!miniature && people.filter(c => c.speech && (selected === c.id || people.filter(p => p.speech).at(-1)?.id === c.id)).map(c => {
+    {!miniature && people.map(c => {
       const position = motion.position(c.id);
-      return <SpeechBubble key={`${c.id}:${c.speechConversationId}:${c.speech}`} text={c.speech!} name={c.name}
-        onOpenConversation={onOpenConversation && Number.isSafeInteger(c.speechConversationId) && c.speechConversationId! > 0 && c.speechConversationId! < Number.MAX_SAFE_INTEGER && !world.history.some(e => e.id === c.speechConversationId && (!e.conversation || !e.characters.includes(c.id))) ? () => onOpenConversation(c.speechConversationId!) : undefined}
+      return <ResidentSpeech key={c.id} character={c} world={world}
+        visible={selected === c.id || people.filter(p => p.speech).at(-1)?.id === c.id}
+        onOpenConversation={onOpenConversation}
         x={position?.x ?? (c.inElevator ? 757 : 135 + c.x * 5.85)}
         y={236 + (2 - (position?.floor ?? c.floor)) * 143}/>;
     })}
