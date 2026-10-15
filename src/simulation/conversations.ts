@@ -1,3 +1,4 @@
+import { finishRepair, repairScene } from './repair';
 import { EVENTS } from './catalog';
 import { rememberEvent } from './memories';
 import { chooseConversationScene } from './conversation-scenes';
@@ -10,6 +11,11 @@ export function isConversing(world: WorldState, id: string) {
 }
 function finish(world: WorldState, entry: LogEntry, interrupted = false) {
   const thread = entry.conversation!;
+  if (entry.kind === 'conflict' && !thread.repair) {
+    const r = world.relationships[[...entry.characters].sort().join(':')];
+    if (r) { r.unresolvedConflict = { id: entry.id, minute: world.minute, topic: thread.topic }; r.repairCommitment = undefined; }
+  }
+  finishRepair(world, entry, interrupted);
   thread.title = conversationTitle(world, entry);
   thread.status = interrupted ? 'interrupted' : 'finished';
   thread.planned = undefined;
@@ -28,11 +34,11 @@ function finish(world: WorldState, entry: LogEntry, interrupted = false) {
 export function interruptConversations(world: WorldState, id: string) {
   for (const entry of world.history) if (entry.conversation?.status === 'active' && entry.characters.includes(id)) finish(world, entry, true);
 }
-export function beginConversation(world: WorldState, a: Character, b: Character, positive: boolean) {
-  const scene = chooseConversationScene(world, a, b, positive);
+export function beginConversation(world: WorldState, a: Character, b: Character, positive: boolean, repair?: NonNullable<ReturnType<typeof repairScene>>) {
+  const scene = repair ?? chooseConversationScene(world, a, b, positive);
   const { topic } = scene;
   const text = scene.lines[0];
-  const entry: LogEntry = { id: world.nextLog++, minute: world.minute, kind: positive ? 'conversation' : 'conflict', text: `${a.name} ${positive ? 'talks with' : 'works through a disagreement with'} ${b.name}.${scene.eventText ? ` ${scene.eventText}` : ''}`, characters: [a.id, b.id], conversation: { topic, sceneId: scene.id, fallbackTurns: scene.lines.slice(1), tone: positive ? 'warm' : 'tense', status: 'active', turns: [{ speakerId: a.id, text, minute: world.minute }], nextTurnAt: world.minute + TURN_INTERVAL, targetTurns: scene.lines.length } };
+  const entry: LogEntry = { id: world.nextLog++, minute: world.minute, kind: positive ? 'conversation' : 'conflict', text: `${a.name} ${positive ? 'talks with' : 'works through a disagreement with'} ${b.name}.${scene.eventText ? ` ${scene.eventText}` : ''}`, characters: [a.id, b.id], conversation: { repair: repair?.repair, generationAttempted: repair ? true : undefined, topic, sceneId: scene.id, fallbackTurns: scene.lines.slice(1), tone: positive ? 'warm' : 'tense', status: 'active', turns: [{ speakerId: a.id, text, minute: world.minute }], nextTurnAt: world.minute + TURN_INTERVAL, targetTurns: scene.lines.length } };
   entry.conversation!.title = conversationTitle(world, entry);
   world.history.push(entry);
   a.speech = text; a.speechUntil = world.minute + TURN_INTERVAL;

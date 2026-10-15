@@ -13,13 +13,14 @@ export interface Character {
   mood: number; energy: number; belonging: number; memories: Memory[];
   speech?: string; speechUntil?: number;
 }
-export interface Relationship { a: string; b: string; affinity: number; trust: number; encounters: number; lastMinute: number; }
+export interface Relationship { a: string; b: string; affinity: number; trust: number; encounters: number; lastMinute: number; lastRepairMinute?: number; repairedConflictId?: number; unresolvedConflict?: { id: number; minute: number; topic: string }; repairCommitment?: { conflictId: number; initiatorId: string }; }
 export interface ConversationTurn { speakerId: string; text: string; minute: number; generated?: boolean; }
 export interface Conversation {
   topic: string; title?: string; tone: 'warm' | 'tense'; status: 'active' | 'finished' | 'interrupted';
   turns: ConversationTurn[]; nextTurnAt: number; targetTurns: number;
   /** Saved procedural arc; absent in legacy threads. Never treated as revealed dialogue. */
   sceneId?: string; fallbackTurns?: string[];
+  repair?: { conflictId: number; phase: 'offer' | 'follow-through'; accepted: boolean };
   planned?: { speakerId: string; text: string }[]; generationAttempted?: boolean;
 }
 export interface LogEntry { id: number; minute: number; kind: LogKind; text: string; characters: string[]; generated?: boolean; conversation?: Conversation; }
