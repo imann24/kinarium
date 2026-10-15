@@ -25,8 +25,10 @@ export default function ResidentSpeech({ character, visible, world, x, y, onOpen
   const id = utterance.conversationId;
   const linked = Number.isSafeInteger(id) && id! > 0 && id! < Number.MAX_SAFE_INTEGER
     && !world.history.some(e => e.id === id && (!e.conversation || !e.characters.includes(character.id)));
+  const entry = world.history.find(e => e.id === id && e.conversation);
+  const conversationLabel = entry && entry.characters.length > 2 ? `Open conversation among ${entry.characters.map(id => world.characters.find(c => c.id === id)?.name ?? id).join(', ')}` : undefined;
   return <SpeechBubble key={utterance.key} text={utterance.text} name={character.name} residentId={character.id} x={x} y={y}
-    onExpand={() => setReading(utterance)}
+    conversationLabel={conversationLabel} onExpand={() => setReading(utterance)}
     onDismiss={() => { setDismissed(utterance.key); setReading(undefined); }}
     onOpenConversation={onOpenConversation && linked ? () => onOpenConversation(id!) : undefined}/>;
 }

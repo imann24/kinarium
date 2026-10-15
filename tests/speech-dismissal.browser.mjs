@@ -16,7 +16,8 @@ try {
     const { createWorld } = await import('/src/simulation/engine.ts');
     const { beginConversation } = await import('/src/simulation/conversations.ts');
     const world = createWorld({ slug: 'dismissal', name: 'Reading time', populationCap: 2 }, Date.now(), 42);
-    const [a,b] = world.characters; a.name = 'Cleo';
+    const [a,b] = world.characters;
+    a.x = b.x = 10; a.floor = b.floor = a.destination = b.destination = 0; a.name = 'Cleo';
     a.floor = b.floor = a.destination = b.destination = 0;
     const entry = beginConversation(world,a,b,true);
     a.speech = 'This is a longer thought that deserves time to read. ' + 'LongWord'.repeat(50);

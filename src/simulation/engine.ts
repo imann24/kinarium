@@ -1,7 +1,7 @@
 import { residentDrift, residentStats, recordResidentChange } from './resident-state';
 import { contactWillingness, repairScene } from './repair';
 import { updateHouseDetails } from './house-details';
-import { advanceConversations, beginConversation, isConversing, interruptConversations } from './conversations';
+import { advanceConversations, beginConversation, nearby as inConversationRange, isConversing, interruptConversations } from './conversations';
 import { memoryInfluence, rememberEvent } from './memories';
 import { COLORS, EVENTS, TEMPLATES, TRAITS } from './catalog';
 import type { Character, Command, LogKind, Relationship, WorldState, WorldSummary } from './types';
@@ -111,7 +111,7 @@ export function step(s: WorldState) {
     } else { c.x = clamp(c.x + (random(s) - .5) * 18, 8, 84); if (!c.speech) c.activity = night ? 'resting' : (template.floors[c.floor].activity ?? ['making tea', 'reading', 'tending the plants'][c.floor]); }
   }
   if (people.length > 1 && random(s) < .48) {
-    const a = pick(s, people); const nearby = people.filter(b => !isConversing(s, a.id) && !isConversing(s, b.id) && b.id !== a.id && !b.inElevator && !a.inElevator && b.floor === a.floor && b.destination === b.floor && a.destination === a.floor);
+    const a = pick(s, people); const nearby = people.filter(b => !isConversing(s, a.id) && !isConversing(s, b.id) && b.id !== a.id && !b.inElevator && !a.inElevator && b.floor === a.floor && b.destination === b.floor && a.destination === a.floor && inConversationRange(a, b) && a.energy >= 20 && b.energy >= 20);
     if (nearby.length) {
       const weights = nearby.map(b => contactWillingness(relationship(s, a.id, b.id)));
       let draw = random(s) * weights.reduce((sum, weight) => sum + weight, 0);

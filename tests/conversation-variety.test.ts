@@ -12,7 +12,9 @@ function finish(world: WorldState) {
 }
 function worldFor(seed = 42, templateId = 'common-house') {
   const world = createWorld({ slug: 'variety', name: 'Variety', templateId }, 0, seed);
-  world.characters.forEach(c => { c.floor = 0; c.inElevator = false; });
+  world.characters.forEach(c => { c.x = 10; c.destination = c.floor = 0; c.inElevator = false; });
+  // Keep pairwise scene/variety coverage isolated from optional group joining.
+  world.characters.slice(2).forEach(c => { c.x = 80; });
   return world;
 }
 describe('procedural conversational variety', () => {
@@ -51,6 +53,8 @@ describe('procedural conversational variety', () => {
     const world = worldFor();
     const openings: string[] = [];
     for (let i = 0; i < 6; i++) {
+      world.characters.forEach(c => { c.x = 80; });
+      world.characters[i].x = world.characters[(i + 1) % 6].x = 10;
       const entry = beginConversation(world, world.characters[i], world.characters[(i + 1) % 6], true);
       openings.push(entry.conversation!.turns[0].text); finish(world);
     }
@@ -117,7 +121,7 @@ describe('AI variety within existing data boundaries', () => {
     expect(repeatsConversation(world, entry, [{ text: lines[0] }, { text: 'Which tools would make a shared workshop easier to use?' }, { text: 'Labels might help me find things without interrupting someone.' }])).toBe(false);
     expect(repeatsConversation(world, entry, [{ text: lines[0] }, { text: lines[0].toUpperCase() }])).toBe(true);
     const context = JSON.parse(run.mock.calls[0][1].messages[1].content);
-    expect(Object.keys(context).sort()).toEqual(['topic','tone','transcript','characters','relationship','community','recentEvents','previousConversation'].sort());
+    expect(Object.keys(context).sort()).toEqual(['participantOrder','relationships','topic','tone','transcript','characters','relationship','community','recentEvents','previousConversation'].sort());
     const openingTitle = entry.conversation!.title;
     world.minute += TURN_INTERVAL; advanceConversations(world);
     expect(entry.conversation!.title).toBe(openingTitle);

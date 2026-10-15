@@ -7,6 +7,7 @@ import { applyConversationPlan } from '../src/server/conversation-policy';
 function fixture(seed = 42) {
   const world = createWorld({ slug: 'repair', name: 'Repair', populationCap: 2 }, 0, seed);
   const [a, b] = world.characters;
+  a.x = b.x = 10; a.floor = b.floor = a.destination = b.destination = 0;
   a.floor = b.floor = a.destination = b.destination = 0;
   a.energy = b.energy = a.mood = b.mood = 75;
   const r = relationship(world, a.id, b.id); r.trust = 5; r.affinity = -20;

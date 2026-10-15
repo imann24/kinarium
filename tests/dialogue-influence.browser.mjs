@@ -17,6 +17,7 @@ try {
     const { beginConversation, advanceConversations } = await import('/src/simulation/conversations.ts');
     const world = createWorld({ slug: 'title-browser', name: 'Conversation titles' }, Date.now(), 42);
     const [a, b] = world.characters;
+    a.x = b.x = 10; a.floor = b.floor = a.destination = b.destination = 0;
     a.floor = b.floor = 0;
     a.energy = 15;
     beginConversation(world, a, b, true);

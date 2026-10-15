@@ -107,7 +107,7 @@ export function chooseConversationScene(world: WorldState, a: Character, b: Char
   const ownedMemory = dialogueMemory(world, a, b);
   const recalled = ownedMemory?.kind === 'conflict' ? ownedMemory : undefined;
   if (previous?.conversation || recalled) {
-    const quote = previous?.conversation?.turns.filter(t => t.speakerId === b.id && t.text.length <= 110 && !/[“”]/.test(t.text)).at(-1)?.text;
+    const quote = previous?.conversation?.turns.slice(previous.conversation.joinedAtTurn?.[a.id] ?? 0).filter(t => t.speakerId === b.id && t.text.length <= 110 && !/[“”]/.test(t.text)).at(-1)?.text;
     add('revisit', previous?.conversation?.topic ?? 'Returning to a disagreement', [
       quote ? `Last time you said, “${quote}” Would you put it the same way now?` : recalled || previous?.conversation?.tone === 'tense' ? 'Our disagreement is still on my mind. Is there a part you would want me to understand better?' : 'Our last conversation is still on my mind. Is there a part you would put differently now?',
       positive ? 'I might put it less firmly. The feeling matters to me, but I’m not sure my first words captured it.' : 'I still feel strongly about it. I don’t want a calmer conversation to be mistaken for agreement.',

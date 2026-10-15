@@ -273,3 +273,34 @@ that modal or moves its focus. Unexpanded speech keeps its normal simulation lif
 
 Browser regression: `tests/speech-dismissal.browser.mjs` uses local snapshots and a
 controlled browser clock to check progress, expiry, replacement, dismissal, and focus.
+
+### Nearby group conversations
+
+Warm conversations can include **up to four residents**. Every participant must
+be present, outside the elevator, settled on the same floor, and within **20 map
+x units** of every other participant (not merely connected by a chain). The
+initial pair uses the existing trust-weighted encounter choice. Additional
+residents need at least 25 energy and 20 mood, and at least 25 trust with each
+participant; reserved residents need 40 energy, and any pair involving a reserved
+resident needs 30 trust. Defaults for an unrecorded bond are 30 trust.
+
+Residents can join the opening gathering before its first reply, provided AI
+planning has not started. Thereafter membership is fixed. Turns cycle through the
+participant list every six simulation minutes, with at most eight procedural
+turns. Departure, elevator travel, or leaving proximity pauses the whole thread;
+residents can form a fresh gathering later. A resident cannot occupy two active
+conversations. Old persisted pair threads retain their original distance behavior
+and do not recruit new participants.
+
+Groups reserve three AI calls, one per upcoming speaker using that resident's
+selected model, even when all models match. Calls share the growing transcript,
+participant-specific memories, attendance boundaries, all relevant bonds, and
+the existing six-second deadline. Existing daily budgets, cooldowns, output
+validation and procedural fallback remain in force. An invalid or failed response
+never installs a partial plan. Generated dialogue never changes simulation state.
+
+The initiating pair keeps its existing relationship/state outcome. Joining or
+listening alone grants no pairwise affinity, trust, or repair credit. Memories
+name the actual participants and contain only dialogue heard after joining;
+unrevealed plans are discarded. Disagreements and repair arcs remain private
+pairs: a warm group does not forgive or resolve anyone's conflict.

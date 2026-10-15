@@ -10,6 +10,7 @@ import ConversationThread from '../src/client/ConversationThread';
 function fixture(positive = true) {
   const world = createWorld({ slug: 'thread-test', name: 'Threads', populationCap: 2 }, 0, 42);
   const [a,b] = world.characters;
+  a.x = b.x = 10; a.floor = b.floor = a.destination = b.destination = 0;
   for (const c of [a,b]) { c.floor = 0; c.destination = 0; }
   const entry = beginConversation(world, a, b, positive);
   return { world, a, b, entry };
@@ -77,6 +78,7 @@ describe('conversation lifecycle', () => {
   });
   it.each(['makers-house', 'harbor-house'])('grounds topics in the actual %s setting', templateId => {
     const world = createWorld({slug:'setting',name:'Setting',templateId},0);
+    world.characters.slice(0, 2).forEach(c => Object.assign(c, { x: 10, floor: 0, destination: 0 }));
     const entry = beginConversation(world,world.characters[0],world.characters[1],false);
     expect(entry.conversation!.topic).not.toContain('garden');
     expect(entry.conversation!.turns[0].text).toContain(templateId === 'makers-house' ? 'studio' : 'loft');

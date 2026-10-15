@@ -11,6 +11,7 @@ function fixture() {
   const world = createWorld({ slug: 'influence', name: 'Influence' }, 0, 42);
   world.minute = 60;
   const [a,b] = world.characters;
+  a.x = b.x = 10; a.floor = b.floor = a.destination = b.destination = 0;
   for (const c of [a,b]) Object.assign(c, { trait: 'kind', mood: 55, energy: 70, belonging: 60, floor: 0, inElevator: false, memories: [] });
   const bond = Object.values(world.relationships).find(r => [r.a,r.b].includes(a.id) && [r.a,r.b].includes(b.id))!;
   Object.assign(bond, { trust: 50, affinity: 10 });
