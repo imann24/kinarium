@@ -111,7 +111,7 @@ describe('reading a relationship as a story', () => {
     const n = relationshipNarrative(r, a, b);
     expect(n.story[0]).toBe(`${a.name} and ${b.name} first met on Day 1 · 08:20, talking about company without pressure. By Day 1 · 15:00, they were becoming real friends.`);
     expect(n.story[1]).toContain('talking about rest without earning it brought them together, while clashing over fairness when supplies are limited once pulled them apart');
-    expect(n.story[2]).toBe('Today they are growing close, and trust runs deep.');
+    expect(n.story[2]).toBe('Today they are close, and trust runs deep.');
     expect(n.disagreements[0].mended).toBe('Mended on Day 1 · 14:10');
     expect(n.views[0].feeling).toContain(`counts ${b.name} among the people they trust most`);
     expect(n.views[0].details).toContain(`${a.name} is usually the one to seek ${b.name} out.`);
