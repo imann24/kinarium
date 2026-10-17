@@ -1,4 +1,5 @@
 import { finishRepair, repairScene } from './repair';
+import { flareConflict, startConflict } from './goodwill';
 import { EVENTS } from './catalog';
 import { rememberEvent } from './memories';
 import { recordHeardWords } from './relationship-story';
@@ -41,7 +42,10 @@ function finish(world: WorldState, entry: LogEntry, interrupted = false) {
   const thread = entry.conversation!;
   if (entry.kind === 'conflict' && !thread.repair) {
     const r = world.relationships[[...entry.characters].sort().join(':')];
-    if (r) { r.unresolvedConflict = { id: entry.id, minute: world.minute, topic: thread.topic }; r.repairCommitment = undefined; }
+    // A flare-up of an open disagreement keeps it, and any repair under way, rather than starting over.
+    if (r) r.lastQuarrelMinute = world.minute;
+    if (r && r.unresolvedConflict) flareConflict(r);
+    else if (r) { r.unresolvedConflict = { id: entry.id, minute: world.minute, topic: thread.topic }; r.repairCommitment = undefined; startConflict(r, world.minute); }
   }
   finishRepair(world, entry, interrupted);
   recordHeardWords(world, entry);

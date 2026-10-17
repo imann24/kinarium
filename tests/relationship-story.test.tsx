@@ -66,7 +66,8 @@ describe('recorded relationship history', () => {
     expect(r.story!.perspectives[a.id]).toMatchObject({ repairsOffered: 1 });
     expect(r.story!.perspectives[b.id]).toMatchObject({ spaceRequested: 1 });
     expect(r.story!.connections.some(t => t.source === 'repair')).toBe(false);
-    world.minute += 130;
+    // A refusal makes the next bid wait six hours.
+    world.minute += 370;
     beginConversation(world, a, b, true, repairScene(world, a, b, r, 0)); settle(world);
     world.minute += 130;
     beginConversation(world, a, b, true, repairScene(world, a, b, r, 0)); settle(world);

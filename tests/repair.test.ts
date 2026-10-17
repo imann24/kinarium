@@ -58,14 +58,22 @@ describe('distrust and repair', () => {
   it('respects refusal, interruption and new conflict without awarding unperformed actions', () => {
     const { world, a, b, r } = conflictFixture(); world.minute += 120;
     const rejected = beginConversation(world, a, b, true, repairScene(world, a, b, r, .99)!);
-    finish(world); expect(r.trust).toBe(5); expect(r.repairCommitment).toBeUndefined();
-    expect(rejected.text).toContain('trust is unchanged');
+    finish(world); expect(r.trust).toBe(5.5); expect(r.goodwill).toBe(1); expect(r.repairCommitment).toBeUndefined();
+    expect(rejected.text).toContain('builds a little goodwill');
+    // A refusal makes the next bid wait six hours.
+    world.minute += 240; expect(repairScene(world, a, b, r, 0)).toBeUndefined();
     world.minute += 120;
     beginConversation(world, a, b, true, repairScene(world, a, b, r, 0)!);
-    interruptConversations(world, a.id); expect(r.trust).toBe(5); expect(r.repairCommitment).toBeUndefined();
-    world.minute += 120;
+    interruptConversations(world, a.id); expect(r.trust).toBe(5.5); expect(r.repairCommitment).toBeUndefined();
+    world.minute += 360;
     beginConversation(world, a, b, true, repairScene(world, a, b, r, 0)!); finish(world);
     expect(r.repairCommitment).toBeDefined();
+    // A flare-up of the same open disagreement costs goodwill but keeps the repair under way.
+    const conflictId = r.unresolvedConflict!.id, goodwill = r.goodwill!;
+    beginConversation(world, a, b, false); finish(world);
+    expect(r.unresolvedConflict!.id).toBe(conflictId); expect(r.repairCommitment).toBeDefined(); expect(r.goodwill).toBe(goodwill - .5);
+    // A disagreement after the last one settled is new, and replaces any earlier promise.
+    r.unresolvedConflict = undefined;
     beginConversation(world, a, b, false); finish(world); expect(r.repairCommitment).toBeUndefined();
   });
   it('restores wellbeing only after completed repair and records the outcome for future dialogue', () => {
@@ -93,13 +101,15 @@ describe('distrust and repair', () => {
     const { world, a, b, r } = conflictFixture();
     const before = { belonging: a.belonging, mood: a.mood, tension: world.tension };
     for (const interrupted of [false, true]) {
-      world.minute += 120;
+      world.minute += interrupted ? 360 : 120;
       const entry = beginConversation(world, a, b, true, repairScene(world, a, b, r, interrupted ? 0 : .99)!);
       if (interrupted) interruptConversations(world, a.id); else finish(world);
       expect(a.belonging).toBe(before.belonging); expect(a.mood).toBe(before.mood); expect(world.tension).toBe(before.tension);
       expect(r.unresolvedConflict).toBeDefined(); expect(r.repairCommitment).toBeUndefined();
       expect(a.memories[0].tone).toBe('neutral'); expect(repairScene(world, a, b, r, 0)).toBeUndefined();
-      expect(entry.text).toContain(interrupted ? 'no trust or wellbeing restored' : 'trust is unchanged');
+      expect(entry.text).toContain(interrupted ? 'no trust or wellbeing restored' : 'builds a little goodwill');
+      // Only the honored refusal counts; the interrupted bid adds nothing.
+      expect(r.trust).toBe(5.5); expect(r.goodwill).toBe(1);
     }
   });
   it('makes acceptance depend on both residents, prior trust, affinity and current tension', () => {

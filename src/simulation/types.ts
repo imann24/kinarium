@@ -52,6 +52,14 @@ export interface Relationship {
   lastConnectionMinute?: number; quietSince?: number; quietLastMinute?: number; lastQuietMinute?: number;
   unresolvedConflict?: { id: number; minute: number; topic: string };
   repairCommitment?: { conflictId: number; initiatorId: string };
+  /** 0–10, earned by honoring each other's choices; absent (0) in older saves. */
+  goodwill?: number;
+  /** When goodwill first eased the current conflict; cleared by a new conflict. */
+  easedMinute?: number;
+  /** Latest quarrel, including flare-ups of an open disagreement; absent in older saves. */
+  lastQuarrelMinute?: number;
+  /** Refused repair attempts on one conflict, for backing off between bids. */
+  repairRefusals?: { conflictId: number; count: number };
   story?: RelationshipStory;
 }
 export interface ConversationTurn { speakerId: string; text: string; minute: number; generated?: boolean; }
@@ -79,6 +87,8 @@ export interface WorldState {
   /** Missing in older snapshots; treated as stopped on their next step. */
   elevatorPhase?: 'moving' | 'stopped';
   cooldowns: Record<string, number>; lastRitualDay: number;
+  /** After a material gift, supplies ease worries until this minute; absent in older saves. */
+  reliefUntil?: number;
 }
 export interface WorldSummary { slug: string; name: string; description: string; templateId: string; createdAt: number; population: number; populationCap: number; mode: TimeMode; protected: boolean; cohesion: number; }
 export interface Presence { id: string; name: string; color: string; }

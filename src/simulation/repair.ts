@@ -1,24 +1,37 @@
 import { communityStats, recordCommunityChange } from './community-state';
+import { addGoodwill, goodwill, repairRefusals } from './goodwill';
 import { recordRepair } from './relationship-story';
 import { recordResidentChange, residentStats } from './resident-state';
 import type { Character, Conversation, LogEntry, Relationship, WorldState } from './types';
 
 const bound = (n: number, low = 0) => Math.max(low, Math.min(100, n));
+/** Pairs give each other room for a while after a fresh disagreement. */
+export const CONFLICT_SPACE_MINUTES = 180;
 /** Even strangers have ordinary contact; distrust reduces it without making exile permanent. */
-export function contactWillingness(r: Relationship) { return .12 + .88 * Math.min(1, r.trust / 50); }
+export function contactWillingness(r: Relationship, minute?: number) {
+  const willing = .12 + .88 * Math.min(1, r.trust / 50);
+  const quarrel = r.lastQuarrelMinute ?? r.unresolvedConflict?.minute;
+  const fresh = minute !== undefined && r.unresolvedConflict && quarrel !== undefined && minute - quarrel < CONFLICT_SPACE_MINUTES;
+  return fresh ? willing * .4 : willing;
+}
+/** After a refusal, the next bid waits six hours, doubling with each further refusal up to a day. */
+export const repairWait = (refusals: number) => refusals ? 360 * 2 ** Math.min(2, refusals - 1) : 120;
 
 export function repairScene(world: WorldState, a: Character, b: Character, r: Relationship, roll: number) {
   const historical = [...world.history].reverse().find(e => e.kind === 'conflict' && !e.conversation?.repair && e.conversation?.status === 'finished' && e.characters.includes(a.id) && e.characters.includes(b.id));
   const conflict = r.unresolvedConflict ?? (historical ? { id: historical.id, minute: historical.minute, topic: historical.conversation!.topic } : undefined);
   if (!conflict || conflict.id === r.repairedConflictId) return;
   const since = world.minute - Math.max(conflict.minute, r.lastRepairMinute ?? conflict.minute);
-  if (since < 120 || a.energy < 25 || b.energy < 25) return;
+  const refused = repairRefusals(r, conflict.id);
+  if (since < repairWait(refused) || a.energy < 25 || b.energy < 25) return;
   const following = r.repairCommitment?.conflictId === conflict.id;
   if (following && r.repairCommitment!.initiatorId !== a.id) return;
   // Mood, temperament, time and past follow-through affect readiness; refusal remains possible.
+  // Goodwill from honored choices raises readiness and the floor under it. Space that was
+  // asked for and given also makes the next bid on the same disagreement easier to accept.
   const openness = (c: Character) => c.mood / 400 + (c.trait === 'kind' ? .1 : c.trait === 'reserved' ? -.06 : c.trait === 'spirited' ? -.03 : 0);
-  const readiness = Math.max(.08, Math.min(.8, .2 + r.trust / 250 + r.affinity / 500
-    + Math.min(openness(a), openness(b)) - world.tension / 400));
+  const readiness = Math.max(.08 + goodwill(r) * .02, Math.min(.8, .2 + r.trust / 250 + r.affinity / 500
+    + Math.min(openness(a), openness(b)) - world.tension / 400 + goodwill(r) * .03 + Math.min(.3, refused * .1)));
   const accepted = roll < readiness;
   const topic = conflict.topic;
   const variant = (world.nextLog + Math.floor((r.lastRepairMinute ?? conflict.minute) / 120)) % 3;
@@ -70,12 +83,18 @@ export function finishRepair(world: WorldState, entry: LogEntry, interrupted: bo
   const previous = r.affinity;
   // Older saved repairs lack their topic; recover it from the conflict when still known.
   const topic = repair.topic ?? (r.unresolvedConflict?.id === repair.conflictId ? r.unresolvedConflict.topic : world.history.find(e => e.id === repair.conflictId)?.conversation?.topic) ?? 'An earlier disagreement';
-  const gain = repair.accepted ? (repair.phase === 'follow-through' ? 7 : 1) : 0;
+  // Respecting a request for space is itself a kept commitment: a little trust, more goodwill.
+  // Asking first and then leaving the room that was asked for keeps the promise, even without sitting together.
+  const kept = repair.phase === 'follow-through';
+  const gain = repair.accepted ? (kept ? 7 : 1) : kept ? 2 : .5;
   r.trust = bound(r.trust + gain);
   r.affinity = bound(r.affinity + (repair.accepted ? 2 : 0), -100);
   recordRepair(r, entry, topic, r.affinity - previous);
+  addGoodwill(r, kept ? 2 : 1, world.minute);
+  // Refusals lengthen the wait before asking again; acceptance resets it.
+  r.repairRefusals = repair.accepted ? undefined : { conflictId: repair.conflictId, count: repairRefusals(r, repair.conflictId) + 1 };
   if (repair.accepted && repair.phase === 'offer') r.repairCommitment = { conflictId: repair.conflictId, initiatorId: entry.characters[0] };
-  if (repair.accepted && repair.phase === 'follow-through') { r.repairedConflictId = repair.conflictId; r.repairCommitment = undefined; r.unresolvedConflict = undefined; }
+  if (repair.accepted && repair.phase === 'follow-through') { r.repairedConflictId = repair.conflictId; r.repairCommitment = undefined; r.unresolvedConflict = undefined; r.easedMinute = undefined; r.repairRefusals = undefined; }
   if (repair.accepted) {
     const beforeCommunity = communityStats(world);
     const followThrough = repair.phase === 'follow-through';
@@ -92,5 +111,5 @@ export function finishRepair(world: WorldState, entry: LogEntry, interrupted: bo
     recordCommunityChange(world, beforeCommunity, followThrough ? 'Repair: choice respected' : 'Repair: tension acknowledged', entry.id);
     r.lastConnectionMinute = world.minute;
   }
-  entry.text += repair.accepted ? ` ${repair.phase === 'follow-through' ? 'A respected choice rebuilds some trust' : 'They agree to try asking first'}; mood and belonging improve, and house tension eases. The disagreement is not erased.` : 'The request for space is respected; trust is unchanged.';
+  entry.text += repair.accepted ? ` ${repair.phase === 'follow-through' ? 'A respected choice rebuilds some trust' : 'They agree to try asking first'}; mood and belonging improve, and house tension eases. The disagreement is not erased.` : kept ? ' They asked first, as promised, and the choice of space is respected; the kept promise rebuilds a little trust and goodwill.' : ' The request for space is respected, which builds a little goodwill.';
 }

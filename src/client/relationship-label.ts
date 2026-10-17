@@ -1,3 +1,4 @@
+import { isEased } from '../simulation/goodwill';
 import type { Relationship } from '../simulation/types';
 
 export const bondLabels = {
@@ -6,6 +7,7 @@ export const bondLabels = {
   trusted: 'Trusted, not close',
   familiar: 'Familiar but distant',
   repairing: 'Repair promised',
+  easing: 'Easing',
   strained: 'Strained',
   forming: 'Getting acquainted',
   unmet: 'Yet to meet',
@@ -16,8 +18,10 @@ export type BondKind = keyof typeof bondLabels;
 export function bondKind(r: Relationship): BondKind {
   if (r.encounters === 0) return 'unmet';
   if (r.unresolvedConflict) {
-    return r.repairCommitment?.conflictId === r.unresolvedConflict.id
-      && r.repairedConflictId !== r.unresolvedConflict.id ? 'repairing' : 'strained';
+    if (r.repairCommitment?.conflictId === r.unresolvedConflict.id
+      && r.repairedConflictId !== r.unresolvedConflict.id) return 'repairing';
+    // Honored choices have built enough goodwill that the disagreement is easing.
+    return isEased(r) ? 'easing' : 'strained';
   }
   if (r.affinity < -20) return 'strained';
   if (r.affinity > 35) return r.trust > 55 ? 'close' : 'warm';
