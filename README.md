@@ -309,6 +309,12 @@ name the actual participants and contain only dialogue heard after joining;
 unrevealed plans are discarded. Disagreements and repair arcs remain private
 pairs: a warm group does not forgive or resolve anyone's conflict.
 
+### Community score details
+
+Hover, focus, click or tap Togetherness, Tension or Shared resources to inspect the score. Details distinguish current per-step pressures from up to five recorded discrete changes in the last six simulation hours. Production/consumption/scarcity explanations share the engine formula; records contain actual bounded deltas and event IDs. Old saves are never backfilled from journal prose. Close with Escape, the close control, the trigger or an outside click/tap.
+
+With Vite running, `PLAYWRIGHT_MODULE=<path-to-playwright/index.mjs> node scripts/test-community-metrics.mjs` exercises all three controls using mocked local worlds, including keyboard, hover, touch, dismissal, light/dark and 1440/390/320px layouts. No live world is changed.
+
 ### Reconnection and quiet company
 
 Repair reuses the existing offer/follow-through process. Completed offers restore 1 mood/belonging per resident; later respected choices restore 3, with bounded house relief. Both residents’ mood and temperament, trust, affinity and house tension affect acceptance. Refusals, interruptions and stale/replayed plans cannot earn repair rewards. Ordinary warm contact has a two-hour recovery interval and cannot rebuild trust while conflict remains unresolved.

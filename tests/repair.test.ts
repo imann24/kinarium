@@ -86,6 +86,7 @@ describe('distrust and repair', () => {
     world.minute += 120;
     const action = beginConversation(world, a, b, true, repairScene(world, a, b, r, 0)!); finish(world);
     expect(a.belonging).toBe(before.belonging + 4); expect(world.tension).toBe(before.tension - 2.5);
+    expect(world.communityChanges?.at(-1)).toMatchObject({ eventId: action.id, cohesion: 1, tension: -2 });
     expect(a.stateChanges?.at(-1)?.eventId).toBe(action.id); expect(r.unresolvedConflict).toBeUndefined();
   });
   it('does not reward refusal and interrupted offers with wellbeing or house relief', () => {

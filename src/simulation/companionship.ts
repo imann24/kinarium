@@ -1,3 +1,4 @@
+import { communityStats, recordCommunityChange } from './community-state';
 import { nearby } from './conversations';
 import { rememberEvent } from './memories';
 import { recordResidentChange, residentStats } from './resident-state';
@@ -48,7 +49,9 @@ export function advanceQuietCompanionship(world: WorldState) {
       text: `${a.name} and ${b.name} spend a quiet while together. ${tense ? 'Familiar company offers a small respite; their disagreement and trust are unchanged.' : comfort >= .8 ? 'Trusted company restores some mood, energy and belonging; house tension eases.' : 'Comfortable company offers a little rest and belonging; house tension eases slightly.'}`,
     };
     world.history.push(entry);
+    const beforeCommunity = communityStats(world);
     world.tension = bound(world.tension - .6 * comfort);
+    recordCommunityChange(world, beforeCommunity, `Quiet company: ${a.name} and ${b.name}`, entry.id);
     for (const [c, other] of [[a, b], [b, a]]) {
       const before = residentStats(c);
       c.mood = bound(c.mood + 3 * comfort);

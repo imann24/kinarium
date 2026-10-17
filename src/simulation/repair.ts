@@ -1,3 +1,4 @@
+import { communityStats, recordCommunityChange } from './community-state';
 import { recordResidentChange, residentStats } from './resident-state';
 import type { Character, LogEntry, Relationship, WorldState } from './types';
 
@@ -71,6 +72,7 @@ export function finishRepair(world: WorldState, entry: LogEntry, interrupted: bo
   if (repair.accepted && repair.phase === 'offer') r.repairCommitment = { conflictId: repair.conflictId, initiatorId: entry.characters[0] };
   if (repair.accepted && repair.phase === 'follow-through') { r.repairedConflictId = repair.conflictId; r.repairCommitment = undefined; r.unresolvedConflict = undefined; }
   if (repair.accepted) {
+    const beforeCommunity = communityStats(world);
     const followThrough = repair.phase === 'follow-through';
     world.tension = bound(world.tension - (followThrough ? 2 : .5));
     world.cohesion = bound(world.cohesion + (followThrough ? 1 : .25));
@@ -82,6 +84,7 @@ export function finishRepair(world: WorldState, entry: LogEntry, interrupted: bo
       c.belonging = bound(c.belonging + (followThrough ? 3 : 1));
       recordResidentChange(c, before, world.minute, followThrough ? 'Repair: choice respected' : 'Repair: tension acknowledged', entry.id);
     }
+    recordCommunityChange(world, beforeCommunity, followThrough ? 'Repair: choice respected' : 'Repair: tension acknowledged', entry.id);
     r.lastConnectionMinute = world.minute;
   }
   entry.text += repair.accepted ? ` ${repair.phase === 'follow-through' ? 'A respected choice rebuilds some trust' : 'They agree to try asking first'}; mood and belonging improve, and house tension eases. The disagreement is not erased.` : 'The request for space is respected; trust is unchanged.';

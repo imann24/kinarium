@@ -30,6 +30,8 @@ describe('quiet companionship', () => {
     const entry = world.history.at(-1)!;
     expect(entry.text).toContain('Trusted company');
     expect(a.stateChanges?.at(-1)?.belonging).toBe(a.belonging - 30);
+    expect(world.communityChanges?.at(-1)?.eventId).toBe(entry.id);
+    expect(world.communityChanges?.at(-1)?.tension).toBeLessThan(0);
     expect(a.memories[0].eventId).toBe(entry.id);
     expect(dialogueMemory(world, a, b)?.eventId).toBe(entry.id);
   });

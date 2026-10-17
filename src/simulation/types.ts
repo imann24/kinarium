@@ -51,6 +51,7 @@ export interface WorldState {
   detailsRevision?: number;
   settings: WorldSettings; minute: number; lastTickAt: number; seed: number; nextCharacter: number;
   characters: Character[]; relationships: Record<string, Relationship>; history: LogEntry[]; nextLog: number;
+  communityChanges?: import('./community-state').CommunityChange[];
   cohesion: number; tension: number; resources: number; elevatorFloor: number; elevatorDirection: number;
   /** Missing in older snapshots; treated as stopped on their next step. */
   elevatorPhase?: 'moving' | 'stopped';
