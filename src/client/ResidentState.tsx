@@ -22,7 +22,7 @@ export default function ResidentState({ character: c, world }: { character: Char
       <dl>
         <div><dt>Mood · {direction(c.mood, moodPressure)}</dt><dd>{drift.supplies < 0 ? 'Scarce supplies push mood down' : 'Available supplies support mood'}; {drift.connection < 0 ? 'lower belonging adds downward pressure' : drift.connection > 0 ? 'higher belonging adds support' : 'belonging adds no pressure'}{drift.tension < 0 ? '; house tension pushes down.' : '; no house tension pressure.'}</dd></div>
         <div><dt>Energy · {direction(c.energy, drift.energy)}</dt><dd>{drift.night ? 'Nighttime restores energy.' : c.floor === 1 ? 'Being on the rest floor restores energy.' : 'Daytime outside the rest floor uses energy.'} Energy does not directly change mood.</dd></div>
-        <div><dt>Belonging · {direction(c.belonging, -.025)}</dt><dd>Slowly fades over time. Warm encounters can raise it; disagreements can lower it.</dd></div>
+        <div><dt>Belonging · {direction(c.belonging, -.025)}</dt><dd>Slowly fades over time. Warm encounters, completed repair and comfortable quiet company can raise it; disagreements can lower it.</dd></div>
       </dl>
       <details><summary>Ongoing effects in numbers</summary><p>Next 2 simulated minutes, before movement or encounters. Values stay within 0–100.</p><ul>
         <li>Mood: supplies {signed(drift.supplies)}, belonging {signed(drift.connection)}, tension {signed(drift.tension)}. Net pressure {signed(moodPressure)}; change after limits {signed(drift.next.mood - c.mood)}.</li>

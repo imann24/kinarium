@@ -4,7 +4,7 @@ import type { Character, Memory, WorldState } from './types';
 /** A memory belongs to its speaker. Metadata from old saves is never invented. */
 export function dialogueMemory(world: WorldState, speaker: Character, other: Character): Memory | undefined {
   return recallMemories(speaker, { participantIds: [other.id], minute: world.minute, beforeEventId: world.nextLog, limit: 64 }).find(memory => {
-    if (memory.eventId === undefined || !memory.participantIds?.includes(other.id) || !['conversation', 'conflict', 'friendship', 'event'].includes(memory.kind ?? '')) return false;
+    if (memory.eventId === undefined || !memory.participantIds?.includes(other.id) || !['conversation', 'conflict', 'friendship', 'event', 'ritual'].includes(memory.kind ?? '')) return false;
     const source = world.history.find(e => e.id === memory.eventId);
     return !source || (source.minute <= world.minute && source.minute === memory.minute && source.kind === memory.kind && source.characters.includes(speaker.id) && source.characters.includes(other.id) && source.conversation?.status !== 'active');
   });

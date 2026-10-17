@@ -1,3 +1,4 @@
+import { recordResidentChange, residentStats } from './resident-state';
 import type { Character, LogEntry, Relationship, WorldState } from './types';
 
 const bound = (n: number, low = 0) => Math.max(low, Math.min(100, n));
@@ -13,7 +14,9 @@ export function repairScene(world: WorldState, a: Character, b: Character, r: Re
   const following = r.repairCommitment?.conflictId === conflict.id;
   if (following && r.repairCommitment!.initiatorId !== a.id) return;
   // Mood, temperament, time and past follow-through affect readiness; refusal remains possible.
-  const readiness = Math.max(.15, Math.min(.8, .3 + r.trust / 200 + b.mood / 300 + (b.trait === 'kind' ? .12 : b.trait === 'reserved' ? -.08 : 0) - world.tension / 300));
+  const openness = (c: Character) => c.mood / 400 + (c.trait === 'kind' ? .1 : c.trait === 'reserved' ? -.06 : c.trait === 'spirited' ? -.03 : 0);
+  const readiness = Math.max(.08, Math.min(.8, .2 + r.trust / 250 + r.affinity / 500
+    + Math.min(openness(a), openness(b)) - world.tension / 400));
   const accepted = roll < readiness;
   const topic = conflict.topic;
   const lines = following ? [
@@ -22,7 +25,7 @@ export function repairScene(world: WorldState, a: Character, b: Character, r: Re
     accepted ? 'Go ahead. I’ll wait and listen.' : 'All right. I’ll leave you room and won’t press for an answer.',
     accepted ? 'Thank you for waiting. Being able to make that choice helps, even though I’m still cautious.' : 'Thank you for accepting that. I still need time.',
   ] : [
-    `I’ve been thinking about our disagreement about ${topic.toLowerCase()}. Could I listen to what is still bothering you?`,
+    `There is still tension between us after our disagreement about ${topic.toLowerCase()}. Could I listen to what is still bothering you?`,
     accepted ? 'I want room to disagree without having to defend it immediately. Can you give me that?' : 'Not yet. I don’t want to go through it again right now.',
     accepted ? 'Yes. Next time we share a space, I’ll ask what you want before making a choice for us.' : 'I hear you. I’ll give you space before asking again.',
     accepted ? 'I’m willing to see how that goes. A promise alone doesn’t settle this.' : 'That is what I need right now. This is still unresolved.',
@@ -34,17 +37,36 @@ export function repairScene(world: WorldState, a: Character, b: Character, r: Re
 /** Consequences require the action AND response to have been revealed, never just planned. */
 export function finishRepair(world: WorldState, entry: LogEntry, interrupted: boolean) {
   const repair = entry.conversation?.repair;
-  if (!repair) return;
+  if (!repair || repair.applied) return;
+  if (!interrupted && entry.conversation!.turns.length < entry.conversation!.targetTurns) return;
   const r = world.relationships[[...entry.characters].sort().join(':')];
   if (!r) return;
+  repair.applied = true;
   r.lastRepairMinute = world.minute;
-  if (interrupted) return;
+  if (interrupted) { entry.text += ' Repair paused; no trust or wellbeing restored.'; return; }
+  // A stale plan cannot settle a newer disagreement or reward the same repair twice.
+  if (r.repairedConflictId === repair.conflictId || (r.unresolvedConflict && r.unresolvedConflict.id !== repair.conflictId)) return;
+  if (repair.phase === 'offer' && r.repairCommitment?.conflictId === repair.conflictId) return;
+  if (repair.phase === 'follow-through' && (r.repairCommitment?.conflictId !== repair.conflictId || r.repairCommitment.initiatorId !== entry.characters[0])) return;
   r.encounters++; r.lastMinute = world.minute;
   const gain = repair.accepted ? (repair.phase === 'follow-through' ? 7 : 1) : 0;
   r.trust = bound(r.trust + gain);
   r.affinity = bound(r.affinity + (repair.accepted ? 2 : 0), -100);
   if (repair.accepted && repair.phase === 'offer') r.repairCommitment = { conflictId: repair.conflictId, initiatorId: entry.characters[0] };
   if (repair.accepted && repair.phase === 'follow-through') { r.repairedConflictId = repair.conflictId; r.repairCommitment = undefined; r.unresolvedConflict = undefined; }
-  world.tension = bound(world.tension - (gain ? 1 : .2));
-  entry.text += repair.accepted ? ` ${repair.phase === 'follow-through' ? 'A respected choice rebuilds some trust' : 'They agree to try asking first'}; the disagreement is not erased.` : 'The request for space is respected; trust is unchanged.';
+  if (repair.accepted) {
+    const followThrough = repair.phase === 'follow-through';
+    world.tension = bound(world.tension - (followThrough ? 2 : .5));
+    world.cohesion = bound(world.cohesion + (followThrough ? 1 : .25));
+    for (const id of entry.characters) {
+      const c = world.characters.find(person => person.id === id);
+      if (!c) continue;
+      const before = residentStats(c);
+      c.mood = bound(c.mood + (followThrough ? 3 : 1));
+      c.belonging = bound(c.belonging + (followThrough ? 3 : 1));
+      recordResidentChange(c, before, world.minute, followThrough ? 'Repair: choice respected' : 'Repair: tension acknowledged', entry.id);
+    }
+    r.lastConnectionMinute = world.minute;
+  }
+  entry.text += repair.accepted ? ` ${repair.phase === 'follow-through' ? 'A respected choice rebuilds some trust' : 'They agree to try asking first'}; mood and belonging improve, and house tension eases. The disagreement is not erased.` : 'The request for space is respected; trust is unchanged.';
 }
