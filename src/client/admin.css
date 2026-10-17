@@ -16,3 +16,5 @@
 .admin-houses p { margin: 8px 0; }
 .admin-houses button { flex-shrink: 0; }
 @media (max-width: 560px) { .admin-houses li { align-items: flex-start; flex-direction: column; } .admin-confirm, .admin-login { padding: 18px; } }
+.admin-deleted { opacity: .75; }
+.admin-page section { margin-top: 36px; }
