@@ -82,7 +82,7 @@ describe('community insights rendering', () => {
     const html = renderToStaticMarkup(<CommunityInsights world={w} onSelectResident={() => {}}/>);
     expect(html).toContain('42/100'); expect(html).toContain('Everyone, including away');
     expect(html).toContain('aria-pressed="false"'); expect(html).toContain('up to 80 entries');
-    expect(html).toContain('score trends are unavailable'); expect(html).toContain('<caption>');
+    expect(html).toContain('score trends are unavailable'); expect(html).not.toContain('<caption>');
   });
   it('renders useful empty states without NaN, Infinity or fake statistics', () => {
     const w = world(); w.characters.forEach(c => { c.away = true; }); w.history = [];
@@ -108,7 +108,7 @@ describe('dedicated insights view', () => {
     expect(html).toContain('width:20%;left:30%');
     expect(html).toContain('Last 2 hours: 2 conversations, 1 conflicts, partial history');
     expect(html).toContain('width:50%');
-    expect(html).toContain('View activity as a table');
+    expect(html).not.toContain('View activity as a table');
     expect(html).toContain('Partial history');
   });
 });
