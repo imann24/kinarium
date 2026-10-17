@@ -69,7 +69,7 @@
 :root[data-theme='dark'] :is(.input-prefix,.template-note,.mode,.live-chip,.event-allowance,.new-world-card) { background:var(--surface-soft); border-color:var(--control-border); }
 :root[data-theme='dark'] :is(.pills button.selected,.journal-filters .selected,.mode.selected,.sidebar-tabs button.active,.live-chip,.card-badge) { color:var(--accent); background:var(--surface-soft); border-color:var(--control-border); }
 :root[data-theme='dark'] :is(.community-stats,.timeline-icon,.event-icon,.new-world-icon,.large-icon) { background:var(--surface-soft); color:var(--accent); border-color:var(--line); }
-:root[data-theme='dark'] :is(.new-world-card:hover,.icon-button:hover,.outline:hover:not(:disabled),.event-card:hover:not(:disabled),.bond-card:hover,.resident-row:hover) { background:var(--surface-hover); }
+:root[data-theme='dark'] :is(.new-world-card:hover,.icon-button:hover,.outline:hover:not(:disabled),.event-card:active:not(:disabled),.bond-card:hover,.resident-row:hover) { background:var(--surface-hover); }
 :root[data-theme='dark'] .primary { background:#bbcea4; border-color:#bbcea4; color:#1e2c1d; }
 :root[data-theme='dark'] .primary:hover:not(:disabled) { background:#d0dfbc; border-color:#d0dfbc; }
 :root[data-theme='dark'] :is(.card-meta,.stage-toolbar,.stage-footer,.community-stats,.stat,.sidebar-tabs,.journal-entry,.resident-row,.small-bond,.bond-card,.presence-row,.memories p,.section-top h2 span) { border-color:var(--line); }
@@ -123,6 +123,7 @@
 :root[data-theme='light'] :is(.fullscreen-toggle,.bond-card b span,.guide-copy b) { color:var(--secondary); }
 
 :root .template-preview p { color:var(--secondary); }
+@media(hover:hover) and (pointer:fine){:root[data-theme='dark'] .event-card:hover:not(:disabled) { background:var(--surface-hover); }}
 
 /* Fullscreen is not useful on phones; keep the button while fullscreen so it can still be exited. */
 @media (max-width:760px), (hover:none) and (pointer:coarse) {
