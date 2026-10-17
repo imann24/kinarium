@@ -1,5 +1,6 @@
 import { repeatsConversation } from './conversation-variety';
 import { TEMPLATES } from '../simulation/catalog';
+import { dialogueModel } from '../simulation/dialogue-models';
 import { recallMemories } from '../simulation/memories';
 import type { Character, LogEntry, Relationship, WorldState } from '../simulation/types';
 
@@ -40,8 +41,16 @@ export function validateModelSelection(config: LLMConfig, selection: unknown): s
   if (typeof selection !== 'string' || !modelOptions(config).allowed.includes(selection)) throw new Error('Choose an allowed dialogue model or the default.');
   return selection;
 }
+/** Registry models other than the default may fall back to the default once, so each such request reserves a second call. */
+function fallbackModel(config: LLMConfig, model: string) {
+  const { defaultModel } = modelOptions(config);
+  return (config.LLM_PROVIDER || 'cloudflare') === 'cloudflare' && dialogueModel(model) && defaultModel && defaultModel !== model ? defaultModel : null;
+}
 export function conversationCallCount(config: LLMConfig, world: WorldState, entry: LogEntry) {
-  return entry.characters.length > 2 || new Set(entry.characters.map(id => resolveModel(config, world.characters.find(c => c.id === id)?.model))).size > 1 ? 3 : 1;
+  const models = entry.characters.map(id => resolveModel(config, world.characters.find(c => c.id === id)?.model));
+  const mixed = entry.characters.length > 2 || new Set(models).size > 1;
+  const used = mixed ? [0, 1, 2].map(i => models[((entry.conversation?.turns.length ?? 0) + i) % models.length]) : [models[0]];
+  return used.length + used.filter(m => m && fallbackModel(config, m)).length;
 }
 
 // Unknown providers fail closed; changing providers is always explicit.
@@ -72,11 +81,21 @@ export async function enrichDialogue(config: LLMConfig, world: WorldState, entry
   return dialogue(await requestDialogue(config, inputs, resolveModel(config, characters[0]?.model)));
 }
 
-async function requestDialogue(config: LLMConfig, inputs: { max_tokens: number; temperature: number; messages: { role: string; content: string }[] }, model = resolveModel(config), signal = AbortSignal.timeout(6_000)): Promise<unknown> {
+type DialogueInputs = { max_tokens: number; temperature: number; messages: { role: string; content: string }[] };
+
+/** One request, then at most one retry on the default model when a registry model errors or returns nothing. */
+async function requestDialogue(config: LLMConfig, inputs: DialogueInputs, model = resolveModel(config), signal = AbortSignal.timeout(6_000)): Promise<unknown> {
+  const result = await requestModel(config, inputs, model, signal);
+  if (typeof result === 'string' && result.trim() || !model) return result;
+  const fallback = fallbackModel(config, model);
+  return fallback && !signal.aborted ? requestModel(config, inputs, fallback, signal) : result;
+}
+
+async function requestModel(config: LLMConfig, inputs: DialogueInputs, model: string | null, signal: AbortSignal): Promise<unknown> {
   if (!model || signal.aborted) return null;
   try {
     if ((config.LLM_PROVIDER || 'cloudflare') === 'cloudflare') {
-      const result = await config.AI!.run(model, inputs, { signal }) as { response?: unknown; choices?: { message?: { content?: unknown } }[] } | null;
+      const result = await config.AI!.run(model, { ...inputs, ...dialogueModel(model)?.extraInputs }, { signal }) as { response?: unknown; choices?: { message?: { content?: unknown } }[] } | null;
       return typeof result?.response === 'string' ? result.response : result?.choices?.[0]?.message?.content;
     }
     const response = await fetch(`${config.LLM_BASE_URL!.replace(/\/$/, '')}/chat/completions`, {
