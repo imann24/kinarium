@@ -1,6 +1,7 @@
 import { communityStats, recordCommunityChange } from './community-state';
+import { recordRepair } from './relationship-story';
 import { recordResidentChange, residentStats } from './resident-state';
-import type { Character, LogEntry, Relationship, WorldState } from './types';
+import type { Character, Conversation, LogEntry, Relationship, WorldState } from './types';
 
 const bound = (n: number, low = 0) => Math.max(low, Math.min(100, n));
 /** Even strangers have ordinary contact; distrust reduces it without making exile permanent. */
@@ -48,7 +49,7 @@ export function repairScene(world: WorldState, a: Character, b: Character, r: Re
     accepted ? 'I’m willing to see how that goes. A promise alone doesn’t settle this.' : 'That is what I need right now. This is still unresolved.',
   ];
   return { eventText: undefined, id: following ? 'repair:follow-through' : 'repair:offer', topic: following ? 'Following through after disagreement' : 'An attempt to repair', lines, relevance: 100,
-    repair: { conflictId: conflict.id, phase: following ? 'follow-through' as const : 'offer' as const, accepted } };
+    repair: { conflictId: conflict.id, phase: following ? 'follow-through' : 'offer', accepted, topic } as NonNullable<Conversation['repair']> };
 }
 
 /** Consequences require the action AND response to have been revealed, never just planned. */
@@ -66,9 +67,13 @@ export function finishRepair(world: WorldState, entry: LogEntry, interrupted: bo
   if (repair.phase === 'offer' && r.repairCommitment?.conflictId === repair.conflictId) return;
   if (repair.phase === 'follow-through' && (r.repairCommitment?.conflictId !== repair.conflictId || r.repairCommitment.initiatorId !== entry.characters[0])) return;
   r.encounters++; r.lastMinute = world.minute;
+  const previous = r.affinity;
+  // Older saved repairs lack their topic; recover it from the conflict when still known.
+  const topic = repair.topic ?? (r.unresolvedConflict?.id === repair.conflictId ? r.unresolvedConflict.topic : world.history.find(e => e.id === repair.conflictId)?.conversation?.topic) ?? 'An earlier disagreement';
   const gain = repair.accepted ? (repair.phase === 'follow-through' ? 7 : 1) : 0;
   r.trust = bound(r.trust + gain);
   r.affinity = bound(r.affinity + (repair.accepted ? 2 : 0), -100);
+  recordRepair(r, entry, topic, r.affinity - previous);
   if (repair.accepted && repair.phase === 'offer') r.repairCommitment = { conflictId: repair.conflictId, initiatorId: entry.characters[0] };
   if (repair.accepted && repair.phase === 'follow-through') { r.repairedConflictId = repair.conflictId; r.repairCommitment = undefined; r.unresolvedConflict = undefined; }
   if (repair.accepted) {
