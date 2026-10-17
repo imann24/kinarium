@@ -16,6 +16,8 @@ export interface Character {
   mood: number; energy: number; belonging: number; memories: Memory[];
   /** Actual bounded deltas from recent discrete effects; absent in older saves. */
   stateChanges?: ResidentStateChange[];
+  /** Limits restorative company across different partners as well as repeated pairs. */
+  lastQuietMinute?: number;
   /** Display-only cached history; optional for legacy saves. */
   residentSummary?: import('./resident-summary').SavedResidentSummary;
   speech?: string; speechUntil?: number;
@@ -43,7 +45,15 @@ export interface RelationshipStory {
   connections: RelationshipThread[]; disagreements: RelationshipThread[];
   perspectives: Record<string, RelationshipPerspective>;
 }
-export interface Relationship { a: string; b: string; affinity: number; trust: number; encounters: number; lastMinute: number; lastRepairMinute?: number; repairedConflictId?: number; unresolvedConflict?: { id: number; minute: number; topic: string }; repairCommitment?: { conflictId: number; initiatorId: string }; story?: RelationshipStory; }
+export interface Relationship {
+  a: string; b: string; affinity: number; trust: number; encounters: number; lastMinute: number;
+  lastRepairMinute?: number; repairedConflictId?: number;
+  /** Recovery cooldowns and continuously observed quiet time; optional for older saves. */
+  lastConnectionMinute?: number; quietSince?: number; quietLastMinute?: number; lastQuietMinute?: number;
+  unresolvedConflict?: { id: number; minute: number; topic: string };
+  repairCommitment?: { conflictId: number; initiatorId: string };
+  story?: RelationshipStory;
+}
 export interface ConversationTurn { speakerId: string; text: string; minute: number; generated?: boolean; }
 export interface Conversation {
   /** Absent in persisted legacy pairs. */
@@ -53,7 +63,7 @@ export interface Conversation {
   /** Saved procedural arc; absent in legacy threads. Never treated as revealed dialogue. */
   sceneId?: string; fallbackTurns?: string[];
   /** `topic` names the original disagreement; absent in older saves. */
-  repair?: { conflictId: number; phase: 'offer' | 'follow-through'; accepted: boolean; topic?: string };
+  repair?: { conflictId: number; phase: 'offer' | 'follow-through'; accepted: boolean; applied?: boolean; topic?: string };
   planned?: { speakerId: string; text: string }[]; generationAttempted?: boolean;
 }
 export interface LogEntry { id: number; minute: number; kind: LogKind; text: string; characters: string[]; generated?: boolean; conversation?: Conversation; }
@@ -64,6 +74,7 @@ export interface WorldState {
   detailsRevision?: number;
   settings: WorldSettings; minute: number; lastTickAt: number; seed: number; nextCharacter: number;
   characters: Character[]; relationships: Record<string, Relationship>; history: LogEntry[]; nextLog: number;
+  communityChanges?: import('./community-state').CommunityChange[];
   cohesion: number; tension: number; resources: number; elevatorFloor: number; elevatorDirection: number;
   /** Missing in older snapshots; treated as stopped on their next step. */
   elevatorPhase?: 'moving' | 'stopped';

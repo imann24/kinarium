@@ -1,3 +1,5 @@
+import { communityDrift, communityStats, recordCommunityChange } from './community-state';
+import { advanceQuietCompanionship } from './companionship';
 import { separateStandingResidents } from './standing';
 import { residentDrift, residentStats, recordResidentChange } from './resident-state';
 import { contactWillingness, repairScene } from './repair';
@@ -67,20 +69,35 @@ export function createWorld(input: { slug: string; name: string; description?: s
 }
 function interact(s: WorldState, a: Character, b: Character) {
   const beforeA = residentStats(a), beforeB = residentStats(b);
+  const beforeCommunity = communityStats(s);
   const r = relationship(s, a.id, b.id);
   const repair = repairScene(s, a, b, r, random(s));
   if (repair) { beginConversation(s, a, b, true, repair); return; }
   const scarcity = s.resources < 25 ? .15 : 0;
   const kindness = (a.trait === 'kind' || b.trait === 'kind') ? .13 : 0;
   const positive = random(s) > clamp(.19 + s.tension / 240 + scarcity - kindness - r.affinity / 400 - (memoryInfluence(a, b.id, s.minute) + memoryInfluence(b, a.id, s.minute)) / 2, .06, .87);
+  // Warm contact is welcome, but repeated greetings cannot wash out a conflict.
+  const reward = s.minute - (r.lastConnectionMinute ?? -Infinity) >= 120;
+  const unresolved = !!r.unresolvedConflict;
+  const recovery = reward ? 1 : 0;
+  const moodChange = positive ? recovery * (unresolved ? 1 : 3) : -5;
+  const belongingChange = positive ? recovery * (unresolved ? .5 : 2) : -3;
   const previous = r.affinity;
-  r.affinity = clamp(r.affinity + (positive ? 4 : -7), -100, 100);
-  r.trust = clamp(r.trust + (positive ? 2 : -4)); r.encounters++; r.lastMinute = s.minute;
-  a.mood = clamp(a.mood + (positive ? 3 : -5)); b.mood = clamp(b.mood + (positive ? 3 : -5));
-  a.belonging = clamp(a.belonging + (positive ? 2 : -3)); b.belonging = clamp(b.belonging + (positive ? 2 : -3));
-  s.cohesion = clamp(s.cohesion + (positive ? .5 : -.9)); s.tension = clamp(s.tension + (positive ? -.5 : 1.2));
+  r.affinity = clamp(r.affinity + (positive ? recovery * (unresolved ? 1 : 4) : -7), -100, 100);
+  r.trust = clamp(r.trust + (positive ? (unresolved ? 0 : 2 * recovery) : -4));
+  r.encounters++; r.lastMinute = s.minute;
+  for (const c of [a, b]) {
+    c.mood = clamp(c.mood + moodChange);
+    c.belonging = clamp(c.belonging + belongingChange);
+  }
+  s.cohesion = clamp(s.cohesion + (positive ? (unresolved ? 0 : .5 * recovery) : -.9));
+  s.tension = clamp(s.tension + (positive ? (unresolved ? 0 : -.5 * recovery) : 1.2));
+  if (positive && reward) r.lastConnectionMinute = s.minute;
   const encounter = beginConversation(s, a, b, positive);
   recordEncounter(r, encounter, a.id, r.affinity - previous);
+  if (positive && !reward) encounter.text += ' They keep talking; this recent connection grants no additional recovery.';
+  else if (positive && unresolved) encounter.text += ' A little connection; trust and the unresolved disagreement are unchanged.';
+  recordCommunityChange(s, beforeCommunity, `${positive ? 'Warm encounter' : 'Disagreement'}: ${a.name} and ${b.name}`, encounter.id);
   recordResidentChange(a, beforeA, s.minute, `${positive ? 'Warm encounter' : 'Disagreement'} with ${b.name}`, encounter.id);
   recordResidentChange(b, beforeB, s.minute, `${positive ? 'Warm encounter' : 'Disagreement'} with ${a.name}`, encounter.id);
   if (previous < 35 && r.affinity >= 35) { const t = `${a.name} and ${b.name} are becoming real friends.`; const friendship = log(s, 'friendship', t, [a.id, b.id]); recordFriendship(r, s.minute); rememberEvent(a, friendship, `I’m becoming friends with ${b.name}.`, { tone: 'warm', salience: 5 }); rememberEvent(b, friendship, `I’m becoming friends with ${a.name}.`, { tone: 'warm', salience: 5 }); }
@@ -115,8 +132,9 @@ export function step(s: WorldState) {
     } else { c.x = clamp(c.x + (random(s) - .5) * 18, 8, 84); if (!c.speech) c.activity = night ? 'resting' : (template.floors[c.floor].activity ?? ['making tea', 'reading', 'tending the plants'][c.floor]); }
   }
   separateStandingResidents(s);
+  advanceQuietCompanionship(s);
   if (people.length > 1 && random(s) < .48) {
-    const a = pick(s, people); const nearby = people.filter(b => !isConversing(s, a.id) && !isConversing(s, b.id) && b.id !== a.id && !b.inElevator && !a.inElevator && b.floor === a.floor && b.destination === b.floor && a.destination === a.floor && inConversationRange(a, b) && a.energy >= 20 && b.energy >= 20);
+    const a = pick(s, people); const nearby = people.filter(b => !isConversing(s, a.id) && !isConversing(s, b.id) && b.id !== a.id && !b.inElevator && !a.inElevator && b.floor === a.floor && b.destination === b.floor && a.destination === a.floor && inConversationRange(a, b) && a.energy >= 10 && b.energy >= 10);
     if (nearby.length) {
       const weights = nearby.map(b => contactWillingness(relationship(s, a.id, b.id)));
       let draw = random(s) * weights.reduce((sum, weight) => sum + weight, 0);
@@ -125,9 +143,7 @@ export function step(s: WorldState) {
       else a.activity = `giving ${b.name} space`;
     }
   }
-  s.resources = clamp(s.resources - people.length * .008 + people.filter(c => c.floor === 2 && c.trait === 'practical').length * .12);
-  // Scarcity and unresolved conflict can erode a community; high trust supports repair.
-  if (s.resources < 20) { s.tension = clamp(s.tension + .06); s.cohesion = clamp(s.cohesion - .04); }
+  Object.assign(s, communityDrift(s).next);
   if (s.minute % 120 === 0) {
     for (const r of Object.values(s.relationships)) {
       if (s.minute - r.lastMinute > 720) { r.affinity *= .985; r.trust = clamp(r.trust - .2); }
@@ -136,8 +152,10 @@ export function step(s: WorldState) {
   const day = Math.floor(s.minute / 1440);
   if (s.minute % 1440 >= 1080 && s.lastRitualDay < day && people.length >= 2) {
     s.lastRitualDay = day;
+    const beforeCommunity = communityStats(s);
     if (s.cohesion > 45) { const ritual = log(s, 'ritual', 'As evening settles, the house gathers for tea. An ordinary habit becomes a little tradition.', people.map(c => c.id)); s.cohesion = clamp(s.cohesion + 3); s.resources = clamp(s.resources + 8); for (const c of people) rememberEvent(c, ritual, 'I joined the house for evening tea.', { tone: 'warm', salience: 2 }); }
     else { log(s, 'ritual', 'Evening comes, but the common table stays quiet. Everyone keeps to their own corner.'); s.tension = clamp(s.tension + 2); }
+    recordCommunityChange(s, beforeCommunity, s.cohesion > 45 ? 'Evening tea' : 'An unshared evening', s.history.at(-1)!.id);
   }
 }
 export function advance(s: WorldState, now: number) {
@@ -175,9 +193,11 @@ export function applyCommand(s: WorldState, command: Command, now: number) {
       if (!event) throw new Error('Unknown event.');
       if ((s.cooldowns.events ?? 0) > now) throw new Error('Let this moment settle before introducing another event.');
       s.cooldowns.events = now + EVENT_COOLDOWN_MS;
+      const beforeCommunity = communityStats(s);
       s.cohesion = clamp(s.cohesion + event.cohesion); s.tension = clamp(s.tension + event.tension); s.resources = clamp(s.resources + event.resources);
       const people = activeCharacters(s);
       const occasion = log(s, 'event', event.text, people.map(c => c.id));
+      recordCommunityChange(s, beforeCommunity, event.name, occasion.id);
       for (const c of people) { const before = residentStats(c); c.mood = clamp(c.mood + event.mood); recordResidentChange(c, before, s.minute, event.name, occasion.id); rememberEvent(c, occasion, `I was here for ${event.name.toLowerCase()}. ${event.text}`, { tone: event.mood > 0 ? 'warm' : event.mood < 0 ? 'tense' : 'neutral', salience: 3 }); if (event.tone === 'kind') c.destination = 0; }
       for (let i = 0; i < people.length; i++) for (let j = i + 1; j < people.length; j++) { const r = relationship(s, people[i].id, people[j].id); const previous = r.affinity; r.affinity = clamp(r.affinity + (event.tone === 'kind' ? 3 : -2), -100, 100); recordSharedEvent(r, event.name, r.affinity - previous, occasion); r.trust = clamp(r.trust + (event.tone === 'kind' ? 2 : -2)); }
       break;

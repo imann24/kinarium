@@ -24,6 +24,27 @@ export const EVENT_REPLIES: Record<string, Record<Trait, string>> = {
     spirited: 'I like a story that surprises me. I wouldn’t want someone to polish away everything awkward.',
     kind: 'I want to listen without making the teller feel responsible for comforting the room.',
   },
+  'community-gathering': {
+    practical: 'A question everyone can answer beats a long agenda. I’d start with one thing we could improve together.',
+    reserved: 'A small conversation at the edge of the room. I have more to say when I’m not competing to be heard.',
+    curious: 'The idea I didn’t expect. I want to ask someone what they see here that I keep missing.',
+    spirited: 'A lively argument about something small, followed by a laugh. Agreement isn’t the only way to connect.',
+    kind: 'An invitation that reaches the person hovering near the door. I’d like to be brave enough to make it.',
+  },
+  'vulnerable-share': {
+    practical: 'I’d like to admit when I don’t have an answer. Being useful all the time is a tiring ambition.',
+    reserved: 'One honest sentence would count for me. I don’t need to tell my whole story to mean it.',
+    curious: 'I’d ask what someone wishes people understood, and let them choose how much to say.',
+    spirited: 'I’d admit that confidence can be a bit of a costume. That is harder than making a joke.',
+    kind: 'I’d like to say when I need help instead of waiting for somebody to notice.',
+  },
+  'group-meditation': {
+    practical: 'A short pause suits me. I don’t need a perfectly clear mind for a breath to be worthwhile.',
+    reserved: 'Quiet company appeals to me. We can share a moment without having to explain it.',
+    curious: 'I notice how quickly a thought turns into another question. I’d like to watch that without chasing it.',
+    spirited: 'Sitting still is a challenge I can laugh about. I’d try a few breaths, rather than aim for perfection.',
+    kind: 'I like a pause where nobody needs me to fix anything. I’d like to let myself have that.',
+  },
   'new-project': {
     practical: 'Possibility, if we can make clear what we are deciding. An argument about everything at once is hard to use.',
     reserved: 'Both. I’d want time to find my view before the loudest ideas become the whole conversation.',

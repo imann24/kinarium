@@ -23,6 +23,18 @@ export function chooseConversationScene(world: WorldState, a: Character, b: Char
   const scenes: Scene[] = [];
   const add = (id: string, topic: string, lines: string[], relevance = 10) => scenes.push({ id, topic, lines, relevance });
   if (positive) {
+    add('taste', 'A small, fiercely held opinion', [
+      'I think tea should taste a little bitter. What harmless opinion would you defend much too fiercely?',
+      voice(b, { practical: 'A cup needs a handle you can actually hold. Beautiful but useless mugs annoy me.', curious: 'A strange flavor deserves a second sip. How else do you know whether you dislike it?', reserved: 'Quiet breakfasts. I’m prepared to be surprisingly stubborn about them.', spirited: 'Cinnamon improves nearly everything. I realize that is a dangerous position.', kind: 'The best cup is the one someone chose for you. Even if it is slightly hideous.' }),
+      'I disagree with at least part of that, and now I want to hear your defense.',
+      'Good. A little disagreement is more interesting than politely liking everything.',
+    ], 11);
+    if ((relationship?.trust ?? 0) > 50 && !relationship?.unresolvedConflict) add('bid', 'An awkward invitation', [
+      'I’d like to get to know you beyond being polite in the hallway. Tea sometime? That sounded smoother in my head.',
+      voice(b, { reserved: 'I’d like that. I might be quiet, but I do have opinions worth coaxing out.', practical: 'Yes. I’d rather have an awkward invitation than spend weeks guessing.', spirited: 'Yes, and please keep a little of the awkwardness. It makes this interesting.', curious: 'Yes. What would you ask if you weren’t worried about being polite?', kind: 'I’d like that too. I was waiting for an opening, which is a ridiculous way for two people to meet.' }),
+      'What do you wish people asked you about instead of what you do all day?',
+      'What I’m trying to get braver about. Though I might need a whole cup of tea to answer that.',
+    ], 16);
     add('company', 'Company without pressure', [
       a.trait === 'reserved' ? 'I want company, but I’m not always ready to talk. Does that make sense?' : 'Would you rather be invited into the conversation or have room to listen?',
       voice(b, { reserved: 'I’d rather listen at first. Being quiet doesn’t mean I want to be left out.', practical: 'I find it easier to talk over a meal. Having something ordinary to do takes the pressure off.', spirited: 'Invite me in. I like a lively exchange, as long as nobody has to perform.', curious: 'An invitation helps. I like finding out what a quiet person is thinking, without prying.', kind: 'I like being invited, with enough room to say no without hurting anyone.' }),
@@ -123,6 +135,9 @@ export function chooseConversationScene(world: WorldState, a: Character, b: Char
       'shared-meal': 'After the shared meal, I wonder what makes eating together comfortable for you.',
       'care-package': 'That unexpected gift makes me wonder: is it easy for you to accept kindness?',
       'story-night': 'Story night leaves me wondering which parts of ourselves we choose to tell.',
+      'community-gathering': 'After that gathering, what kind of conversation would you like more of around here?',
+      'vulnerable-share': 'That share out makes me wonder: what would you like to be a little more honest about, if you chose to share?',
+      'group-meditation': 'After that quiet pause, what do you make of trying to slow down together?',
       'new-project': 'The garden plan has brought out different opinions. Is that possibility or trouble to you?',
       'power-outage': 'After the lights went out, I keep thinking about how uncertainty affects us. What is hardest for you?',
       rumor: 'That rumor is bothering me. How do we talk about uncertainty without spreading it?',

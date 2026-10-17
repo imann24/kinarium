@@ -47,10 +47,10 @@ describe('bounded proximity gatherings', () => {
     if (reason === 'floor') c.floor = c.destination = 1;
     if (reason === 'distance') c.x = people[0].x + CONVERSATION_RADIUS + 1;
     if (reason === 'travel') c.destination = 1;
-    if (reason === 'tired') c.energy = 20;
+    if (reason === 'tired') c.energy = 10;
     if (reason === 'mood') c.mood = 10;
     if (reason === 'distrust') relationship(world, people[1].id, c.id).trust = 0;
-    if (reason === 'reserved') { c.trait = 'reserved'; c.energy = 35; }
+    if (reason === 'reserved') { c.trait = 'reserved'; c.energy = 20; }
     expect(start().characters).toHaveLength(2);
   });
   it('requires all-pairs proximity, not a chain of neighbors', () => {
