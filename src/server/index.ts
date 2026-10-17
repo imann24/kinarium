@@ -9,6 +9,7 @@ import { body, digest, equal, json, passwordHash, string, validOrigin } from './
 import { enrichConversation, isLLMConfigured, modelOptions, validateModelSelection, conversationCallCount, type LLMConfig } from './llm';
 import { applyConversationPlan, dailyConversationLimit } from './conversation-policy';
 import { availableEvents, consumeEvent, eventBudget } from '../simulation/event-budget';
+import { assertAppropriate, isAppropriate } from '../simulation/content-filter';
 
 interface Env extends LLMConfig { WORLDS: DurableObjectNamespace<WorldRoom>; DIRECTORY: DurableObjectNamespace<WorldDirectory>; ASSETS: Fetcher; }
 type Stored = { world: WorldState; password?: { salt: string; hash: string }; persistedLog: number; llmDay: string; llmCalls: number; lastLLM: number; };
@@ -76,6 +77,7 @@ export class WorldDirectory extends DurableObject<Env> {
       const mode = input.mode ?? 'fast-forward'; if (!['persistent', 'fast-forward'].includes(String(mode))) throw new Error('Unknown time mode.');
       const templateId = string(input.templateId, 40, 'common-house'); if (!Object.hasOwn(TEMPLATES, templateId)) throw new Error('Unknown template.');
       const description = string(input.description, 240);
+      assertAppropriate(name, 'world name'); assertAppropriate(slug, 'world address'); assertAppropriate(description, 'description');
       const ip = request.headers.get('CF-Connecting-IP') || 'local'; const now = Date.now();
       this.ctx.storage.sql.exec('DELETE FROM limits WHERE expires < ?', now);
       const key = await digest(ip); const limit = this.ctx.storage.sql.exec<{ count: number }>('SELECT count FROM limits WHERE key=?', key).toArray()[0];
@@ -205,7 +207,8 @@ export class WorldRoom extends DurableObject<Env> {
         const pair = new WebSocketPair(); const [client, server] = Object.values(pair);
         const visitor = this.visitor(request);
         const playerId = (url.searchParams.get('player') || '').slice(0, 50);
-        const name = (url.searchParams.get('name') || 'Wandering observer').slice(0, 24);
+        const requested = (url.searchParams.get('name') || '').slice(0, 24);
+        const name = requested && isAppropriate(requested) ? requested : 'Wandering observer';
         const presence = { id: playerId || crypto.randomUUID(), name, color: ['#718564', '#b77b59', '#7396a1', '#ab8299'][name.length % 4] };
         // A reconnect can overlap the old socket, and one observer can have
         // several tabs. Keep their names consistent regardless of socket order.
@@ -253,12 +256,14 @@ export class WorldRoom extends DurableObject<Env> {
     switch (input.type) {
       case 'add-character': {
         const trait = input.trait; if (trait !== undefined && !TRAITS.includes(trait as typeof TRAITS[number])) throw new Error('Unknown personality.');
-        return { type: input.type, name: string(input.name, 30), trait: trait as typeof TRAITS[number] | undefined, backstory: string(input.backstory, 500) };
+        const name = string(input.name, 30), backstory = string(input.backstory, 500);
+        assertAppropriate(name, 'name'); assertAppropriate(backstory, 'backstory');
+        return { type: input.type, name, trait: trait as typeof TRAITS[number] | undefined, backstory };
       }
       case 'set-model': return { type: input.type, characterId: string(input.characterId, 30), model: validateModelSelection(this.env, input.model) };
       case 'set-away': if (typeof input.away !== 'boolean') throw new Error('Specify whether the character is away.'); return { type: input.type, characterId: string(input.characterId, 30), away: input.away };
       case 'trigger-event': return { type: input.type, eventId: string(input.eventId, 40) };
-      case 'house-details': return { type: input.type, name: input.name as string, description: input.description as string, expectedRevision: input.expectedRevision as number };
+      case 'house-details': assertAppropriate(input.name, 'house name'); assertAppropriate(input.description, 'description'); return { type: input.type, name: input.name as string, description: input.description as string, expectedRevision: input.expectedRevision as number };
       case 'settings': return { type: input.type, mode: input.mode as TimeMode, populationCap: input.populationCap as number };
       default: throw new Error('Unknown action.');
     }
