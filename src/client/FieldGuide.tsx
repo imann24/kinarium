@@ -15,7 +15,7 @@ const SECTIONS = [
     title: 'Conversations & relationships',
     body: (
       <p>
-        Click a speech bubble to read the exchange or jump to it in the <b>Journal</b>. Friendly company builds <b>affinity</b> and <b>trust</b> over time, while tense moments take a one-on-one chat to mend.
+        Click a speech bubble to read the exchange or jump to it in the <b>Journal</b>. Friendly company builds <b>affinity</b> and <b>trust</b> over time, while tense moments take a one-on-one chat to mend. Respecting requests for space builds <b>goodwill</b>.
       </p>
     ),
   },

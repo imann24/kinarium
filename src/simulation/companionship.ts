@@ -1,4 +1,5 @@
 import { communityStats, recordCommunityChange } from './community-state';
+import { goodwill, isEased, settleEasedConflict } from './goodwill';
 import { nearby } from './conversations';
 import { rememberEvent } from './memories';
 import { recordResidentChange, residentStats } from './resident-state';
@@ -10,13 +11,15 @@ const bound = (n: number) => Math.max(0, Math.min(100, n));
 
 /** Both residents must have room for company. Affinity alone is not safety/trust. */
 export function quietComfort(a: Character, b: Character, r: Relationship, minute: number) {
-  if (r.encounters === 0 || r.trust < 35 || r.affinity < 0 || Math.min(a.mood, b.mood) < 15) return 0;
+  // Goodwill shown during a disagreement makes cautious company possible sooner.
+  const eased = isEased(r);
+  if (r.encounters === 0 || r.trust < 35 || r.affinity < (eased ? -20 : 0) || Math.min(a.mood, b.mood) < 15) return 0;
   const openness = (c: Character) => (c.trait === 'reserved' || c.trait === 'kind' ? .1 : c.trait === 'spirited' ? -.1 : 0)
     - Math.max(0, 45 - c.mood) / 100;
-  const comfort = Math.min(1, .25 + r.trust / 160 + r.affinity / 400 + Math.min(openness(a), openness(b)));
+  const comfort = Math.min(1, .25 + r.trust / 160 + r.affinity / 400 + goodwill(r) / 40 + Math.min(openness(a), openness(b)));
   if (comfort < .5) return 0;
   if (r.unresolvedConflict) {
-    if (r.trust < 60 || minute - Math.max(r.unresolvedConflict.minute, r.lastRepairMinute ?? -Infinity) < 120) return 0;
+    if (r.trust < (eased ? 35 : 60) || minute - Math.max(r.unresolvedConflict.minute, r.lastRepairMinute ?? -Infinity) < 120) return 0;
     return comfort * .25; // A respite is possible; it is not forgiveness.
   }
   return comfort;
@@ -44,11 +47,13 @@ export function advanceQuietCompanionship(world: WorldState) {
     r.lastConnectionMinute = world.minute;
     r.lastMinute = world.minute;
     const tense = !!r.unresolvedConflict;
+    const easing = isEased(r);
     const entry: LogEntry = {
       id: world.nextLog++, minute: world.minute, kind: 'ritual', characters: [a.id, b.id],
-      text: `${a.name} and ${b.name} spend a quiet while together. ${tense ? 'Familiar company offers a small respite; their disagreement and trust are unchanged.' : comfort >= .8 ? 'Trusted company restores some mood, energy and belonging; house tension eases.' : 'Comfortable company offers a little rest and belonging; house tension eases slightly.'}`,
+      text: `${a.name} and ${b.name} spend a quiet while together. ${tense ? (easing ? 'Cautious company offers a small respite while their disagreement eases.' : 'Familiar company offers a small respite; their disagreement and trust are unchanged.') : comfort >= .8 ? 'Trusted company restores some mood, energy and belonging; house tension eases.' : 'Comfortable company offers a little rest and belonging; house tension eases slightly.'}`,
     };
     world.history.push(entry);
+    const settled = tense && settleEasedConflict(world, r, entry);
     const beforeCommunity = communityStats(world);
     world.tension = bound(world.tension - .6 * comfort);
     recordCommunityChange(world, beforeCommunity, `Quiet company: ${a.name} and ${b.name}`, entry.id);
@@ -60,7 +65,7 @@ export function advanceQuietCompanionship(world: WorldState) {
       c.lastQuietMinute = world.minute;
       c.activity = `resting quietly with ${other.name}`;
       recordResidentChange(c, before, world.minute, `Quiet company with ${other.name}`, entry.id);
-      rememberEvent(c, entry, `I spent a quiet while with ${other.name}. ${tense ? 'I found a little rest, but our disagreement is still unresolved.' : 'I felt more rested and included without needing to talk.'}`, { tone: tense ? 'neutral' : 'warm', salience: 2 });
+      rememberEvent(c, entry, `I spent a quiet while with ${other.name}. ${settled ? 'Our old disagreement finally feels settled.' : tense ? 'I found a little rest, but our disagreement is still unresolved.' : 'I felt more rested and included without needing to talk.'}`, { tone: tense && !settled ? 'neutral' : 'warm', salience: settled ? 3 : 2 });
     }
     // A resident cannot collect rewards from every nearby partner in the same tick.
     busy.add(a.id); busy.add(b.id);

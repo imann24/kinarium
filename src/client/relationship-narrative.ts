@@ -39,6 +39,7 @@ function view(r: Relationship, from: Character, to: Character): ResidentView {
     : kind === 'close' ? r.trust > 60 ? `${from.name} counts ${to.name} among the people they trust most here.` : `${from.name} is fond of ${to.name}, and feels able to trust them.`
     : kind === 'strained' ? r.trust < 25 ? `${from.name} is wary of ${to.name} and keeps a careful distance.` : `${from.name} finds ${to.name} difficult, but hasn’t given up on them.`
     : kind === 'repairing' ? `${from.name} knows a promise to repair their disagreement is still awaiting follow-through.`
+    : kind === 'easing' ? `${from.name} still remembers their disagreement with ${to.name}, but the goodwill between them is easing it.`
     : kind === 'warm' ? `${from.name} is fond of ${to.name}, though trust is still catching up.`
     : kind === 'familiar' ? `${from.name} knows ${to.name}, but they are not close at present.`
     : r.trust > 55 ? `${from.name} trusts ${to.name}, without feeling close to them.` : `${from.name} is still making up their mind about ${to.name}.`;
@@ -80,7 +81,7 @@ export function relationshipNarrative(r: Relationship, a: Character, b: Characte
   const currentStates: Record<BondKind, string> = {
     close: 'Today they are close', warm: 'Today they are fond of each other but cautious',
     trusted: 'Today they trust each other without being close', familiar: 'Today they are familiar but distant',
-    repairing: 'Today a repair is promised but still awaits follow-through', strained: 'Today the connection is strained',
+    repairing: 'Today a repair is promised but still awaits follow-through', easing: 'Today goodwill is easing an old disagreement', strained: 'Today the connection is strained',
     forming: 'Today they are still getting to know each other', unmet: 'For now they are yet to meet',
   };
   const now = currentStates[kind];

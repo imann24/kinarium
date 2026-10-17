@@ -1,5 +1,6 @@
 import type { Character, WorldState } from './types';
 import { CONVERSATION_RADIUS } from './conversations';
+import { TEMPLATES } from './catalog';
 
 // 1.5 map units = 8.775 SVG units: a small step, not body collision physics.
 export const STANDING_GAP = 1.5;
@@ -21,8 +22,10 @@ export function separateStandingResidents(world: WorldState) {
     const overlaps = (x: number, others: Character[], gap = MIN_STANDING_GAP) => others.some(p => p.id !== c.id && p.floor === c.floor && Math.abs(p.x - x) < gap - EPSILON);
     if (!overlaps(c.x, placed)) { placed.push(c); continue; }
     const peers = people.filter(p => p.id !== c.id && groups.some(g => g.has(c.id) && g.has(p.id)));
-    const low = Math.max(8, ...peers.map(p => p.x - CONVERSATION_RADIUS));
-    const high = Math.min(c.destination === c.floor ? 84 : 94, ...peers.map(p => p.x + CONVERSATION_RADIUS));
+    // Stay within the floor's walkable span (narrow floors in some layouts).
+    const [spanLow, spanHigh] = TEMPLATES[world.templateId]?.floors[c.floor]?.span ?? [8, 84];
+    const low = Math.max(spanLow, ...peers.map(p => p.x - CONVERSATION_RADIUS));
+    const high = Math.min(c.destination === c.floor ? spanHigh : 94, ...peers.map(p => p.x + CONVERSATION_RADIUS));
     // Nearest free boundary of an occupied interval is sufficient in one dimension.
     for (const gap of [STANDING_GAP, MIN_STANDING_GAP]) {
       const candidates = [low, high, ...people.filter(p => p.floor === c.floor && p.id !== c.id)

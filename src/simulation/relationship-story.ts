@@ -51,7 +51,12 @@ export function recordRepair(r: Relationship, entry: LogEntry, topic: string, de
   const repair = entry.conversation!.repair!;
   const [initiator, responder] = entry.characters;
   if (repair.phase === 'offer') perspective(r, initiator).repairsOffered++;
-  if (!repair.accepted) { perspective(r, responder).spaceRequested++; return; }
+  if (!repair.accepted) {
+    perspective(r, responder).spaceRequested++;
+    // Asking first and honoring the answer is the promise itself.
+    if (repair.phase === 'follow-through') perspective(r, initiator).promisesKept++;
+    return;
+  }
   recordThread(r, 'connections', topic, 'repair', Math.max(delta, 1), entry);
   if (repair.phase === 'follow-through') {
     perspective(r, initiator).promisesKept++;

@@ -20,12 +20,12 @@ export default function ResidentState({ character: c, world }: { character: Char
     {c.away ? <p>While away, mood, energy and belonging are paused.</p> : <>
       <p>Between encounters, under current conditions:</p>
       <dl>
-        <div><dt>Mood · {direction(c.mood, moodPressure)}</dt><dd>{drift.supplies < 0 ? 'Scarce supplies push mood down' : 'Available supplies support mood'}; {drift.connection < 0 ? 'lower belonging adds downward pressure' : drift.connection > 0 ? 'higher belonging adds support' : 'belonging adds no pressure'}{drift.tension < 0 ? '; house tension pushes down.' : '; no house tension pressure.'}</dd></div>
+        <div><dt>Mood · {direction(c.mood, moodPressure)}</dt><dd>{drift.supplies < 0 ? 'Scarce supplies push mood down' : drift.supplies > .035 ? 'A recent gift doubles the support from supplies' : 'Available supplies support mood'}; {drift.connection < 0 ? 'lower belonging adds downward pressure' : drift.connection > 0 ? 'higher belonging adds support' : 'belonging adds no pressure'}{drift.tension < 0 ? '; house tension pushes down.' : '; no house tension pressure.'}</dd></div>
         <div><dt>Energy · {direction(c.energy, drift.energy)}</dt><dd>{drift.night ? 'Nighttime restores energy.' : c.floor === 1 ? 'Being on the rest floor restores energy.' : 'Daytime outside the rest floor uses energy.'} Energy does not directly change mood.</dd></div>
-        <div><dt>Belonging · {direction(c.belonging, -.025)}</dt><dd>Slowly fades over time. Warm encounters, completed repair and comfortable quiet company can raise it; disagreements can lower it.</dd></div>
+        <div><dt>Belonging · {direction(c.belonging, -drift.fade)}</dt><dd>{drift.fade ? 'Slowly fades over time' : 'Holding at its floor'}, never below {Math.round(drift.floor)} while {c.name} has the trust they do. Warm encounters, completed repair, evening tea and comfortable quiet company can raise it; disagreements can lower it.</dd></div>
       </dl>
       <details><summary>Ongoing effects in numbers</summary><p>Next 2 simulated minutes, before movement or encounters. Bars point right where a value helps and left where it hurts; values stay within 0–100.</p>
-        <OngoingEffects mood={{ supplies: drift.supplies, connection: drift.connection, tension: drift.tension, net: moodPressure, after: drift.next.mood - c.mood }} energy={{ value: drift.energy, after: drift.next.energy - c.energy }} belonging={{ value: -.025, after: drift.next.belonging - c.belonging }} />
+        <OngoingEffects mood={{ supplies: drift.supplies, connection: drift.connection, tension: drift.tension, net: moodPressure, after: drift.next.mood - c.mood }} energy={{ value: drift.energy, after: drift.next.energy - c.energy }} belonging={{ value: -drift.fade, after: drift.next.belonging - c.belonging }} />
       </details>
     </>}
     <details><summary>Recent direct changes{recent.length ? ` · ${recent.length}` : ''}</summary>
