@@ -96,7 +96,10 @@ describe('bounded proximity gatherings', () => {
     entry.conversation!.planned = [{ speakerId: people[3].id, text: 'Wrong owner' }];
     advance(world, 8);
     expect(entry.conversation!.turns.some(t => t.text === 'Wrong owner')).toBe(false);
-    expect(world.relationships).toEqual(before);
+    // Listeners remember what was said, but scores, beginnings and subjects stay unchanged.
+    const scores = (all: typeof before) => Object.fromEntries(Object.entries(all).map(([key, { story, ...rest }]) => [key, { ...rest, threads: [...story?.connections ?? [], ...story?.disagreements ?? []], beginning: story?.beginning }]));
+    expect(scores(world.relationships)).toEqual(scores(before));
+    expect(bond.story?.perspectives[people[1].id]?.warmWords?.speakerId).toBe(people[2].id);
     expect(buildResidentSummary(people[1], people, world.history, world.minute).tension?.sourceEventIds).toContain(999);
   });
   it('preserves legacy pair saves and keeps repair private', () => {

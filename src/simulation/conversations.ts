@@ -1,6 +1,7 @@
 import { finishRepair, repairScene } from './repair';
 import { EVENTS } from './catalog';
 import { rememberEvent } from './memories';
+import { recordHeardWords } from './relationship-story';
 import { chooseConversationScene } from './conversation-scenes';
 import { conversationTitle } from './conversation-titles';
 import type { Character, LogEntry, WorldState } from './types';
@@ -43,6 +44,7 @@ function finish(world: WorldState, entry: LogEntry, interrupted = false) {
     if (r) { r.unresolvedConflict = { id: entry.id, minute: world.minute, topic: thread.topic }; r.repairCommitment = undefined; }
   }
   finishRepair(world, entry, interrupted);
+  recordHeardWords(world, entry);
   thread.title = conversationTitle(world, entry);
   thread.status = interrupted ? 'interrupted' : 'finished';
   thread.planned = undefined;

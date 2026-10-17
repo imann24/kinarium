@@ -4,6 +4,7 @@ import { contactWillingness, repairScene } from './repair';
 import { updateHouseDetails } from './house-details';
 import { advanceConversations, beginConversation, nearby as inConversationRange, isConversing, interruptConversations } from './conversations';
 import { memoryInfluence, rememberEvent } from './memories';
+import { recordEncounter, recordFriendship, recordSharedEvent } from './relationship-story';
 import { COLORS, EVENTS, TEMPLATES, TRAITS } from './catalog';
 import type { Character, Command, LogKind, Relationship, WorldState, WorldSummary } from './types';
 
@@ -79,9 +80,10 @@ function interact(s: WorldState, a: Character, b: Character) {
   a.belonging = clamp(a.belonging + (positive ? 2 : -3)); b.belonging = clamp(b.belonging + (positive ? 2 : -3));
   s.cohesion = clamp(s.cohesion + (positive ? .5 : -.9)); s.tension = clamp(s.tension + (positive ? -.5 : 1.2));
   const encounter = beginConversation(s, a, b, positive);
+  recordEncounter(r, encounter, a.id, r.affinity - previous);
   recordResidentChange(a, beforeA, s.minute, `${positive ? 'Warm encounter' : 'Disagreement'} with ${b.name}`, encounter.id);
   recordResidentChange(b, beforeB, s.minute, `${positive ? 'Warm encounter' : 'Disagreement'} with ${a.name}`, encounter.id);
-  if (previous < 35 && r.affinity >= 35) { const t = `${a.name} and ${b.name} are becoming real friends.`; const friendship = log(s, 'friendship', t, [a.id, b.id]); rememberEvent(a, friendship, `I’m becoming friends with ${b.name}.`, { tone: 'warm', salience: 5 }); rememberEvent(b, friendship, `I’m becoming friends with ${a.name}.`, { tone: 'warm', salience: 5 }); }
+  if (previous < 35 && r.affinity >= 35) { const t = `${a.name} and ${b.name} are becoming real friends.`; const friendship = log(s, 'friendship', t, [a.id, b.id]); recordFriendship(r, s.minute); rememberEvent(a, friendship, `I’m becoming friends with ${b.name}.`, { tone: 'warm', salience: 5 }); rememberEvent(b, friendship, `I’m becoming friends with ${a.name}.`, { tone: 'warm', salience: 5 }); }
 }
 export function step(s: WorldState) {
   s.minute += MINUTES_PER_TICK;
@@ -177,7 +179,7 @@ export function applyCommand(s: WorldState, command: Command, now: number) {
       const people = activeCharacters(s);
       const occasion = log(s, 'event', event.text, people.map(c => c.id));
       for (const c of people) { const before = residentStats(c); c.mood = clamp(c.mood + event.mood); recordResidentChange(c, before, s.minute, event.name, occasion.id); rememberEvent(c, occasion, `I was here for ${event.name.toLowerCase()}. ${event.text}`, { tone: event.mood > 0 ? 'warm' : event.mood < 0 ? 'tense' : 'neutral', salience: 3 }); if (event.tone === 'kind') c.destination = 0; }
-      for (let i = 0; i < people.length; i++) for (let j = i + 1; j < people.length; j++) { const r = relationship(s, people[i].id, people[j].id); r.affinity = clamp(r.affinity + (event.tone === 'kind' ? 3 : -2), -100, 100); r.trust = clamp(r.trust + (event.tone === 'kind' ? 2 : -2)); }
+      for (let i = 0; i < people.length; i++) for (let j = i + 1; j < people.length; j++) { const r = relationship(s, people[i].id, people[j].id); const previous = r.affinity; r.affinity = clamp(r.affinity + (event.tone === 'kind' ? 3 : -2), -100, 100); recordSharedEvent(r, event.name, r.affinity - previous, occasion); r.trust = clamp(r.trust + (event.tone === 'kind' ? 2 : -2)); }
       break;
     }
     case 'settings': {

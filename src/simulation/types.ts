@@ -22,7 +22,28 @@ export interface Character {
   /** Journal entry that produced this utterance; absent for legacy/unlinked speech. */
   speechConversationId?: number;
 }
-export interface Relationship { a: string; b: string; affinity: number; trust: number; encounters: number; lastMinute: number; lastRepairMinute?: number; repairedConflictId?: number; unresolvedConflict?: { id: number; minute: number; topic: string }; repairCommitment?: { conflictId: number; initiatorId: string }; }
+/** One subject that repeatedly moved a pair closer or further apart. `impact` is affinity moved, always positive. */
+export interface RelationshipThread {
+  topic: string; source: 'conversation' | 'event' | 'repair'; count: number; impact: number;
+  firstMinute: number; lastMinute: number; lastEventId: number;
+  /** Set when a later repair settled this disagreement; cleared if it flares up again. */
+  mendedMinute?: number;
+}
+/** `group` marks words heard in a gathering; one-to-one words are more personal and take precedence. */
+export interface RememberedWords { speakerId: string; text: string; minute: number; eventId: number; group?: true; }
+/** What one resident has done toward, and heard from, the other. Keyed by the holder's id. */
+export interface RelationshipPerspective {
+  reachedOut: number; repairsOffered: number; spaceRequested: number; promisesKept: number;
+  warmWords?: RememberedWords; hardWords?: RememberedWords;
+}
+/** Bounded, durable relationship history; absent in older saves and for pairs with no shared moments. */
+export interface RelationshipStory {
+  beginning?: { minute: number; eventId: number; topic: string; tone: 'warm' | 'tense' };
+  friendsMinute?: number;
+  connections: RelationshipThread[]; disagreements: RelationshipThread[];
+  perspectives: Record<string, RelationshipPerspective>;
+}
+export interface Relationship { a: string; b: string; affinity: number; trust: number; encounters: number; lastMinute: number; lastRepairMinute?: number; repairedConflictId?: number; unresolvedConflict?: { id: number; minute: number; topic: string }; repairCommitment?: { conflictId: number; initiatorId: string }; story?: RelationshipStory; }
 export interface ConversationTurn { speakerId: string; text: string; minute: number; generated?: boolean; }
 export interface Conversation {
   /** Absent in persisted legacy pairs. */
@@ -31,7 +52,8 @@ export interface Conversation {
   turns: ConversationTurn[]; nextTurnAt: number; targetTurns: number;
   /** Saved procedural arc; absent in legacy threads. Never treated as revealed dialogue. */
   sceneId?: string; fallbackTurns?: string[];
-  repair?: { conflictId: number; phase: 'offer' | 'follow-through'; accepted: boolean };
+  /** `topic` names the original disagreement; absent in older saves. */
+  repair?: { conflictId: number; phase: 'offer' | 'follow-through'; accepted: boolean; topic?: string };
   planned?: { speakerId: string; text: string }[]; generationAttempted?: boolean;
 }
 export interface LogEntry { id: number; minute: number; kind: LogKind; text: string; characters: string[]; generated?: boolean; conversation?: Conversation; }
