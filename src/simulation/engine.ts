@@ -16,6 +16,8 @@ export const TICK_MS = 4_000;
 export const MINUTES_PER_TICK = 2;
 export const MAX_CATCHUP_STEPS = 720;
 export const EVENT_COOLDOWN_MS = 45_000;
+/** Warmth within a day of a refused approach counts as a turnaround. */
+export const TURNAROUND_MINUTES = 1440;
 /** Share of a quarrel's cost when the pair's disagreement is already open. */
 export const FLARE_UP = .6;
 /** How long a material gift eases supply worries. */
@@ -111,13 +113,16 @@ function interact(s: WorldState, a: Character, b: Character) {
   if (positive && reward) r.lastConnectionMinute = s.minute;
   const encounter = beginConversation(s, a, b, positive);
   recordEncounter(r, encounter, a.id, r.affinity - previous);
-  if (positive && !reward) encounter.text += ' They keep talking; this recent connection grants no additional recovery.';
-  else if (positive && eased) { if (!settleEasedConflict(s, r, encounter)) encounter.text += ' Goodwill lets a little trust return; the disagreement is easing.'; }
-  else if (positive && unresolved) encounter.text += ' A little connection; trust and the unresolved disagreement are unchanged.';
+  // Mechanics live in the score explanations; the journal only notes what changed between them.
+  if (positive && reward && eased) { if (!settleEasedConflict(s, r, encounter)) encounter.text += ' Their disagreement is easing.'; }
+  // Warmth soon after a refused approach is a turning point in their story.
+  if (positive && reward && r.lastRefusedMinute !== undefined && s.minute - r.lastRefusedMinute <= TURNAROUND_MINUTES) {
+    encounter.highlight ??= 'turnaround'; r.lastRefusedMinute = undefined;
+  }
   recordCommunityChange(s, beforeCommunity, `${positive ? 'Warm encounter' : 'Disagreement'}: ${a.name} and ${b.name}`, encounter.id);
   recordResidentChange(a, beforeA, s.minute, `${positive ? 'Warm encounter' : 'Disagreement'} with ${b.name}`, encounter.id);
   recordResidentChange(b, beforeB, s.minute, `${positive ? 'Warm encounter' : 'Disagreement'} with ${a.name}`, encounter.id);
-  if (previous < 35 && r.affinity >= 35) { const t = `${a.name} and ${b.name} are becoming real friends.`; const friendship = log(s, 'friendship', t, [a.id, b.id]); recordFriendship(r, s.minute); rememberEvent(a, friendship, `I’m becoming friends with ${b.name}.`, { tone: 'warm', salience: 5 }); rememberEvent(b, friendship, `I’m becoming friends with ${a.name}.`, { tone: 'warm', salience: 5 }); }
+  if (previous < 35 && r.affinity >= 35) { const t = `${a.name} and ${b.name} are becoming real friends.`; const friendship = log(s, 'friendship', t, [a.id, b.id]); friendship.highlight = 'friendship'; recordFriendship(r, s.minute); rememberEvent(a, friendship, `I’m becoming friends with ${b.name}.`, { tone: 'warm', salience: 5 }); rememberEvent(b, friendship, `I’m becoming friends with ${a.name}.`, { tone: 'warm', salience: 5 }); }
 }
 export const TEA_MOOD = 15, TEA_AFFINITY = -25;
 /** Residents in good enough spirits who have at least one housemate they can sit with. */

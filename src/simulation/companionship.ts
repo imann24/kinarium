@@ -50,7 +50,7 @@ export function advanceQuietCompanionship(world: WorldState) {
     const easing = isEased(r);
     const entry: LogEntry = {
       id: world.nextLog++, minute: world.minute, kind: 'ritual', characters: [a.id, b.id],
-      text: `${a.name} and ${b.name} spend a quiet while together. ${tense ? (easing ? 'Cautious company offers a small respite while their disagreement eases.' : 'Familiar company offers a small respite; their disagreement and trust are unchanged.') : comfort >= .8 ? 'Trusted company restores some mood, energy and belonging; house tension eases.' : 'Comfortable company offers a little rest and belonging; house tension eases slightly.'}`,
+      text: `${a.name} and ${b.name} spend a quiet while together. ${tense ? (easing ? 'Cautious company offers a small respite while their disagreement eases.' : 'Familiar company offers a small respite; their disagreement is still open.') : comfort >= .8 ? 'Trusted company restores some mood, energy and belonging; house tension eases.' : 'Comfortable company offers a little rest and belonging; house tension eases slightly.'}`,
     };
     world.history.push(entry);
     const settled = tense && settleEasedConflict(world, r, entry);
