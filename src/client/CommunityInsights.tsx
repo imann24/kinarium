@@ -5,8 +5,8 @@ import { communityInsights, pairRecords, recentActivity, type BondKind, type Ins
 import './community-insights.css';
 import HouseNarrative from './HouseNarrative';
 import RelationshipStory from './RelationshipStory';
+import { bondLabels as labels } from './relationship-label';
 
-const labels: Record<BondKind, string> = { close: 'Growing close', strained: 'Strained', forming: 'Getting acquainted', unmet: 'Yet to meet' };
 const kinds = Object.keys(labels) as BondKind[];
 
 export function insightLocation(search: string) {
@@ -41,7 +41,7 @@ export default function CommunityInsights({ world, onSelectResident }: { world: 
   const bonds = data.bonds.filter(b => filter === 'all' || b.kind === filter)
     .sort((a, b) => b.relationship.encounters - a.relationship.encounters || a.a.name.localeCompare(b.a.name));
   const chosen = data.bonds.find(b => `${b.a.id}:${b.b.id}` === selected);
-  const distribution = { close: data.close, forming: data.forming, strained: data.strained, unmet: data.notMet };
+  const distribution = { ...data.distribution, unmet: data.notMet };
   const activityMax = Math.max(1, ...activity.buckets.flatMap(b => [b.conversations, b.conflicts]));
   const records = chosen ? pairRecords(activity.entries, chosen.a.id, chosen.b.id) : [];
   return <section className="community-insights" aria-labelledby="insights-title">
@@ -61,9 +61,9 @@ export default function CommunityInsights({ world, onSelectResident }: { world: 
       {!data.possiblePairs && <p className="insights-empty">Welcome at least two residents to see the social fabric take shape.</p>}
     </section>
     <div className="insights-columns">
-      <section className="insights-panel"><h3>Between neighbors</h3><p className="insights-note">{data.close} growing close · {data.forming} getting acquainted · {data.strained} strained</p>
+      <section className="insights-panel"><h3>Between neighbors</h3><p className="insights-note">{kinds.filter(kind => kind !== 'unmet' && distribution[kind] > 0).map(kind => `${distribution[kind]} ${labels[kind].toLowerCase()}`).join(' · ')}</p>
         <label className="insights-filter">Explore connections<select value={filter} onChange={e => { setFilter(e.target.value as typeof filter); setSelected(undefined); }}><option value="all">All connections</option>{Object.entries(labels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
-        <p className="insights-note">Sorted by encounters. Growing close: affinity above 35; strained: below −20. Pairs without encounters stay “yet to meet,” even if shared events changed their scores.</p>
+        <p className="insights-note">Sorted by encounters. Familiarity starts at 10 encounters or a recorded friendship. Close requires affinity above 35 and trust above 55; either alone means fond but cautious or trusted, not close. Affinity below −20 or an unresolved conflict means strained; a matching repair commitment means repair promised. Pairs without encounters stay “yet to meet,” even if shared events changed their scores.</p>
         <div className="insights-bond-list" aria-label="Connections">{bonds.map(({ a, b, relationship: r, kind }) => <button key={`${a.id}:${b.id}`} className="insights-bond" aria-pressed={selected === `${a.id}:${b.id}`} onClick={() => setSelected(`${a.id}:${b.id}`)}><span><b>{a.name}{a.away ? ' (away)' : ''} & {b.name}{b.away ? ' (away)' : ''}</b><small>{labels[kind]} · {r.encounters} encounters</small></span><span>Affinity {Math.round(r.affinity)}<Meter value={r.affinity} affinity/><small>Trust {score(r.trust)}</small></span></button>)}{!bonds.length && <p className="insights-empty">{data.possiblePairs === 0 ? 'Connections need at least two residents in this view.' : 'No connections in this group yet.'}</p>}</div>
         {chosen ? <RelationshipStory relationship={chosen.relationship} a={chosen.a} b={chosen.b} records={records} onSelectResident={onSelectResident}/> : <p className="insights-note">Choose a connection to read its story: how it began, what drew them together or apart, and how each sees the other.</p>}
       </section>

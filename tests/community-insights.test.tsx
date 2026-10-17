@@ -33,7 +33,7 @@ describe('community insight calculations', () => {
     expect(bondKind(r)).toBe('unmet');
     expect(communityInsights(w)).toMatchObject({ trust: null, encounters: 0, notMet: 3 });
     r.encounters = 1;
-    for (const [affinity, kind] of [[35, 'forming'], [35.1, 'close'], [-20, 'forming'], [-20.1, 'strained']] as const) {
+    for (const [affinity, kind] of [[35, 'forming'], [35.1, 'warm'], [-20, 'forming'], [-20.1, 'strained']] as const) {
       r.affinity = affinity; expect(bondKind(r)).toBe(kind);
     }
   });

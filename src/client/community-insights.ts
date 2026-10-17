@@ -1,13 +1,11 @@
 import type { Character, LogEntry, Relationship, WorldState } from '../simulation/types';
 
+import { bondKind, bondLabels, type BondKind } from './relationship-label';
+export { bondKind } from './relationship-label';
+export type { BondKind } from './relationship-label';
 export type InsightScope = 'home' | 'all';
-export type BondKind = 'close' | 'strained' | 'forming' | 'unmet';
 export interface InsightBond { relationship: Relationship; a: Character; b: Character; kind: BondKind; }
 
-// Match the existing Bonds view's thresholds. These are display groups, not diagnoses.
-export function bondKind(r: Relationship): BondKind {
-  return r.encounters === 0 ? 'unmet' : r.affinity > 35 ? 'close' : r.affinity < -20 ? 'strained' : 'forming';
-}
 const average = (values: number[]) => values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : null;
 
 /** Derive current-state statistics without mutating the authoritative simulation. */
@@ -23,6 +21,7 @@ export function communityInsights(world: WorldState, scope: InsightScope = 'home
   const possiblePairs = residents.length * Math.max(0, residents.length - 1) / 2;
   return {
     residents, bonds, met, possiblePairs,
+    distribution: Object.fromEntries(Object.keys(bondLabels).map(kind => [kind, bonds.filter(b => b.kind === kind).length])) as Record<BondKind, number>,
     notMet: possiblePairs - met.length,
     close: met.filter(b => b.kind === 'close').length,
     strained: met.filter(b => b.kind === 'strained').length,
