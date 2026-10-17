@@ -41,7 +41,66 @@ function TemplateFurniture({ templateId, floor, y }: { templateId: string; floor
       <circle cx="614" cy={y + 69} r="14" fill="#e3dbc1" stroke="#889c9b" strokeWidth="4"/>
     </>}
   </g>;
+  if (templateId === 'courtyard-house') return <g>
+    {floor === 0 && <>
+      <ellipse cx="420" cy={y + 120} rx="62" ry="9" fill="#9fb4b4" opacity=".45"/>
+      <path d={`M368 ${y + 122}q52-24 104 0`} fill="#b7a98c" stroke="#9a8c70" strokeWidth="3"/>
+      <path d={`M420 ${y + 112}v-34m-14 10q14-20 28 0`} fill="none" stroke="#8fa9ab" strokeWidth="3" strokeLinecap="round"/>
+      <rect x="188" y={y + 101} width="76" height="8" rx="3" fill="#a88d68"/><path d={`M195 ${y + 109}v17m62-17v17`} stroke="#8e7656" strokeWidth="5"/>
+      <rect x="560" y={y + 101} width="76" height="8" rx="3" fill="#a88d68"/><path d={`M567 ${y + 109}v17m62-17v17`} stroke="#8e7656" strokeWidth="5"/>
+      <path d={`M150 ${y + 34}q130 22 260 0`} fill="none" stroke="#a59a83" strokeWidth="1.5"/>
+      {['#d5b26a', '#9db0a6', '#c88f74'].map((color, i) => <rect key={color} x={196 + i * 64} y={y + 40 + (i === 1 ? 6 : 2)} width="22" height="18" fill={color}/>)}
+      <Plant x={300} y={y + 107} size={.9}/><Plant x={666} y={y + 105} size={1.15}/>
+    </>}
+    {floor === 1 && <>
+      <rect x="196" y={y + 92} width="36" height="30" rx="7" fill="#a99a80"/><rect x="196" y={y + 78} width="10" height="44" rx="4" fill="#9a8b71"/>
+      <rect x="300" y={y + 92} width="36" height="30" rx="7" fill="#a99a80"/><rect x="326" y={y + 78} width="10" height="44" rx="4" fill="#9a8b71"/>
+      <circle cx="266" cy={y + 95} r="14" fill="#c4ad87"/><path d={`M266 ${y + 109}v17`} stroke="#9e8a69" strokeWidth="4"/><rect x="259" y={y + 85} width="11" height="9" rx="2" fill="#efe1be"/>
+      <path d={`M266 ${y + 20}v20`} stroke="#a59a83" strokeWidth="1.5"/><Plant x={266} y={y + 62} size={.5}/>
+    </>}
+    {floor === 2 && <>
+      {[452, 560].map(x => <g key={x}><path d={`M${x} ${y + 126}v-46`} stroke="#8c7158" strokeWidth="6"/><circle cx={x} cy={y + 62} r="28" fill="#93a878"/><circle cx={x - 14} cy={y + 50} r="16" fill="#a2b685"/>{[-12, 6, 15].map(dx => <circle key={dx} cx={x + dx} cy={y + 66 + dx / 3} r="4" fill="#d9c068"/>)}</g>)}
+      <path d={`m498 ${y + 126} 10-62m14 62-10-62m-11 16h17m-19 16h20m-22 16h24`} fill="none" stroke="#a7865f" strokeWidth="3"/>
+      <rect x="590" y={y + 104} width="34" height="22" fill="#b79b70"/><path d={`M590 ${y + 115}h34`} stroke="#977e58" strokeWidth="2"/>
+    </>}
+  </g>;
+  if (templateId === 'lantern-tower') return <g>
+    {floor === 0 && <>
+      <circle cx="400" cy={y + 92} r="22" fill="#b49a73"/><path d={`M400 ${y + 102}v24m-12 0h24`} stroke="#977e5c" strokeWidth="5"/>
+      <rect x="392" y={y + 79} width="15" height="11" rx="2" fill="#efe1be"/>
+      {[352, 448].map(x => <path key={x} d={`M${x - 9} ${y + 104}h18m-15 0v22m12-22v22`} stroke="#9a7f5a" strokeWidth="4"/>)}
+      <rect x="460" y={y + 50} width="54" height="6" fill="#9a8a6c"/>
+      {[0, 1, 2].map(i => <path key={i} d={`M${468 + i * 15} ${y + 50}v-13h9v13`} fill="#8d9a8e" stroke="#6f7f75" strokeWidth="1.5"/>)}
+    </>}
+    {floor === 1 && <>
+      <path d={`M326 ${y + 126}h36v-16h-24v-16h24v-16h-24v-16h24v-16h-24`} fill="none" stroke="#a48b68" strokeWidth="5" strokeLinejoin="round"/>
+      <rect x="430" y={y + 40} width="60" height="84" fill="#a58c6a"/>
+      {[0, 1, 2].map(row => <g key={row}><path d={`M432 ${y + 66 + row * 26}h56`} stroke="#d8c49d" strokeWidth="3"/>{[0, 1, 2, 3, 4].map(i => <rect key={i} x={436 + i * 10} y={y + 47 + row * 26} width="6" height="18" rx="1" fill={['#d0b083', '#82917b', '#bd8772', '#e4d5b5', '#969998'][(i + row) % 5]}/>)}</g>)}
+    </>}
+    {floor === 2 && <>
+      <path d={`M396 ${y + 126}h50l-8-30h-34Z`} fill="#8f9585"/>
+      <rect x="398" y={y + 40} width="46" height="56" rx="8" fill="#f4e6b4" stroke="#b8a46a" strokeWidth="4"/>
+      <path d={`M406 ${y + 52}h30m-30 12h30m-30 12h30`} stroke="#d8c27c" strokeWidth="2"/>
+      <path d={`M396 ${y + 36}h50l-25-16Z`} fill="#8a9381"/>
+    </>}
+  </g>;
   return null;
+}
+// Unreachable parts of a narrow floor: open air over the courtyard, or tower stone.
+// A low passage on the elevator side keeps the route to the lift visible.
+function LayoutMask({ templateId, span, y, sky }: { templateId: string; span?: readonly [number, number]; y: number; sky: string }) {
+  if (!span) return null;
+  const open = templateId === 'courtyard-house';
+  const left = 135 + span[0] * 5.85 - 22, right = 135 + span[1] * 5.85 + 22;
+  const fill = open ? `url(#${sky})` : '#b6ae96';
+  const parts: { x: number; w: number; h: number }[] = [];
+  if (left > 113) parts.push({ x: 113, w: left - 113, h: 128 });
+  if (right < 704) parts.push({ x: right, w: 704 - right, h: open ? 128 : 62 });
+  return <g data-layout-mask>{parts.map(({ x, w, h }) => <g key={x}>
+    <rect x={x} y={y} width={w} height={h} fill={fill}/>
+    {open ? <><path d={`M${x} ${y + 96}h${w}`} stroke="#9c9a83" strokeWidth="3"/>{Array.from({ length: Math.floor(w / 16) + 1 }, (_, i) => <path key={i} d={`M${x + 4 + i * 16} ${y + 96}v32`} stroke="#a8a690" strokeWidth="2"/>)}</>
+      : <>{Array.from({ length: Math.ceil(h / 16) }, (_, row) => <path key={row} d={`M${x} ${y + 16 + row * 16}h${w}`} stroke="#a29a82" strokeWidth="1.5"/>)}<path d={`M${x} ${y}v${h}M${x + w} ${y}v${h}`} stroke="#9a927a" strokeWidth="4"/></>}
+  </g>)}</g>;
 }
 export function Person({ character, small = false }: { character: Pick<Character, 'color' | 'name' | 'id'>; small?: boolean }) {
   const variant = Number(character.id.replace(/\D/g, '')) % 3;
@@ -71,6 +130,8 @@ export default function Building({ world, selected, onSelect, onOpenConversation
   const svgId = useId();
   const skyId = `${svgId}-sky`; const wallId = `${svgId}-wall`;
   const harbor = template.id === 'harbor-house';
+  // Newer templates draw all their own furniture instead of the shared common-house pieces.
+  const bespoke = template.floors.some(f => f.span);
   const night = world.minute % 1440 >= 1200 || world.minute % 1440 < 360;
   // The live frame trims only scenery margins; keep the sun, outside plants,
   // resident speech, elevator and bottom caption inside it. Previews keep their original frame.
@@ -95,11 +156,12 @@ export default function Building({ world, selected, onSelect, onOpenConversation
         <path d={`M113 ${y + 128}h591v8H113Z`} fill="#c6b399"/>
         <path d={`M113 ${y + 130}h591`} stroke="#af9f87"/>
         {[157, 350, 560].map(x => <g key={x}><path d={`M${x} ${y + 89}v-47a27 27 0 0 1 54 0v47Z`} fill={night ? 'var(--window-night, #adbab7)' : 'var(--window-day, #eef0dc)'} stroke="#b7b394" strokeWidth="5"/><path d={`M${x + 27} ${y + 16}v73m-27-38h54`} stroke="#c2bda2" strokeWidth="3"/></g>)}
-        <text x="128" y={y + 18} fontSize="8" letterSpacing="1.4" fill="var(--scene-label, #7f7e67)">0{floor + 1}</text>
         {floor === 2 && template.id === 'common-house' && <g><Plant x={250} y={y + 107} size={1.1}/><Plant x={651} y={y + 104} size={1.2}/><rect x="320" y={y + 92} width="110" height="16" rx="3" fill="#9a9b72"/><path d={`M330 ${y + 108}v21m90-21v21`} stroke="#838467" strokeWidth="5"/><Plant x={339} y={y + 73} size={.65}/><Plant x={378} y={y + 73} size={.65}/><Plant x={413} y={y + 73} size={.5}/><path d={`M477 ${y + 124}v-27q20-12 38 0v27m-36-14h34`} fill="#c4ad83" stroke="#a78f6b" strokeWidth="3"/></g>}
-        {floor === 1 && <g><rect x="262" y={y + 44} width="51" height="78" fill="#aa906d"/><path d={`M264 ${y + 71}h47m-47 26h47`} stroke="#dbc69f" strokeWidth="3"/>{[0,1,2,3,4].map(i => <rect key={i} x={269+i*8} y={y+51} width="5" height="18" rx="1" fill={['#d0b083','#82917b','#bd8772','#e4d5b5','#969998'][i]}/>)}<rect x="449" y={y + 93} width="88" height="29" rx="6" fill="#99a089"/><rect x="449" y={y + 84} width="88" height="26" rx="7" fill="#aab198"/><path d={`M452 ${y + 100}v17m82-17v17`} stroke="#7d8c71" strokeWidth="8" strokeLinecap="round"/><path d={`M600 ${y + 124}v-69m-17 3h34l-9-17h-16Z`} fill="#e8d7a7" stroke="#a89570" strokeWidth="2"/><Plant x={165} y={y + 109} size={.8}/><rect x="369" y={y + 35} width="34" height="25" fill="#e8debd" stroke="#ad9271" strokeWidth="3"/><circle cx="386" cy={y + 46} r="6" fill="#b4bb98"/></g>}
-        {floor === 0 && template.id !== 'makers-house' && <g><rect x="135" y={y + 85} width="94" height="40" fill="#b4ae8c"/><rect x="132" y={y + 81} width="100" height="7" rx="2" fill="#8e8b70"/><path d={`M180 ${y + 89}v34m-39-23h29m20 0h29`} stroke="#8d9075"/><rect x="147" y={y + 67} width="18" height="15" rx="3" fill="#d4c5a1"/><path d={`M165 ${y + 70}q13 1 0 8`} fill="none" stroke="#d4c5a1" strokeWidth="3"/><ellipse cx="397" cy={y + 125} rx="95" ry="8" fill="#b9a078" opacity=".3"/><path d={`M336 ${y + 96}h117m-105 0v30m94-30v30`} stroke="#9a7f5a" strokeWidth="6" strokeLinecap="round"/><rect x="335" y={y + 91} width="120" height="8" rx="3" fill="#b49a73"/><rect x="370" y={y + 81} width="12" height="10" rx="2" fill="#efe1be"/><rect x="414" y={y + 81} width="12" height="10" rx="2" fill="#c8d0ac"/><path d={`M312 ${y + 126}v-32m-1 22h21m144 10v-32m-19 22h20`} stroke="#a49370" strokeWidth="4"/><Plant x={652} y={y + 103} size={1.2}/></g>}
+        {floor === 1 && !bespoke && <g><rect x="262" y={y + 44} width="51" height="78" fill="#aa906d"/><path d={`M264 ${y + 71}h47m-47 26h47`} stroke="#dbc69f" strokeWidth="3"/>{[0,1,2,3,4].map(i => <rect key={i} x={269+i*8} y={y+51} width="5" height="18" rx="1" fill={['#d0b083','#82917b','#bd8772','#e4d5b5','#969998'][i]}/>)}<rect x="449" y={y + 93} width="88" height="29" rx="6" fill="#99a089"/><rect x="449" y={y + 84} width="88" height="26" rx="7" fill="#aab198"/><path d={`M452 ${y + 100}v17m82-17v17`} stroke="#7d8c71" strokeWidth="8" strokeLinecap="round"/><path d={`M600 ${y + 124}v-69m-17 3h34l-9-17h-16Z`} fill="#e8d7a7" stroke="#a89570" strokeWidth="2"/><Plant x={165} y={y + 109} size={.8}/><rect x="369" y={y + 35} width="34" height="25" fill="#e8debd" stroke="#ad9271" strokeWidth="3"/><circle cx="386" cy={y + 46} r="6" fill="#b4bb98"/></g>}
+        {floor === 0 && template.id !== 'makers-house' && !bespoke && <g><rect x="135" y={y + 85} width="94" height="40" fill="#b4ae8c"/><rect x="132" y={y + 81} width="100" height="7" rx="2" fill="#8e8b70"/><path d={`M180 ${y + 89}v34m-39-23h29m20 0h29`} stroke="#8d9075"/><rect x="147" y={y + 67} width="18" height="15" rx="3" fill="#d4c5a1"/><path d={`M165 ${y + 70}q13 1 0 8`} fill="none" stroke="#d4c5a1" strokeWidth="3"/><ellipse cx="397" cy={y + 125} rx="95" ry="8" fill="#b9a078" opacity=".3"/><path d={`M336 ${y + 96}h117m-105 0v30m94-30v30`} stroke="#9a7f5a" strokeWidth="6" strokeLinecap="round"/><rect x="335" y={y + 91} width="120" height="8" rx="3" fill="#b49a73"/><rect x="370" y={y + 81} width="12" height="10" rx="2" fill="#efe1be"/><rect x="414" y={y + 81} width="12" height="10" rx="2" fill="#c8d0ac"/><path d={`M312 ${y + 126}v-32m-1 22h21m144 10v-32m-19 22h20`} stroke="#a49370" strokeWidth="4"/><Plant x={652} y={y + 103} size={1.2}/></g>}
         <TemplateFurniture templateId={template.id} floor={floor} y={y}/>
+        <LayoutMask templateId={template.id} span={template.floors[floor].span} y={y} sky={skyId}/>
+        <text x="128" y={y + 18} fontSize="8" letterSpacing="1.4" fill="var(--scene-label, #7f7e67)">0{floor + 1}</text>
       </g>;
     })}
     <rect x="707" y="112" width="101" height="418" fill="#b9b9a2"/>
