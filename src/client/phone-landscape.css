@@ -1,0 +1,11 @@
+/* Phones held sideways are wider than the mobile breakpoint but only a few hundred pixels tall.
+   Fitting the house to that height shrinks it to a narrow strip, so let it span the width and scroll instead. */
+@media (orientation:landscape) and (max-height:500px) and (hover:none) and (pointer:coarse) {
+  :root { --page-gutter:12px; }
+  .world-layout { grid-template-columns:1fr; gap:14px; }
+  .world-stage { width:100%; }
+  .world-page:not(.world-fullscreen) .world-stage .building { max-height:none; }
+  .world-page:not(.world-fullscreen) .world-sidebar { height:min(520px,calc(100dvh - 24px)); max-height:none; }
+  .stage-toolbar { padding:0 12px; }
+  .world-stage .stage-footer { padding:8px 12px; }
+}
