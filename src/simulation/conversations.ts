@@ -20,8 +20,8 @@ function joinNearby(world: WorldState, entry: LogEntry) {
   const people = entry.characters.map(id => world.characters.find(c => c.id === id)!);
   for (const c of world.characters) {
     if (people.length >= MAX_CONVERSATION_PARTICIPANTS) break;
-    if (entry.characters.includes(c.id) || isConversing(world, c.id) || c.energy < (c.trait === 'reserved' ? 40 : 25) || c.mood < 20) continue;
-    if (!people.every(p => nearby(c, p) && p.energy >= 25 && p.mood >= 20 && (world.relationships[[c.id, p.id].sort().join(':')]?.trust ?? 30) >= (c.trait === 'reserved' || p.trait === 'reserved' ? 30 : 25))) continue;
+    if (entry.characters.includes(c.id) || isConversing(world, c.id) || c.energy < (c.trait === 'reserved' ? 25 : 15) || c.mood < 20) continue;
+    if (!people.every(p => nearby(c, p) && p.energy >= 15 && p.mood >= 20 && (world.relationships[[c.id, p.id].sort().join(':')]?.trust ?? 30) >= (c.trait === 'reserved' || p.trait === 'reserved' ? 30 : 25))) continue;
     people.push(c); entry.characters.push(c.id);
     (thread.joinedAtTurn ??= {})[c.id] = thread.turns.length;
     thread.planned = undefined;
@@ -84,8 +84,9 @@ export function beginConversation(world: WorldState, a: Character, b: Character,
 function fallback(entry: LogEntry, speaker: Character) {
   const thread = entry.conversation!;
   if (entry.characters.length > 2) {
-    if (speaker.energy < 30) return 'I’m running low on energy. Could we leave a little room for quiet?';
-    if (speaker.mood < 30) return 'I’m finding words difficult today, but I’m listening.';
+    if (speaker.energy < 10) return 'I’m worn out. I need to stop here.';
+    if (speaker.energy < 30) return speaker.trait === 'practical' ? 'My quick vote: try one small part before drawing up a whole plan.' : 'One short thought: I’d rather hear a surprising answer than have us all agree.';
+    if (speaker.mood < 30) return 'I’m in a rough mood, and I might sound blunt: I want a say in what we try, even if my idea is awkward.';
     const cue = { practical: 'Which part would you want to try first?', curious: 'What makes that part stand out to you?', reserved: 'I’m still thinking about that. I’d like to hear a little more.', spirited: 'I see it a little differently. Could we compare what matters most to each of us?', kind: 'I’d like to hear everyone’s perspective, without asking anyone to agree.' };
     if (thread.turns.length >= thread.targetTurns - 1) return 'I have more to think about. This feels like a good place to pause.';
     if (thread.turns.length >= entry.characters.length) {

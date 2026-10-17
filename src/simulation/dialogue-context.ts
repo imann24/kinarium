@@ -17,11 +17,18 @@ export function memoryExcerpt(memory: Memory): string | undefined {
   return excerpt && !/[“”"\n]/.test(excerpt) ? excerpt : undefined;
 }
 
-/** Keep the subject and first response; let a disclosed state change the ending. */
+/** Keep the substance; fatigue usually shortens a contribution, not willingness to connect. */
 export function statefulProgression(lines: string[], a: Character, b: Character, positive: boolean): string[] {
-  if (a.energy < 30) return [...lines.slice(0, 2), 'I’m running out of energy. Could we leave the rest of this for now?', positive ? 'Yes. There is no need to find an answer while you’re worn out.' : 'We can stop here without pretending we agree.'];
-  if (b.energy < 30) return [...lines.slice(0, 2), 'Would you like to keep exploring this, or is this enough for now?', 'I’m tired. I would rather pause than give an answer I haven’t thought through.', 'Then this can stay open. You don’t owe me a quick answer.'];
-  if (a.mood < 30) return [...lines.slice(0, 2), 'I’m having a hard time finding the words today. I don’t want that to come across as not caring.', positive ? 'We don’t have to make this cheerful. You can leave some of it unsaid.' : 'I hear that. I can give you room and still have a different view.'];
-  if (b.mood < 30) return [...lines.slice(0, 2), 'How does talking about this feel to you right now?', 'Honestly, I’m feeling low. I don’t have much room for an upbeat answer.', positive ? 'You don’t have to make it upbeat for me. We can let the question rest.' : 'I won’t ask you to sound cheerful. The disagreement can wait.'];
-  return lines;
+  if (a.energy < 10) return [...lines.slice(0, 2), 'I’m running out of energy. Could we leave the rest of this for now?', positive ? 'Yes. There is no need to find an answer while you’re worn out.' : 'We can stop here without pretending we agree.'];
+  if (b.energy < 10) return [...lines.slice(0, 2), lines[2], 'I’m too tired to give this another thought right now. Let’s leave it here.'];
+  const result = [...lines];
+  const prefix = (index: number, text: string) => { if (result[index].length + text.length <= 220) result[index] = text + result[index]; };
+  if (a.energy < 30 || b.energy < 30) {
+    // Preserve the actual topic and response rather than replacing them with a refusal.
+    prefix(a.energy < 30 ? 2 : 3, a.energy < 30 ? 'Briefly: ' : 'My short answer: ');
+    return result.slice(0, 4);
+  }
+  if (a.mood < 30) prefix(2, 'I’m having a rough day, so this may come out bluntly. ');
+  else if (b.mood < 30) prefix(3, 'I’m feeling low, but this matters to me. ');
+  return result;
 }

@@ -129,7 +129,7 @@ export function step(s: WorldState) {
   separateStandingResidents(s);
   advanceQuietCompanionship(s);
   if (people.length > 1 && random(s) < .48) {
-    const a = pick(s, people); const nearby = people.filter(b => !isConversing(s, a.id) && !isConversing(s, b.id) && b.id !== a.id && !b.inElevator && !a.inElevator && b.floor === a.floor && b.destination === b.floor && a.destination === a.floor && inConversationRange(a, b) && a.energy >= 20 && b.energy >= 20);
+    const a = pick(s, people); const nearby = people.filter(b => !isConversing(s, a.id) && !isConversing(s, b.id) && b.id !== a.id && !b.inElevator && !a.inElevator && b.floor === a.floor && b.destination === b.floor && a.destination === a.floor && inConversationRange(a, b) && a.energy >= 10 && b.energy >= 10);
     if (nearby.length) {
       const weights = nearby.map(b => contactWillingness(relationship(s, a.id, b.id)));
       let draw = random(s) * weights.reduce((sum, weight) => sum + weight, 0);
