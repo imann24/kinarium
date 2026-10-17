@@ -34,7 +34,7 @@ try {
     assert.deepEqual(commands, [{ type: 'trigger-event', eventId: 'shared-meal' }], `${theme} ${width}px: one tap triggers the event once`);
     assert.equal(await card.evaluate(el => getComputedStyle(el).transform), 'none', 'no hover lift left behind after the tap');
     assert.deepEqual(errors, []);
-    if (theme === 'light' && width === 390) await page.screenshot({ path: process.env.SCREENSHOT || '/dev/null', fullPage: false });
+    if (process.env.SCREENSHOT && theme === 'light' && width === 390) await page.screenshot({ path: process.env.SCREENSHOT });
     await context.close();
   }
   const desktop = await browser.newPage({ viewport: { width: 1440, height: 900 } });
