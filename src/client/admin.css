@@ -1,4 +1,4 @@
-.admin-page { width: min(900px, calc(100% - 40px)); margin: 48px auto 80px; }
+.admin-page { max-width: var(--page-max); margin: 48px auto 80px; padding: 0 var(--page-gutter); }
 .admin-page > p { max-width: 720px; line-height: 1.7; }
 .admin-page h1 { margin-bottom: 20px; }
 .admin-page h2 { font-size: 1.2rem; margin: 0 0 10px; }
