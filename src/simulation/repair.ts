@@ -19,14 +19,30 @@ export function repairScene(world: WorldState, a: Character, b: Character, r: Re
     + Math.min(openness(a), openness(b)) - world.tension / 400));
   const accepted = roll < readiness;
   const topic = conflict.topic;
+  const variant = (world.nextLog + Math.floor((r.lastRepairMinute ?? conflict.minute) / 120)) % 3;
+  const openings = [
+    `There is still tension between us after our disagreement about ${topic.toLowerCase()}. Could I listen to what is still bothering you?`,
+    `Our disagreement about ${topic.toLowerCase()} is still tense. I want to understand your side, even if it stings. Where should I start?`,
+    `I don’t want the tension over ${topic.toLowerCase()} to be all we have. What have I missed about your point of view?`,
+  ];
+  const requests = [
+    'I want room to disagree without having to defend it immediately. Can you give me that?',
+    'Let me finish a thought before we argue with it. Then ask what I want, instead of guessing.',
+    'I need a say in what happens between us. Ask me first, even if my answer is inconvenient.',
+  ];
+  const refusals = [
+    'Not yet. I don’t want to go through it again right now.',
+    'I’m still angry. I can hear the offer, but I’m not ready to accept it.',
+    'I want this to change too, but I need more time before we try again.',
+  ];
   const lines = following ? [
     `After our disagreement about ${topic.toLowerCase()}, I said I would ask first. Would you like to choose where we sit, or would you prefer space?`,
     accepted ? 'I’ll choose a place to sit. Please let me finish explaining before you answer.' : 'Space, please. I’m not ready to sit together.',
     accepted ? 'Go ahead. I’ll wait and listen.' : 'All right. I’ll leave you room and won’t press for an answer.',
     accepted ? 'Thank you for waiting. Being able to make that choice helps, even though I’m still cautious.' : 'Thank you for accepting that. I still need time.',
   ] : [
-    `There is still tension between us after our disagreement about ${topic.toLowerCase()}. Could I listen to what is still bothering you?`,
-    accepted ? 'I want room to disagree without having to defend it immediately. Can you give me that?' : 'Not yet. I don’t want to go through it again right now.',
+    openings[variant],
+    accepted ? requests[variant] : refusals[variant],
     accepted ? 'Yes. Next time we share a space, I’ll ask what you want before making a choice for us.' : 'I hear you. I’ll give you space before asking again.',
     accepted ? 'I’m willing to see how that goes. A promise alone doesn’t settle this.' : 'That is what I need right now. This is still unresolved.',
   ];

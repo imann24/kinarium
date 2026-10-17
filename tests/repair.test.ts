@@ -147,6 +147,18 @@ describe('distrust and repair', () => {
       expect(r.repairedConflictId).toBeUndefined();
     }
   });
+  it('varies renewed repair bids without changing their concrete commitment or erasing refusal', () => {
+    const { world, a, b, r } = conflictFixture(); world.minute += 120;
+    const openings = new Set<string>();
+    for (let i = 0; i < 3; i++) {
+      world.nextLog++;
+      const scene = repairScene(world, a, b, r, 0)!;
+      openings.add(scene.lines[0]); expect(scene.lines[0]).toMatch(/tension|tense/);
+      expect(scene.lines[2]).toContain('I’ll ask what you want');
+      expect(repairScene(world, a, b, r, .99)?.repair.accepted).toBe(false);
+    }
+    expect(openings.size).toBe(3);
+  });
   it('preserves pending repair across serialization and archived history', () => {
     const { world, a, b, r } = conflictFixture(); world.minute += 120;
     beginConversation(world, a, b, true, repairScene(world, a, b, r, 0)!); finish(world);
