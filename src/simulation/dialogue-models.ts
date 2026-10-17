@@ -21,9 +21,5 @@ export const DIALOGUE_MODELS: readonly DialogueModelInfo[] = [
 
 export const dialogueModel = (id: string | null | undefined) => DIALOGUE_MODELS.find(m => m.id === id);
 
-/** Human label with an approximate price, falling back to the raw ID for operator-supplied models. */
-export function dialogueModelLabel(id: string) {
-  const m = dialogueModel(id);
-  if (!m) return id;
-  return m.price ? `${m.label} · $${m.price.input}/$${m.price.output} per M tokens` : m.label;
-}
+/** Display name only; operator-supplied models outside the registry show their raw ID. */
+export const dialogueModelLabel = (id: string) => dialogueModel(id)?.label ?? id;
