@@ -124,3 +124,8 @@
 
 :root .template-preview p { color:var(--secondary); }
 @media(hover:hover) and (pointer:fine){:root[data-theme='dark'] .event-card:hover:not(:disabled) { background:var(--surface-hover); }}
+
+/* Fullscreen is not useful on phones; keep the button while fullscreen so it can still be exited. */
+@media (max-width:760px), (hover:none) and (pointer:coarse) {
+  .world-page:not(.world-fullscreen) .fullscreen-toggle { display:none; }
+}
