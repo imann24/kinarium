@@ -308,3 +308,9 @@ listening alone grants no pairwise affinity, trust, or repair credit. Memories
 name the actual participants and contain only dialogue heard after joining;
 unrevealed plans are discarded. Disagreements and repair arcs remain private
 pairs: a warm group does not forgive or resolve anyone's conflict.
+
+### Reconnection and quiet company
+
+Repair reuses the existing offer/follow-through process. Completed offers restore 1 mood/belonging per resident; later respected choices restore 3, with bounded house relief. Both residents’ mood and temperament, trust, affinity and house tension affect acceptance. Refusals, interruptions and stale/replayed plans cannot earn repair rewards. Ordinary warm contact has a two-hour recovery interval and cannot rebuild trust while conflict remains unresolved.
+
+Quiet company requires 12 continuously observed simulation minutes nearby without conversation or travel. Trust, affinity, mood and temperament determine comfort; unresolved conflict permits only a small respite after cooling down. Recovery is limited to once per resident per four simulation hours, preserves conflict/trust, and is recorded in the journal, resident state changes and recallable memories. Skipped catch-up time does not count as observed company.

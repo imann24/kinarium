@@ -16,13 +16,22 @@ export interface Character {
   mood: number; energy: number; belonging: number; memories: Memory[];
   /** Actual bounded deltas from recent discrete effects; absent in older saves. */
   stateChanges?: ResidentStateChange[];
+  /** Limits restorative company across different partners as well as repeated pairs. */
+  lastQuietMinute?: number;
   /** Display-only cached history; optional for legacy saves. */
   residentSummary?: import('./resident-summary').SavedResidentSummary;
   speech?: string; speechUntil?: number;
   /** Journal entry that produced this utterance; absent for legacy/unlinked speech. */
   speechConversationId?: number;
 }
-export interface Relationship { a: string; b: string; affinity: number; trust: number; encounters: number; lastMinute: number; lastRepairMinute?: number; repairedConflictId?: number; unresolvedConflict?: { id: number; minute: number; topic: string }; repairCommitment?: { conflictId: number; initiatorId: string }; }
+export interface Relationship {
+  a: string; b: string; affinity: number; trust: number; encounters: number; lastMinute: number;
+  lastRepairMinute?: number; repairedConflictId?: number;
+  /** Recovery cooldowns and continuously observed quiet time; optional for older saves. */
+  lastConnectionMinute?: number; quietSince?: number; quietLastMinute?: number; lastQuietMinute?: number;
+  unresolvedConflict?: { id: number; minute: number; topic: string };
+  repairCommitment?: { conflictId: number; initiatorId: string };
+}
 export interface ConversationTurn { speakerId: string; text: string; minute: number; generated?: boolean; }
 export interface Conversation {
   /** Absent in persisted legacy pairs. */
@@ -31,7 +40,7 @@ export interface Conversation {
   turns: ConversationTurn[]; nextTurnAt: number; targetTurns: number;
   /** Saved procedural arc; absent in legacy threads. Never treated as revealed dialogue. */
   sceneId?: string; fallbackTurns?: string[];
-  repair?: { conflictId: number; phase: 'offer' | 'follow-through'; accepted: boolean };
+  repair?: { conflictId: number; phase: 'offer' | 'follow-through'; accepted: boolean; applied?: boolean };
   planned?: { speakerId: string; text: string }[]; generationAttempted?: boolean;
 }
 export interface LogEntry { id: number; minute: number; kind: LogKind; text: string; characters: string[]; generated?: boolean; conversation?: Conversation; }

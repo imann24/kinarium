@@ -55,7 +55,7 @@ function finish(world: WorldState, entry: LogEntry, interrupted = false) {
     if (!heard.length) { c.activity = 'leaving a gathering'; c.speech = undefined; c.speechConversationId = undefined; continue; }
     const transcript = heard.map(t => `${world.characters.find(c => c.id === t.speakerId)?.name ?? t.speakerId}: “${t.text}”`).join(' ');
     const others = entry.characters.filter(other => other !== id).map(other => world.characters.find(p => p.id === other)?.name ?? other).join(' and ');
-    rememberEvent(c, entry, `I ${thread.tone === 'tense' ? 'disagreed' : 'talked'} with ${others} about ${thread.topic.toLowerCase()}.${interrupted ? ' Our conversation was interrupted.' : ''} ${transcript}`, { tone: thread.tone, salience: thread.tone === 'tense' ? 3 : 1 });
+    rememberEvent(c, entry, `I ${thread.tone === 'tense' ? 'disagreed' : 'talked'} with ${others} about ${thread.topic.toLowerCase()}.${interrupted ? ' Our conversation was interrupted.' : ''}${thread.repair ? ` ${entry.text}` : ''} ${transcript}`, { tone: thread.repair && (!thread.repair.accepted || interrupted) ? 'neutral' : thread.tone, salience: thread.repair || thread.tone === 'tense' ? 3 : 1 });
     c.activity = 'reflecting on a conversation';
     c.speech = undefined; c.speechConversationId = undefined;
   }

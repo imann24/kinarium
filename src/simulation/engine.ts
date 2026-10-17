@@ -1,3 +1,4 @@
+import { advanceQuietCompanionship } from './companionship';
 import { separateStandingResidents } from './standing';
 import { residentDrift, residentStats, recordResidentChange } from './resident-state';
 import { contactWillingness, repairScene } from './repair';
@@ -72,13 +73,26 @@ function interact(s: WorldState, a: Character, b: Character) {
   const scarcity = s.resources < 25 ? .15 : 0;
   const kindness = (a.trait === 'kind' || b.trait === 'kind') ? .13 : 0;
   const positive = random(s) > clamp(.19 + s.tension / 240 + scarcity - kindness - r.affinity / 400 - (memoryInfluence(a, b.id, s.minute) + memoryInfluence(b, a.id, s.minute)) / 2, .06, .87);
+  // Warm contact is welcome, but repeated greetings cannot wash out a conflict.
+  const reward = s.minute - (r.lastConnectionMinute ?? -Infinity) >= 120;
+  const unresolved = !!r.unresolvedConflict;
+  const recovery = reward ? 1 : 0;
+  const moodChange = positive ? recovery * (unresolved ? 1 : 3) : -5;
+  const belongingChange = positive ? recovery * (unresolved ? .5 : 2) : -3;
   const previous = r.affinity;
-  r.affinity = clamp(r.affinity + (positive ? 4 : -7), -100, 100);
-  r.trust = clamp(r.trust + (positive ? 2 : -4)); r.encounters++; r.lastMinute = s.minute;
-  a.mood = clamp(a.mood + (positive ? 3 : -5)); b.mood = clamp(b.mood + (positive ? 3 : -5));
-  a.belonging = clamp(a.belonging + (positive ? 2 : -3)); b.belonging = clamp(b.belonging + (positive ? 2 : -3));
-  s.cohesion = clamp(s.cohesion + (positive ? .5 : -.9)); s.tension = clamp(s.tension + (positive ? -.5 : 1.2));
+  r.affinity = clamp(r.affinity + (positive ? recovery * (unresolved ? 1 : 4) : -7), -100, 100);
+  r.trust = clamp(r.trust + (positive ? (unresolved ? 0 : 2 * recovery) : -4));
+  r.encounters++; r.lastMinute = s.minute;
+  for (const c of [a, b]) {
+    c.mood = clamp(c.mood + moodChange);
+    c.belonging = clamp(c.belonging + belongingChange);
+  }
+  s.cohesion = clamp(s.cohesion + (positive ? (unresolved ? 0 : .5 * recovery) : -.9));
+  s.tension = clamp(s.tension + (positive ? (unresolved ? 0 : -.5 * recovery) : 1.2));
+  if (positive && reward) r.lastConnectionMinute = s.minute;
   const encounter = beginConversation(s, a, b, positive);
+  if (positive && !reward) encounter.text += ' They keep talking; this recent connection grants no additional recovery.';
+  else if (positive && unresolved) encounter.text += ' A little connection; trust and the unresolved disagreement are unchanged.';
   recordResidentChange(a, beforeA, s.minute, `${positive ? 'Warm encounter' : 'Disagreement'} with ${b.name}`, encounter.id);
   recordResidentChange(b, beforeB, s.minute, `${positive ? 'Warm encounter' : 'Disagreement'} with ${a.name}`, encounter.id);
   if (previous < 35 && r.affinity >= 35) { const t = `${a.name} and ${b.name} are becoming real friends.`; const friendship = log(s, 'friendship', t, [a.id, b.id]); rememberEvent(a, friendship, `I’m becoming friends with ${b.name}.`, { tone: 'warm', salience: 5 }); rememberEvent(b, friendship, `I’m becoming friends with ${a.name}.`, { tone: 'warm', salience: 5 }); }
@@ -113,6 +127,7 @@ export function step(s: WorldState) {
     } else { c.x = clamp(c.x + (random(s) - .5) * 18, 8, 84); if (!c.speech) c.activity = night ? 'resting' : (template.floors[c.floor].activity ?? ['making tea', 'reading', 'tending the plants'][c.floor]); }
   }
   separateStandingResidents(s);
+  advanceQuietCompanionship(s);
   if (people.length > 1 && random(s) < .48) {
     const a = pick(s, people); const nearby = people.filter(b => !isConversing(s, a.id) && !isConversing(s, b.id) && b.id !== a.id && !b.inElevator && !a.inElevator && b.floor === a.floor && b.destination === b.floor && a.destination === a.floor && inConversationRange(a, b) && a.energy >= 20 && b.energy >= 20);
     if (nearby.length) {
