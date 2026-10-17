@@ -1,3 +1,4 @@
+import { communityDrift, communityStats, recordCommunityChange } from './community-state';
 import { advanceQuietCompanionship } from './companionship';
 import { separateStandingResidents } from './standing';
 import { residentDrift, residentStats, recordResidentChange } from './resident-state';
@@ -67,6 +68,7 @@ export function createWorld(input: { slug: string; name: string; description?: s
 }
 function interact(s: WorldState, a: Character, b: Character) {
   const beforeA = residentStats(a), beforeB = residentStats(b);
+  const beforeCommunity = communityStats(s);
   const r = relationship(s, a.id, b.id);
   const repair = repairScene(s, a, b, r, random(s));
   if (repair) { beginConversation(s, a, b, true, repair); return; }
@@ -93,6 +95,7 @@ function interact(s: WorldState, a: Character, b: Character) {
   const encounter = beginConversation(s, a, b, positive);
   if (positive && !reward) encounter.text += ' They keep talking; this recent connection grants no additional recovery.';
   else if (positive && unresolved) encounter.text += ' A little connection; trust and the unresolved disagreement are unchanged.';
+  recordCommunityChange(s, beforeCommunity, `${positive ? 'Warm encounter' : 'Disagreement'}: ${a.name} and ${b.name}`, encounter.id);
   recordResidentChange(a, beforeA, s.minute, `${positive ? 'Warm encounter' : 'Disagreement'} with ${b.name}`, encounter.id);
   recordResidentChange(b, beforeB, s.minute, `${positive ? 'Warm encounter' : 'Disagreement'} with ${a.name}`, encounter.id);
   if (previous < 35 && r.affinity >= 35) { const t = `${a.name} and ${b.name} are becoming real friends.`; const friendship = log(s, 'friendship', t, [a.id, b.id]); rememberEvent(a, friendship, `I’m becoming friends with ${b.name}.`, { tone: 'warm', salience: 5 }); rememberEvent(b, friendship, `I’m becoming friends with ${a.name}.`, { tone: 'warm', salience: 5 }); }
@@ -138,9 +141,7 @@ export function step(s: WorldState) {
       else a.activity = `giving ${b.name} space`;
     }
   }
-  s.resources = clamp(s.resources - people.length * .008 + people.filter(c => c.floor === 2 && c.trait === 'practical').length * .12);
-  // Scarcity and unresolved conflict can erode a community; high trust supports repair.
-  if (s.resources < 20) { s.tension = clamp(s.tension + .06); s.cohesion = clamp(s.cohesion - .04); }
+  Object.assign(s, communityDrift(s).next);
   if (s.minute % 120 === 0) {
     for (const r of Object.values(s.relationships)) {
       if (s.minute - r.lastMinute > 720) { r.affinity *= .985; r.trust = clamp(r.trust - .2); }
@@ -149,8 +150,10 @@ export function step(s: WorldState) {
   const day = Math.floor(s.minute / 1440);
   if (s.minute % 1440 >= 1080 && s.lastRitualDay < day && people.length >= 2) {
     s.lastRitualDay = day;
+    const beforeCommunity = communityStats(s);
     if (s.cohesion > 45) { const ritual = log(s, 'ritual', 'As evening settles, the house gathers for tea. An ordinary habit becomes a little tradition.', people.map(c => c.id)); s.cohesion = clamp(s.cohesion + 3); s.resources = clamp(s.resources + 8); for (const c of people) rememberEvent(c, ritual, 'I joined the house for evening tea.', { tone: 'warm', salience: 2 }); }
     else { log(s, 'ritual', 'Evening comes, but the common table stays quiet. Everyone keeps to their own corner.'); s.tension = clamp(s.tension + 2); }
+    recordCommunityChange(s, beforeCommunity, s.cohesion > 45 ? 'Evening tea' : 'An unshared evening', s.history.at(-1)!.id);
   }
 }
 export function advance(s: WorldState, now: number) {
@@ -188,9 +191,11 @@ export function applyCommand(s: WorldState, command: Command, now: number) {
       if (!event) throw new Error('Unknown event.');
       if ((s.cooldowns.events ?? 0) > now) throw new Error('Let this moment settle before introducing another event.');
       s.cooldowns.events = now + EVENT_COOLDOWN_MS;
+      const beforeCommunity = communityStats(s);
       s.cohesion = clamp(s.cohesion + event.cohesion); s.tension = clamp(s.tension + event.tension); s.resources = clamp(s.resources + event.resources);
       const people = activeCharacters(s);
       const occasion = log(s, 'event', event.text, people.map(c => c.id));
+      recordCommunityChange(s, beforeCommunity, event.name, occasion.id);
       for (const c of people) { const before = residentStats(c); c.mood = clamp(c.mood + event.mood); recordResidentChange(c, before, s.minute, event.name, occasion.id); rememberEvent(c, occasion, `I was here for ${event.name.toLowerCase()}. ${event.text}`, { tone: event.mood > 0 ? 'warm' : event.mood < 0 ? 'tense' : 'neutral', salience: 3 }); if (event.tone === 'kind') c.destination = 0; }
       for (let i = 0; i < people.length; i++) for (let j = i + 1; j < people.length; j++) { const r = relationship(s, people[i].id, people[j].id); r.affinity = clamp(r.affinity + (event.tone === 'kind' ? 3 : -2), -100, 100); r.trust = clamp(r.trust + (event.tone === 'kind' ? 2 : -2)); }
       break;
