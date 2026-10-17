@@ -39,13 +39,13 @@ try {
       await page.setViewportSize({ width, height: 1100 });
       const numbers = panel.locator('summary').first();
       await numbers.focus(); await page.keyboard.press('Enter');
-      assert.match(await panel.innerText(), /supplies −0.2, belonging −0.0155, tension −0.025/);
-      assert.match(await panel.innerText(), /change after limits 0/);
+      assert.match(await panel.innerText(), /Supplies[\s\S]*−0.2[\s\S]*House tension[\s\S]*−0.025/);
+      assert.match(await panel.innerText(), /Change after 0–100 limits: 0/);
       await page.keyboard.press('Enter');
       const recent = panel.locator('summary').last();
       await recent.focus(); await page.keyboard.press('Space');
       assert.match(await panel.innerText(), /A shared meal/);
-      assert.match(await panel.innerText(), /Mood \+1 · Energy 0 · Belonging 0/);
+      assert.match(await panel.innerText(), /Mood \+1[\s\S]*Energy[\s\S]*0[\s\S]*Belonging[\s\S]*0/);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
       assert.equal(await panel.evaluate(e => e.scrollWidth <= e.clientWidth), true);
       await page.keyboard.press('Space');

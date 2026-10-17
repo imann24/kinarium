@@ -3,17 +3,19 @@ import type { Character, ResidentStateChange, ResidentStats, WorldState } from '
 const bound = (value: number) => Math.max(0, Math.min(100, value));
 export const residentStats = (c: Character): ResidentStats => ({ mood: c.mood, energy: c.energy, belonging: c.belonging });
 
-/** Belonging fades only down to this floor, raised by the most trusted tie a resident has. */
-export function belongingFloor(c: Character, relationships: WorldState['relationships'] = {}) {
-  let best = 0;
-  for (const r of Object.values(relationships)) if ((r.a === c.id || r.b === c.id) && r.trust > best) best = r.trust;
-  return 15 + .2 * best;
+/** Each resident's highest trust in anyone. A step computes this once for everyone. */
+export function bestTrust(relationships: WorldState['relationships'] = {}) {
+  const best = new Map<string, number>();
+  for (const r of Object.values(relationships)) for (const id of [r.a, r.b]) if (r.trust > (best.get(id) ?? 0)) best.set(id, r.trust);
+  return best;
 }
+/** Belonging fades only down to this floor, raised by the most trusted tie a resident has. */
+export const belongingFloor = (c: Character, best: Map<string, number>) => 15 + .2 * (best.get(c.id) ?? 0);
 
 /** Same inputs/order as a simulation step, before movement and encounters. */
-export function residentDrift(c: Character, world: Pick<WorldState, 'minute' | 'resources' | 'tension'> & Partial<Pick<WorldState, 'relationships' | 'reliefUntil'>>) {
+export function residentDrift(c: Character, world: Pick<WorldState, 'minute' | 'resources' | 'tension'> & Partial<Pick<WorldState, 'relationships' | 'reliefUntil'>>, trust = bestTrust(world.relationships)) {
   const night = world.minute % 1440 < 360 || world.minute % 1440 > 1320;
-  const floor = belongingFloor(c, world.relationships);
+  const floor = belongingFloor(c, trust);
   // Never pushes belonging up to the floor; it only stops the fade there.
   const fade = c.belonging > floor ? Math.min(.025, c.belonging - floor) : 0;
   const belonging = bound(c.belonging - fade);

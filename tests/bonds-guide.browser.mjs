@@ -45,10 +45,10 @@ try {
       await opener.focus(); await page.keyboard.press('Enter');
       const dialog = page.getByRole('dialog', { name: 'A world with no finish line.' });
       await dialog.waitFor();
-      assert.match(await dialog.innerText(), /that exact thread/);
-      const details = dialog.locator('summary');
+      assert.match(await dialog.innerText(), /Meet the residents/);
+      const details = dialog.locator('summary').last();
       await details.focus(); await page.keyboard.press('Enter');
-      assert.match(await dialog.innerText(), /240 requests per UTC day/);
+      assert.match(await dialog.innerText(), /Dialogue model/);
       assert.equal(await dialog.evaluate(el => el.scrollWidth <= el.clientWidth), true);
       await audit('dialog');
       await page.keyboard.press('Tab');

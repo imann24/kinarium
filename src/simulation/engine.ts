@@ -1,7 +1,7 @@
 import { communityDrift, communityStats, recordCommunityChange } from './community-state';
 import { advanceQuietCompanionship } from './companionship';
 import { separateStandingResidents } from './standing';
-import { residentDrift, residentStats, recordResidentChange } from './resident-state';
+import { bestTrust, residentDrift, residentStats, recordResidentChange } from './resident-state';
 import { contactWillingness, repairScene } from './repair';
 import { GOODWILL_DECAY_PER_DAY, isEased, settleEasedConflict } from './goodwill';
 import { updateHouseDetails } from './house-details';
@@ -9,7 +9,7 @@ import { advanceConversations, beginConversation, nearby as inConversationRange,
 import { memoryInfluence, rememberEvent } from './memories';
 import { recordEncounter, recordFriendship, recordSharedEvent } from './relationship-story';
 import { COLORS, EVENTS, TEMPLATES, TRAITS } from './catalog';
-import type { Character, Command, LogKind, Relationship, WorldState, WorldSummary } from './types';
+import type { Character, Command, LogKind, Relationship, WorldState, WorldSummary, WorldTemplate } from './types';
 
 export const TICK_MS = 4_000;
 export const MINUTES_PER_TICK = 2;
@@ -50,6 +50,7 @@ export function createCharacter(s: WorldState, name?: string, trait?: Character[
     mood: 58 + random(s) * 22, energy: 65 + random(s) * 25, belonging: 35, memories: [],
   };
   c.destination = c.floor;
+  const [low, high] = floorSpan(TEMPLATES[s.templateId], c.floor); c.x = clamp(c.x, low, high);
   for (const other of s.characters) relationship(s, c.id, other.id);
   s.characters.push(c); const arrival = log(s, 'arrival', `${c.name} arrives at the house. A new story begins.`, [c.id]);
   rememberEvent(c, arrival, 'I arrived at the house, ready to begin a new chapter.', { salience: 5 });
@@ -122,6 +123,14 @@ export const TEA_MOOD = 15, TEA_AFFINITY = -25;
 export function teaGuests(s: WorldState, people: Character[]) {
   return people.filter(c => c.mood >= TEA_MOOD && people.some(o => o.id !== c.id && relationship(s, c.id, o.id).affinity >= TEA_AFFINITY));
 }
+export const floorSpan = (template: WorldTemplate, floor: number) => template.floors[floor]?.span ?? [8, 84] as const;
+/** One draw, weighted by each floor's `draw`; equal weights match the original uniform pick. */
+export function chooseFloor(template: WorldTemplate, draw: number) {
+  const weights = template.floors.map(f => f.draw ?? 1);
+  let remaining = draw * weights.reduce((sum, w) => sum + w, 0);
+  const index = weights.findIndex(w => (remaining -= w) < 0);
+  return index < 0 ? weights.length - 1 : index;
+}
 export function step(s: WorldState) {
   s.minute += MINUTES_PER_TICK;
   advanceConversations(s);
@@ -135,21 +144,22 @@ export function step(s: WorldState) {
     if (s.elevatorFloor >= template.floors.length - 1 || s.elevatorFloor <= 0) s.elevatorDirection *= -1;
   } else s.elevatorPhase = 'stopped';
   const night = s.minute % 1440 < 360 || s.minute % 1440 > 1320;
+  const trust = bestTrust(s.relationships);
   for (const c of people) {
     if ((c.speechUntil ?? 0) < s.minute) { c.speech = undefined; c.speechConversationId = undefined; }
-    Object.assign(c, residentDrift(c, s).next);
+    Object.assign(c, residentDrift(c, s, trust).next);
     if (isConversing(s, c.id)) continue;
     if (c.inElevator) {
       c.floor = s.elevatorFloor;
       c.activity = 'riding the elevator';
-      if (s.elevatorPhase === 'stopped' && c.floor === c.destination) { c.inElevator = false; c.x = 84; c.activity = 'stepping out of the elevator'; }
+      if (s.elevatorPhase === 'stopped' && c.floor === c.destination) { c.inElevator = false; c.x = floorSpan(template, c.floor)[1]; c.activity = 'stepping out of the elevator'; }
     } else if (c.destination !== c.floor) {
       c.x = Math.min(94, c.x + 15); c.activity = 'waiting for the elevator';
       if (s.elevatorPhase === 'stopped' && c.x >= 90 && s.elevatorFloor === c.floor) { c.inElevator = true; c.activity = 'riding the elevator'; }
     } else if (random(s) < .12) {
-      c.destination = night || c.energy < 20 ? 1 : Math.floor(random(s) * template.floors.length);
+      c.destination = night ? template.nightFloor ?? 1 : c.energy < 20 ? 1 : chooseFloor(template, random(s));
       c.activity = c.destination === c.floor ? template.floors[c.floor].purpose : 'heading to the elevator';
-    } else { c.x = clamp(c.x + (random(s) - .5) * 18, 8, 84); if (!c.speech) c.activity = night ? 'resting' : (template.floors[c.floor].activity ?? ['making tea', 'reading', 'tending the plants'][c.floor]); }
+    } else { const [low, high] = floorSpan(template, c.floor); c.x = clamp(c.x + (random(s) - .5) * 18, low, high); if (!c.speech) c.activity = night ? 'resting' : (template.floors[c.floor].activity ?? ['making tea', 'reading', 'tending the plants'][c.floor]); }
   }
   separateStandingResidents(s);
   advanceQuietCompanionship(s);
