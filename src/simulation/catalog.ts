@@ -32,6 +32,31 @@ export const TEMPLATES: Record<string, WorldTemplate> = {
     initialNames: ['Marin', 'Iona', 'Finn', 'Pearl', 'Casper', 'Rosa', 'Ari', 'Mae'],
     initialMetrics: { cohesion: 74, tension: 12, resources: 52 },
   },
+  // Hub and spokes: nearly every trip passes through one wide courtyard, while the
+  // upper floors are small pockets at opposite ends of the house.
+  'courtyard-house': {
+    id: 'courtyard-house', starterResidents: RESIDENT_ROSTERS['courtyard-house'], name: 'The courtyard house', description: 'Everyone crosses the open courtyard. Above it, snug balcony nooks and a rooftop orchard at the far end. Many chance meetings, and nowhere to avoid them.',
+    floors: [
+      { name: 'The open courtyard', purpose: 'cross paths in the courtyard', activity: 'sweeping the flagstones', color: '#e6d2ae', draw: 2.4 },
+      { name: 'The balcony nooks', purpose: 'share a quiet corner', activity: 'watching the courtyard', color: '#e2d6c4', span: [8, 40], draw: .6 },
+      { name: 'The rooftop orchard', purpose: 'pick fruit together', activity: 'pruning the pear trees', color: '#cfdcb9', span: [44, 84], draw: .9 },
+    ],
+    initialNames: ['Lior', 'Dalia', 'Wynn', 'Odette', 'Kasim', 'Bree', 'Tove', 'Emil'],
+    initialMetrics: { cohesion: 58, tension: 22, resources: 68 },
+  },
+  // A slender tower: every floor is narrow, and at night everyone climbs to the
+  // lantern room, so the late hours are spent close together.
+  'lantern-tower': {
+    id: 'lantern-tower', starterResidents: RESIDENT_ROSTERS['lantern-tower'], name: 'The lantern tower', description: 'A slender tower with narrow rooms. Each night everyone climbs to the lantern room to keep the light. Close quarters bring warmth and friction.',
+    floors: [
+      { name: 'The lamplit pantry', purpose: 'share a late supper', activity: 'filling the oil cans', color: '#e8d2b4', span: [28, 66], draw: 1.2 },
+      { name: 'The spiral library', purpose: 'read on the stairs', activity: 'shelving logbooks', color: '#dcd6c9', span: [28, 66], draw: .7 },
+      { name: 'The lantern room', purpose: 'keep the light burning', activity: 'polishing the lens', color: '#e9dfb0', span: [36, 60], draw: 1.1 },
+    ],
+    nightFloor: 2,
+    initialNames: ['Hesper', 'Corin', 'Maeve', 'Teodor', 'Lark', 'Ines', 'Rook', 'Elsa'],
+    initialMetrics: { cohesion: 66, tension: 24, resources: 60 },
+  },
 };
 /**
  * How an event touches each pair, kept separate from its material and house-wide effects:

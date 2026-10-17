@@ -109,7 +109,11 @@ export type Command =
 export interface WorldTemplate {
   id: string; name: string; description: string;
   // v1 houses share three floors: gathering, rest, and resource production.
-  floors: { name: string; purpose: string; color: string; activity?: string }[];
+  // Layout: `span` bounds where residents wander on a floor (map units, default 8–84),
+  // `draw` weights how often residents choose it as a destination (default 1).
+  floors: { name: string; purpose: string; color: string; activity?: string; span?: readonly [number, number]; draw?: number }[];
+  // Where residents settle at night (default: the rest floor, 1).
+  nightFloor?: number;
   initialNames: string[];
   starterResidents: readonly Pick<Character, 'name' | 'trait' | 'backstory'>[];
   initialMetrics?: { cohesion: number; tension: number; resources: number };
