@@ -1,3 +1,4 @@
+import Admin from './Admin';
 import { relationshipLabel } from './relationship-label';
 import CommunityMetrics from './CommunityMetrics';
 import IntroduceResidentButton from './IntroduceResidentButton';
@@ -48,7 +49,7 @@ function App() {
   const [guide, setGuide] = useState(false);
   const match = location.pathname.match(/^\/w\/([a-z0-9-]+)(\/insights)?\/?$/);
   return <><UpdateBanner/><header className={`site-header ${match ? 'world-site-header' : ''}`}><Logo/><nav><a href="/" className={!match ? 'active' : ''}>The worlds</a><button className="text-button" onClick={() => setGuide(true)}>Field guide <ArrowUpRight size={13}/></button><span className="header-note"><span className="status-dot"/> A little life, unfolding</span><ThemeControl/></nav></header>
-    {match ? <World slug={match[1]} insights={Boolean(match[2])}/> : location.pathname === '/' ? <Directory/> : <main className="empty-page"><h1>A path without a world.</h1><a href="/">Back to the directory</a></main>}
+    {/^\/admin\/?$/.test(location.pathname) ? <Admin/> : match ? <World slug={match[1]} insights={Boolean(match[2])}/> : location.pathname === '/' ? <Directory/> : <main className="empty-page"><h1>A path without a world.</h1><a href="/">Back to the directory</a></main>}
     {guide && <Modal title="A world with no finish line." eyebrow="THE FIELD GUIDE" onClose={() => setGuide(false)}><FieldGuide/></Modal>}
   </>;
 }

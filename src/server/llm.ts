@@ -120,8 +120,8 @@ export function dialogueDelivery(character: Character, relationship?: Relationsh
 }
 
 /** One bounded request plans a responsive exchange; the engine reveals each turn over time. */
-export async function enrichConversation(config: LLMConfig, world: WorldState, entry: LogEntry) {
-  if (!isLLMConfigured(config) || !entry.conversation) return null;
+export async function enrichConversation(config: LLMConfig, world: WorldState, entry: LogEntry, cancellation?: AbortSignal) {
+  if (!isLLMConfigured(config) || cancellation?.aborted || !entry.conversation) return null;
   const thread = entry.conversation;
   const characters = entry.characters.map(id => world.characters.find(c => c.id === id)!);
   const relationship = Object.values(world.relationships).find(r => entry.characters.includes(r.a) && entry.characters.includes(r.b));
@@ -131,9 +131,10 @@ export async function enrichConversation(config: LLMConfig, world: WorldState, e
     { role: 'user', content: JSON.stringify({ topic: thread.topic, tone: thread.tone, transcript: thread.turns, characters: characters.map(c => ({ id:c.id, name:c.name, trait:c.trait, backstory:c.backstory, mood:Math.round(c.mood), energy:Math.round(c.energy), belonging:Math.round(c.belonging), delivery:dialogueDelivery(c, characters.length > 2 ? Object.values(world.relationships).filter(r => (r.a === c.id || r.b === c.id) && entry.characters.includes(r.a) && entry.characters.includes(r.b)).sort((a, b) => a.trust - b.trust)[0] : relationship), memories:recallMemories(c, { participantIds: entry.characters.filter(id => id !== c.id), minute: entry.minute, beforeEventId: entry.id, limit: 4 }) })), relationship: promptRelationship(relationship), relationships: Object.values(world.relationships).filter(r => entry.characters.includes(r.a) && entry.characters.includes(r.b)).map(promptRelationship), participantOrder: entry.characters, joinedAtTurn: thread.joinedAtTurn, community: { setting:TEMPLATES[world.templateId], description:world.description, tension:Math.round(world.tension), cohesion:Math.round(world.cohesion) }, recentEvents: world.history.filter(e => ['event','ritual','friendship'].includes(e.kind)).slice(-3).map(e => e.text), previousConversation: [...world.history].reverse().find(e => e.id !== entry.id && e.conversation && entry.characters.every(id => e.characters.includes(id)))?.conversation?.turns }) },
   ] };
   const models = characters.map(c => resolveModel(config, c.model));
+  const timeout = AbortSignal.timeout(6_000);
+  const signal = cancellation ? AbortSignal.any([timeout, cancellation]) : timeout;
   let raw: unknown;
   if (characters.length > 2 || new Set(models).size > 1) {
-    const signal = AbortSignal.timeout(6_000);
     const context = JSON.parse(inputs.messages[1].content);
     const turns: { speakerId: string; text: string }[] = [];
     for (let i = 0; i < 3; i++) {
@@ -153,7 +154,7 @@ export async function enrichConversation(config: LLMConfig, world: WorldState, e
       } catch { return null; }
     }
     raw = JSON.stringify({ turns });
-  } else raw = await requestDialogue(config, inputs, models[0]);
+  } else raw = await requestDialogue(config, inputs, models[0], signal);
   try {
     if (typeof raw !== 'string') return null;
     const parsed = JSON.parse(raw.replace(/^```(?:json)?\s*|\s*```$/g, ''));

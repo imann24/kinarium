@@ -1,0 +1,18 @@
+.admin-page { width: min(900px, calc(100% - 40px)); margin: 48px auto 80px; }
+.admin-page > p { max-width: 720px; line-height: 1.7; }
+.admin-page h1 { margin-bottom: 20px; }
+.admin-page h2 { font-size: 1.2rem; margin: 0 0 10px; }
+.admin-page code { overflow-wrap: anywhere; }
+.admin-login, .admin-confirm { display: grid; gap: 14px; margin: 28px 0; padding: 24px; border: 1px solid var(--line); border-radius: 12px; }
+.admin-login { max-width: 460px; }
+.admin-page input { width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); color: inherit; }
+.admin-page button { padding: 10px 16px; border: 1px solid var(--line); border-radius: 6px; }
+.admin-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.admin-confirm { border: 2px solid #a33c31; }
+.admin-delete { background: #a33c31; color: white; }
+.admin-page button:disabled { opacity: .5; cursor: not-allowed; }
+.admin-houses { list-style: none; padding: 0; margin: 28px 0; }
+.admin-houses li { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 24px 0; border-bottom: 1px solid var(--line); }
+.admin-houses p { margin: 8px 0; }
+.admin-houses button { flex-shrink: 0; }
+@media (max-width: 560px) { .admin-houses li { align-items: flex-start; flex-direction: column; } .admin-confirm, .admin-login { padding: 18px; } }
