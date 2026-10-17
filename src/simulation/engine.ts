@@ -3,13 +3,14 @@ import { advanceQuietCompanionship } from './companionship';
 import { separateStandingResidents } from './standing';
 import { bestTrust, residentDrift, residentStats, recordResidentChange } from './resident-state';
 import { contactWillingness, repairScene } from './repair';
+import { advanceGestures, reactToEvent } from './event-reactions';
 import { GOODWILL_DECAY_PER_DAY, isEased, settleEasedConflict } from './goodwill';
 import { updateHouseDetails } from './house-details';
 import { advanceConversations, beginConversation, nearby as inConversationRange, isConversing, interruptConversations } from './conversations';
 import { memoryInfluence, rememberEvent } from './memories';
 import { recordEncounter, recordFriendship, recordSharedEvent } from './relationship-story';
 import { COLORS, EVENTS, TEMPLATES, TRAITS } from './catalog';
-import type { Character, Command, LogKind, Relationship, WorldState, WorldSummary, WorldTemplate } from './types';
+import type { Character, Command, LogEntry, LogKind, Relationship, WorldState, WorldSummary, WorldTemplate } from './types';
 
 export const TICK_MS = 4_000;
 export const MINUTES_PER_TICK = 2;
@@ -24,7 +25,7 @@ export const activeCharacters = (s: WorldState) => s.characters.filter(c => !c.a
 export function random(s: WorldState) { s.seed = (Math.imul(s.seed, 1664525) + 1013904223) >>> 0; return s.seed / 4294967296; }
 function pick<T>(s: WorldState, items: readonly T[]): T { return items[Math.floor(random(s) * items.length)]; }
 export function log(s: WorldState, kind: LogKind, text: string, characters: string[] = []) {
-  const entry = { id: s.nextLog++, minute: s.minute, kind, text, characters };
+  const entry: LogEntry = { id: s.nextLog++, minute: s.minute, kind, text, characters };
   s.history.push(entry); return entry;
 }
 export function relationship(s: WorldState, a: string, b: string): Relationship {
@@ -162,6 +163,7 @@ export function step(s: WorldState) {
     } else { const [low, high] = floorSpan(template, c.floor); c.x = clamp(c.x + (random(s) - .5) * 18, low, high); if (!c.speech) c.activity = night ? 'resting' : (template.floors[c.floor].activity ?? ['making tea', 'reading', 'tending the plants'][c.floor]); }
   }
   separateStandingResidents(s);
+  advanceGestures(s, () => random(s));
   advanceQuietCompanionship(s);
   if (people.length > 1 && random(s) < .48) {
     const a = pick(s, people); const nearby = people.filter(b => !isConversing(s, a.id) && !isConversing(s, b.id) && b.id !== a.id && !b.inElevator && !a.inElevator && b.floor === a.floor && b.destination === b.floor && a.destination === a.floor && inConversationRange(a, b) && a.energy >= 10 && b.energy >= 10);
@@ -241,9 +243,9 @@ export function applyCommand(s: WorldState, command: Command, now: number) {
       const beforeCommunity = communityStats(s);
       s.cohesion = clamp(s.cohesion + event.cohesion); s.tension = clamp(s.tension + event.tension); s.resources = clamp(s.resources + event.resources);
       const people = activeCharacters(s);
-      const occasion = log(s, 'event', event.text, people.map(c => c.id));
+      const occasion = log(s, 'event', event.text, people.map(c => c.id)); occasion.eventDefinitionId = event.id;
       recordCommunityChange(s, beforeCommunity, event.name, occasion.id);
-      for (const c of people) { const before = residentStats(c); c.mood = clamp(c.mood + event.mood); recordResidentChange(c, before, s.minute, event.name, occasion.id); rememberEvent(c, occasion, `I was here for ${event.name.toLowerCase()}. ${event.text}`, { tone: event.mood > 0 ? 'warm' : event.mood < 0 ? 'tense' : 'neutral', salience: 3 }); if (event.tone === 'kind') c.destination = 0; }
+      for (const c of people) { const before = residentStats(c); c.mood = clamp(c.mood + event.mood); recordResidentChange(c, before, s.minute, event.name, occasion.id); if (event.tone === 'kind') c.destination = 0; }
       // Material relief is felt in mood and calm; trust moves only when people actually share a moment.
       if (event.relational === 'relief') s.reliefUntil = s.minute + RELIEF_MINUTES;
       if (event.relational === 'gathering' || event.relational === 'strain') for (let i = 0; i < people.length; i++) for (let j = i + 1; j < people.length; j++) {
@@ -252,6 +254,11 @@ export function applyCommand(s: WorldState, command: Command, now: number) {
         const [affinity, trust] = event.relational === 'strain' ? [-2, -2] : open ? [3, 1] : [1, 0];
         r.affinity = clamp(r.affinity + affinity, -100, 100); recordSharedEvent(r, event.name, r.affinity - previous, occasion); r.trust = clamp(r.trust + trust);
       }
+      // Then each resident responds in their own way; some decide to make a peace offering.
+      const { reactions, gestures } = reactToEvent(s, event, occasion, people);
+      const shown = reactions.filter(x => x.label !== 'kept to themselves').slice(0, 3);
+      if (shown.length) occasion.text += ` ${shown.map(x => `${x.character.name} ${x.label}`).join('; ')}.`;
+      for (const g of gestures.slice(0, 2)) occasion.text += ` ${g.from.name} goes looking for ${g.to.name}.`;
       break;
     }
     case 'settings': {

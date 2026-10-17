@@ -17,6 +17,17 @@ export function contactWillingness(r: Relationship, minute?: number) {
 /** After a refusal, the next bid waits six hours, doubling with each further refusal up to a day. */
 export const repairWait = (refusals: number) => refusals ? 360 * 2 ** Math.min(2, refusals - 1) : 120;
 
+/**
+ * Mood, temperament, time and past follow-through affect readiness; refusal remains possible.
+ * Goodwill from honored choices raises readiness and the floor under it. Space that was
+ * asked for and given also makes the next bid on the same disagreement easier to accept.
+ */
+export function repairReadiness(world: WorldState, a: Character, b: Character, r: Relationship, refused = 0, bonus = 0) {
+  const openness = (c: Character) => c.mood / 400 + (c.trait === 'kind' ? .1 : c.trait === 'reserved' ? -.06 : c.trait === 'spirited' ? -.03 : 0);
+  return Math.max(.08 + goodwill(r) * .02, Math.min(.8, .2 + r.trust / 250 + r.affinity / 500
+    + Math.min(openness(a), openness(b)) - world.tension / 400 + goodwill(r) * .03 + Math.min(.3, refused * .1) + bonus));
+}
+
 export function repairScene(world: WorldState, a: Character, b: Character, r: Relationship, roll: number) {
   const historical = [...world.history].reverse().find(e => e.kind === 'conflict' && !e.conversation?.repair && e.conversation?.status === 'finished' && e.characters.includes(a.id) && e.characters.includes(b.id));
   const conflict = r.unresolvedConflict ?? (historical ? { id: historical.id, minute: historical.minute, topic: historical.conversation!.topic } : undefined);
@@ -26,13 +37,7 @@ export function repairScene(world: WorldState, a: Character, b: Character, r: Re
   if (since < repairWait(refused) || a.energy < 25 || b.energy < 25) return;
   const following = r.repairCommitment?.conflictId === conflict.id;
   if (following && r.repairCommitment!.initiatorId !== a.id) return;
-  // Mood, temperament, time and past follow-through affect readiness; refusal remains possible.
-  // Goodwill from honored choices raises readiness and the floor under it. Space that was
-  // asked for and given also makes the next bid on the same disagreement easier to accept.
-  const openness = (c: Character) => c.mood / 400 + (c.trait === 'kind' ? .1 : c.trait === 'reserved' ? -.06 : c.trait === 'spirited' ? -.03 : 0);
-  const readiness = Math.max(.08 + goodwill(r) * .02, Math.min(.8, .2 + r.trust / 250 + r.affinity / 500
-    + Math.min(openness(a), openness(b)) - world.tension / 400 + goodwill(r) * .03 + Math.min(.3, refused * .1)));
-  const accepted = roll < readiness;
+  const accepted = roll < repairReadiness(world, a, b, r, refused);
   const topic = conflict.topic;
   const variant = (world.nextLog + Math.floor((r.lastRepairMinute ?? conflict.minute) / 120)) % 3;
   const openings = [
@@ -73,6 +78,7 @@ export function finishRepair(world: WorldState, entry: LogEntry, interrupted: bo
   const r = world.relationships[[...entry.characters].sort().join(':')];
   if (!r) return;
   repair.applied = true;
+  if (repair.phase === 'gesture') return finishGesture(world, entry, r, interrupted);
   r.lastRepairMinute = world.minute;
   if (interrupted) { entry.text += ' Repair paused; no trust or wellbeing restored.'; return; }
   // A stale plan cannot settle a newer disagreement or reward the same repair twice.
@@ -112,4 +118,35 @@ export function finishRepair(world: WorldState, entry: LogEntry, interrupted: bo
     r.lastConnectionMinute = world.minute;
   }
   entry.text += repair.accepted ? ` ${repair.phase === 'follow-through' ? 'A respected choice rebuilds some trust' : 'They agree to try asking first'}; mood and belonging improve, and house tension eases. The disagreement is not erased.` : kept ? ' They asked first, as promised, and the choice of space is respected; the kept promise rebuilds a little trust and goodwill.' : ' The request for space is respected, which builds a little goodwill.';
+}
+
+/**
+ * A peace offering prompted by a house event. It does not ask for a promise or start the
+ * repair wait over; it is a small gesture whose welcome depends on the same readiness.
+ */
+function finishGesture(world: WorldState, entry: LogEntry, r: Relationship, interrupted: boolean) {
+  const repair = entry.conversation!.repair!;
+  if (interrupted) { entry.text += ' The offering was set aside before it could be given.'; return; }
+  if (r.repairedConflictId === repair.conflictId || r.unresolvedConflict?.id !== repair.conflictId) return;
+  r.encounters++; r.lastMinute = world.minute;
+  const previous = r.affinity;
+  const topic = repair.topic ?? r.unresolvedConflict.topic;
+  if (repair.accepted) { r.trust = bound(r.trust + 1); r.affinity = bound(r.affinity + 3, -100); }
+  recordRepair(r, entry, topic, r.affinity - previous);
+  // A gift given without pressure counts for something even when it is declined.
+  addGoodwill(r, repair.accepted ? 1 : .5, world.minute);
+  if (repair.accepted) {
+    const beforeCommunity = communityStats(world);
+    world.tension = bound(world.tension - .5);
+    for (const id of entry.characters) {
+      const c = world.characters.find(person => person.id === id);
+      if (!c) continue;
+      const before = residentStats(c);
+      c.mood = bound(c.mood + 1); c.belonging = bound(c.belonging + 1);
+      recordResidentChange(c, before, world.minute, 'Peace offering accepted', entry.id);
+    }
+    recordCommunityChange(world, beforeCommunity, 'Peace offering accepted', entry.id);
+    r.lastConnectionMinute = world.minute;
+  }
+  entry.text += repair.accepted ? ' The offering is accepted; a little trust returns, though the disagreement is still open.' : ' The offering is declined and left without pressure, which still builds a little goodwill.';
 }

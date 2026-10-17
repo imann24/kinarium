@@ -1,4 +1,4 @@
-import { EVENTS } from './catalog';
+import { EVENTS, eventDefinition } from './catalog';
 import type { Character, LogEntry, Memory, WorldState } from './types';
 
 export interface HistoryEpisode {
@@ -52,7 +52,7 @@ export function buildResidentSummary(character: Character, characters: Character
       existing.text = kind === 'ritual' ? `I joined evening tea ${existing.memories.length} times.` : `I ${kind === 'conflict' ? 'had disagreements' : 'talked'} with ${companion} ${existing.memories.length} times${shortTopic}.`;
       continue;
     }
-    const occasion = event && EVENTS.find(candidate => candidate.text === event.text);
+    const occasion = eventDefinition(event);
     const text = kind === 'arrival' ? returnVisit ? 'I returned to the house after time away.' : 'I arrived at the house.'
       : kind === 'departure' ? 'I took some time away from the house.'
       : kind === 'friendship' ? `I became friends with ${companion}.`

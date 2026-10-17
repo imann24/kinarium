@@ -50,7 +50,7 @@ export function recordSharedEvent(r: Relationship, name: string, delta: number, 
 export function recordRepair(r: Relationship, entry: LogEntry, topic: string, delta: number) {
   const repair = entry.conversation!.repair!;
   const [initiator, responder] = entry.characters;
-  if (repair.phase === 'offer') perspective(r, initiator).repairsOffered++;
+  if (repair.phase === 'offer' || repair.phase === 'gesture') perspective(r, initiator).repairsOffered++;
   if (!repair.accepted) {
     perspective(r, responder).spaceRequested++;
     // Asking first and honoring the answer is the promise itself.

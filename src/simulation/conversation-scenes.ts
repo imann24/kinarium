@@ -1,5 +1,5 @@
 import { EVENT_REPLIES } from './event-voices';
-import { EVENTS, TEMPLATES } from './catalog';
+import { EVENTS, TEMPLATES, eventDefinition } from './catalog';
 import { dialogueMemory, memoryExcerpt, statefulProgression } from './dialogue-context';
 import type { Character, Trait, WorldState } from './types';
 
@@ -129,7 +129,7 @@ export function chooseConversationScene(world: WorldState, a: Character, b: Char
     ], previous?.conversation?.tone === 'tense' || recalled ? 24 : 12);
   }
   const event = [...world.history].reverse().find(e => e.kind === 'event' && world.minute - e.minute >= 0 && world.minute - e.minute < 120);
-  const definition = EVENTS.find(e => e.text === event?.text);
+  const definition = eventDefinition(event);
   if (event && definition) {
     const questions: Record<string, string> = {
       'shared-meal': 'After the shared meal, I wonder what makes eating together comfortable for you.',
