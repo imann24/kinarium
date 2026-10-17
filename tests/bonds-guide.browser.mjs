@@ -61,6 +61,18 @@ try {
       assert.equal(await opener.evaluate(el => el === document.activeElement), true);
     }
   }
+  await page.setViewportSize({ width: 390, height: 844 });
+  const bond = page.locator('.bond-card').first();
+  const pair = (await bond.locator('b').innerText()).replace(/\s+/g, ' ').trim().replace(' & ', ' and ');
+  await bond.click();
+  const story = page.getByRole('dialog', { name: pair });
+  await story.waitFor();
+  assert.equal(await page.locator('.character-detail').count(), 0);
+  assert.equal(await story.evaluate(el => el.scrollWidth <= el.clientWidth), true);
+  await page.screenshot({ path: '/tmp/kinarium-bond-modal-390.png' });
+  await page.keyboard.press('Escape');
+  await story.waitFor({ state: 'detached' });
+  assert.equal(await bond.evaluate(el => el === document.activeElement), true);
   snapshot.world.characters[1].away = true;
   await page.goto(`${origin}/w/bonds-guide/insights?connections=close`);
   await page.getByLabel('Explore connections').waitFor();
@@ -71,5 +83,5 @@ try {
   await page.getByLabel('Explore connections').selectOption('strained');
   assert.match(await page.locator('.insights-bond').innerText(), /Trust 20/);
   assert.deepEqual(errors, []);
-  console.log('PASS: live presence changes, both away, restored bonds, unchanged relationship records, Insights scope/filters, guide keyboard/focus/Escape, responsive light/dark 1440/390/320, axe WCAG A/AA when configured, no page errors');
+  console.log('PASS: live presence changes, both away, restored bonds, unchanged relationship records, Insights scope/filters, guide keyboard/focus/Escape, bond card opens connection modal on phone width, responsive light/dark 1440/390/320, axe WCAG A/AA when configured, no page errors');
 } finally { await browser.close(); }
