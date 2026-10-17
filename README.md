@@ -41,6 +41,8 @@ There are deliberately no accounts, ownership privileges, direct NPC controls, o
 
 Event allowances are enforced on the server and saved in SQLite, atomically with successful events. A per-world, HttpOnly anonymous player cookie shares the allowance across tabs and refreshes; changing an observer name does not reset it. Failed events do not spend an allowance. The UI shows remaining events, refill progress, and separate personal/world countdowns using server time. Without accounts, clearing cookies or switching browsers creates a new anonymous player. Change the limits in `src/simulation/event-budget.ts`.
 
+On touch screens an event card triggers on a single tap: the hover lift only applies where a fine pointer can hover, so iOS never spends the first tap on hover. The allowance, the shared cooldown and the disabled state while a request is pending are the safeguards against accidental triggers; there is no confirm step. `tests/one-tap-events.browser.mjs` checks this with local snapshots on an emulated phone at 390/320px in light and dark.
+
 ## Architecture and technology choice
 
 **React + TypeScript + Vite** for the browser. **Cloudflare Workers + SQLite-backed Durable Objects** for the backend and database. Worker static assets serve the SPA from the same origin.
