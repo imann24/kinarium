@@ -11,3 +11,6 @@ export function useMediaQuery(query: string) {
   }, [query]);
   return matches;
 }
+
+/** Portrait phones, plus phones held sideways (wider than 760px but short, with touch only). */
+export const PHONE_QUERY = '(max-width: 760px), (orientation: landscape) and (max-height: 500px) and (hover: none) and (pointer: coarse)';

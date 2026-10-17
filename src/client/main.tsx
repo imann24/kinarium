@@ -40,6 +40,7 @@ import { useFullscreenCanvas } from './useFullscreenCanvas';
 import { useWorldViewport } from './useWorldViewport';
 import './compact-world-header.css';
 import './larger-house-scene.css';
+import './phone-landscape.css';
 import './resident-modal.css';
 import { isAppropriate } from '../simulation/content-filter';
 

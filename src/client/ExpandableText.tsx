@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
-import { useMediaQuery } from './useMediaQuery';
+import { PHONE_QUERY, useMediaQuery } from './useMediaQuery';
 
 // Real reading time, independent of simulation minutes and snapshot frequency.
 export const EXPANDED_SPEECH_MS = 45_000;
@@ -26,7 +26,7 @@ export function SpeechBubble({ text, name, x, y, residentId, conversationLabel =
 }) {
   const [expanded, setExpanded] = useState(false);
   // The scene shrinks to phone width, so expanded speech reads in a viewport-sized sheet instead.
-  const sheet = useMediaQuery('(max-width: 760px)') && expanded;
+  const sheet = useMediaQuery(PHONE_QUERY) && expanded;
   const bubbleRef = useRef<SVGElement | null>(null);
   const setBubble = (el: SVGElement | null) => { bubbleRef.current = el; };
   const sheetRef = useRef<HTMLDivElement>(null);
