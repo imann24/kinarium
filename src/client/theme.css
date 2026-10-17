@@ -123,3 +123,8 @@
 :root[data-theme='light'] :is(.fullscreen-toggle,.bond-card b span,.guide-copy b) { color:var(--secondary); }
 
 :root .template-preview p { color:var(--secondary); }
+
+/* Fullscreen is not useful on phones; keep the button while fullscreen so it can still be exited. */
+@media (max-width:760px), (hover:none) and (pointer:coarse) {
+  .world-page:not(.world-fullscreen) .fullscreen-toggle { display:none; }
+}
