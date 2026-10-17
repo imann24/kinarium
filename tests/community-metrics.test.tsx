@@ -23,6 +23,9 @@ describe('community score explanations', () => {
     expect(communityDrift(world).next).toMatchObject({ tension: 100, cohesion: 0 });
     expect(communityMetricDetails(world, 'tension').current.join(' ')).toContain('+0.06');
     expect(communityMetricDetails(world, 'tension').current.join(' ')).toContain('limits: 0');
+    expect(communityMetricDetails(world, 'tension').headline).toBe('Holding steady between encounters and events.');
+    world.tension = 50;
+    expect(communityMetricDetails(world, 'tension').headline).toBe('Drifting +0.06 per step between encounters and events, because supplies are scarce.');
   });
   it('shares the engine’s actual end-of-step formula', () => {
     const world = createWorld({ slug: 'empty', name: 'Empty', populationCap: 1 }, 0, 42);

@@ -15,11 +15,19 @@ export function communityMetricDetails(w: WorldState, metric: CommunityMetric) {
       : 'At current positions, supplies stay at or above 20 after consumption and production, so scarcity adds no pressure.',
     `Net ongoing change after the 0–100 limits: ${signedMetric(drift.next[metric] - w[metric])} per step. Encounters and events are separate.`,
   ];
+  const net = drift.next[metric] - w[metric];
+  const headline = Math.abs(net) < .0005 ? 'Holding steady between encounters and events.'
+    : `Drifting ${signedMetric(net)} per step between encounters and events${drift.scarcity && metric !== 'resources' ? ', because supplies are scarce' : ''}.`;
+  const summary = {
+    cohesion: 'How connected the house feels. Warm encounters, repair and shared tea build it.',
+    tension: 'How much strain the house is carrying. Disagreements and scarcity raise it; warmth and repair ease it.',
+    resources: 'How well stocked the house’s shared supplies are. Residents use them; practical residents replenish them.',
+  }[metric];
   const meaning = {
     cohesion: 'Togetherness is a running measure of connection in the house, not an average of residents’ belonging or relationships. Warm encounters, completed repair, shared tea and introduced events can change it.',
     tension: 'Tension is a running measure of strain in the house, not a count of unresolved disagreements. Disagreements and scarcity raise it; warm encounters, accepted repair and comfortable quiet company can ease it. Introduced events and unshared evenings can also change it.',
     resources: 'Shared resources is the house’s running supply score. Residents consume supplies; practical residents on the supply floor replenish them. Shared evening tea and introduced events also change it.',
   }[metric];
   const recent = (w.communityChanges ?? []).filter(c => c.minute <= w.minute && w.minute - c.minute <= 360 && c[metric] !== 0).slice(-5).reverse();
-  return { meaning, current, recent };
+  return { summary, headline, meaning, current, recent };
 }

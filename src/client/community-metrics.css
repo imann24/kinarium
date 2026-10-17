@@ -13,5 +13,10 @@
 .metric-details .metric-changes { padding:0; list-style:none; }
 .metric-changes li { display:grid; grid-template-columns:1fr auto; column-gap:12px; border-top:1px solid var(--line); padding-top:7px; }
 .metric-changes small { grid-column:1 / -1; color:var(--muted); }
+.metric-details .metric-headline b { font-weight:600; }
+.metric-more { margin-top:10px; border-top:1px solid var(--line); padding-top:6px; }
+.metric-more>summary { cursor:pointer; padding:4px 0; color:var(--muted); font-size:11px; }
+.metric-more>summary:hover,.metric-more[open]>summary { color:inherit; }
+.metric-more>summary:focus-visible { outline:3px solid var(--green); outline-offset:3px; border-radius:3px; }
 .metric-details .icon-button { min-width:32px; min-height:32px; }
 :root[data-theme='dark'] .metric-details { box-shadow:0 8px 30px #0005; }

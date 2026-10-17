@@ -21,6 +21,7 @@ export default function CommunityMetrics({ world }: { world: WorldState }) {
   const [active, setActive] = useState<CommunityMetric>();
   const [pinned, setPinned] = useState(false);
   const [position, setPosition] = useState({ top: 0, left: 12 });
+  const [layout, setLayout] = useState(0), relayout = () => setLayout(n => n + 1);
   const close = (restore = false) => {
     dismissed.current = active;
     if (restore && active) {
@@ -50,7 +51,7 @@ export default function CommunityMetrics({ world }: { world: WorldState }) {
     };
     place(); window.addEventListener('resize', place); window.addEventListener('scroll', place, true);
     return () => { window.removeEventListener('resize', place); window.removeEventListener('scroll', place, true); };
-  }, [active, world]);
+  }, [active, world, layout]);
   const detail = active ? communityMetricDetails(world, active) : undefined;
   const label = metrics.find(m => m.key === active)?.label;
   return <section ref={root} className="community-stats world-summary metric-summary" aria-label="Community summary"
@@ -71,15 +72,20 @@ export default function CommunityMetrics({ world }: { world: WorldState }) {
       <div className="stat-track" aria-hidden="true"><span style={{ width: `${world[key]}%`, background: color }}/></div>
       <p>{description(world[key])}</p>
     </button>)}
-    {detail && active && <div ref={panel} id={`${id}-details`} role="dialog" aria-modal="false" aria-labelledby={`${id}-title`} tabIndex={-1}
+    {detail && active && <div ref={panel} key={active} id={`${id}-details`} role="dialog" aria-modal="false" aria-labelledby={`${id}-title`} tabIndex={-1}
       className="metric-details" style={position}>
       <div className="metric-details-heading"><h3 id={`${id}-title`}>{label} · {signedMetric(world[active]).replace(/^\+/, '')}/100</h3>
         <button type="button" className="icon-button" aria-label="Close score details" onClick={() => close(true)}><X size={16}/></button></div>
-      <p>{detail.meaning}</p><p className="metric-note">Scores accumulate from the house’s starting state and stay between 0 and 100. They are not a sum of the factors shown here.</p>
-      <h4>Current pressures</h4><p className="metric-note">Per simulation step (2 minutes), using current positions. Movement and new encounters can change these.</p>
-      <ul>{detail.current.map(text => <li key={text}>{text}</li>)}</ul>
-      <h4>Recent recorded changes</h4><p className="metric-note">Up to five changes in the last six simulation hours. Ongoing pressures above are separate; older saves have no backfilled causes.</p>
-      {detail.recent.length ? <ul className="metric-changes">{detail.recent.map(change => <li key={`${change.eventId}:${change.minute}`}><span>{change.cause}</span><b>{signedMetric(change[active])}</b><small>{gameTime(change.minute)}</small></li>)}</ul> : <p>No recorded changes for this score in this window.</p>}
+      <p>{detail.summary}</p>
+      <p className="metric-headline"><b>Right now:</b> {detail.headline}</p>
+      <h4>Recent changes</h4>
+      {detail.recent.length ? <ul className="metric-changes">{detail.recent.map(change => <li key={`${change.eventId}:${change.minute}`}><span>{change.cause}</span><b>{signedMetric(change[active])}</b><small>{gameTime(change.minute)}</small></li>)}</ul> : <p className="metric-note">None recorded in the last six simulation hours.</p>}
+      <details className="metric-more" onToggle={relayout}><summary>Read more about current pressures</summary>
+        <p className="metric-note">Per simulation step (2 minutes), using current positions. Movement and new encounters can change these.</p>
+        <ul>{detail.current.map(text => <li key={text}>{text}</li>)}</ul></details>
+      <details className="metric-more" onToggle={relayout}><summary>Read more about how this score works</summary>
+        <p>{detail.meaning}</p><p className="metric-note">Scores accumulate from the house’s starting state and stay between 0 and 100. They are not a sum of the factors shown here.</p>
+        <p className="metric-note">Recent changes lists up to five recorded changes in the last six simulation hours. Ongoing pressures are separate; older saves have no backfilled causes.</p></details>
     </div>}
   </section>;
 }
