@@ -25,7 +25,7 @@ describe('model configuration and selection', () => {
   it('ships canonical production model IDs and an allowed default', () => {
     const wrangler = JSON.parse(readFileSync(new URL('../wrangler.jsonc', import.meta.url),'utf8').replace(/^\s*\/\/.*$/gm,''));
     const ids = wrangler.vars.LLM_ALLOWED_MODELS.split(',');
-    expect(ids).toHaveLength(3);
+    expect(ids).toHaveLength(6);
     expect(ids.every((id: string)=>id.startsWith('@cf/'))).toBe(true);
     expect(ids).toContain(wrangler.vars.LLM_DEFAULT_MODEL);
     expect(wrangler.env.local.vars.LLM_PROVIDER).toBe('disabled');
@@ -120,5 +120,23 @@ describe('mixed-model authorship', () => {
     const run = vi.fn().mockResolvedValue({response:'invalid'});
     expect(conversationCallCount(config,world,entry)).toBe(1);
     await enrichConversation({...config,AI:{run}},world,entry); expect(run.mock.calls[0][0]).toBe('model-b');
+  });
+});
+
+describe('dialogue model registry and fallback', () => {
+  const base = { LLM_ALLOWED_MODELS: '@cf/meta/llama-3.1-8b-instruct-fp8,@cf/google/gemma-4-26b-a4b-it', LLM_DEFAULT_MODEL: '@cf/meta/llama-3.1-8b-instruct-fp8' };
+  it('sends per-model fields and falls back once to the default on error', async () => {
+    const { world, entry } = fixture(); world.characters.forEach(c => { c.model = '@cf/google/gemma-4-26b-a4b-it'; });
+    const run = vi.fn().mockRejectedValueOnce(new Error('boom')).mockResolvedValue({ response: 'invalid' });
+    await enrichConversation({ AI: { run }, ...base }, world, entry);
+    expect(run.mock.calls.map(c => c[0])).toEqual(['@cf/google/gemma-4-26b-a4b-it', '@cf/meta/llama-3.1-8b-instruct-fp8']);
+    expect(run.mock.calls[0][1].chat_template_kwargs).toEqual({ enable_thinking: false });
+    expect(run.mock.calls[1][1].chat_template_kwargs).toBeUndefined();
+  });
+  it('reserves a second call for registry models that can fall back', () => {
+    const { world, entry } = fixture(); world.characters.forEach(c => { c.model = '@cf/google/gemma-4-26b-a4b-it'; });
+    expect(conversationCallCount(base, world, entry)).toBe(2);
+    world.characters.forEach(c => { c.model = undefined; });
+    expect(conversationCallCount(base, world, entry)).toBe(1);
   });
 });
