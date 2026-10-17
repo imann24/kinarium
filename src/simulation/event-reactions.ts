@@ -103,7 +103,7 @@ function planGestures(world: WorldState, event: EventDefinition, occasion: LogEn
     if (!from.inElevator) from.destination = target.to.floor;
     from.activity = `looking for ${target.to.name}`;
   }
-  world.pendingGestures = pending;
+  world.pendingGestures = pending.length ? pending : undefined;
   return planned;
 }
 
