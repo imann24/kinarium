@@ -23,4 +23,18 @@ button.expandable-text[aria-expanded=true]{cursor:text}
 .speech-box.expanded .expandable-text{flex:0 1 auto;min-height:0}
 .speech-heading,.speech-conversation,.speech-unlinked,.speech-lifetime{flex-shrink:0}
 /* New previews must not cover the text currently being read. */
-.building:has(.speech-box.expanded) .speech-box:not(.expanded){visibility:hidden}
+.building:has(.speech-box.expanded,.speech-anchor) .speech-box:not(.expanded){visibility:hidden}
+.speech-box .expandable-text{touch-action:manipulation}
+
+/* Phones: expanded speech leaves the scaled scene for a readable, viewport-bound sheet. */
+.speech-sheet{position:fixed;z-index:40;left:max(12px,env(safe-area-inset-left));right:max(12px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom));pointer-events:auto;font-size:16px;animation:speech-sheet-in .14s ease-out}
+.speech-sheet .speech-content{max-height:min(70vh,70dvh);padding:12px 14px 14px;border-radius:12px;box-shadow:0 8px 30px #25302133;line-height:1.5}
+.speech-box.speech-sheet .expandable-text{max-height:none;overflow:auto;overscroll-behavior:contain;font-size:16px}
+.speech-sheet .speech-heading{align-items:center;margin-bottom:6px}
+.speech-sheet .speech-speaker{margin:0;padding:0;font-size:16px}
+.speech-sheet .speech-dismiss{width:44px;height:44px;margin:-8px -8px -8px 0}
+.speech-sheet .speech-conversation{min-height:44px;margin-top:12px;font-size:15px}
+.speech-sheet .speech-unlinked{margin-top:12px;font-size:13px}
+.speech-sheet .speech-lifetime{margin-top:12px}
+@keyframes speech-sheet-in{from{opacity:0;transform:translateY(12px)}}
+@media (prefers-reduced-motion:reduce){.speech-sheet{animation:none}}
