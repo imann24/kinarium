@@ -10,3 +10,21 @@
 .resident-state ul { padding-left: 18px; }
 .resident-state-events li { margin-bottom: 12px; }
 .resident-state-events strong, .resident-state-events small, .resident-state-events span { display: block; }
+.resident-state h5 { margin: 10px 0 2px; color: var(--text); font-size: 12px; }
+.delta-groups section small { display: block; color: var(--muted); }
+.delta-row { display: grid; grid-template-columns: minmax(70px, 28%) 1fr 4.2em; align-items: center; gap: 8px; }
+.delta-strong .delta-label, .delta-strong .delta-value { color: var(--text); font-weight: 600; }
+.delta-track { position: relative; height: 8px; border-radius: 4px; background: var(--surface-soft); }
+.delta-track::before { content: ''; position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: var(--control-border); }
+.delta-track i { position: absolute; top: 0; bottom: 0; width: var(--size); border-radius: 4px; background: var(--muted); }
+.delta-row[data-tone=good] .delta-track i { left: 50%; background: var(--change-good); }
+.delta-row[data-tone=bad] .delta-track i { right: 50%; background: var(--change-bad); }
+.delta-value { text-align: right; font-variant-numeric: tabular-nums; font-weight: 500; }
+.delta-row[data-tone=good] .delta-value, .delta-chip[data-tone=good] b { color: var(--change-good); }
+.delta-row[data-tone=bad] .delta-value, .delta-chip[data-tone=bad] b { color: var(--change-bad); }
+.delta-row[data-tone=flat] .delta-value, .delta-chip[data-tone=flat] { color: var(--muted); }
+.delta-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 3px 0; }
+.delta-chip { padding: 1px 8px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface-soft); font-variant-numeric: tabular-nums; }
+.delta-chip[data-tone=good] { border-color: var(--change-good); }
+.delta-chip[data-tone=bad] { border-color: var(--change-bad); }
+.resident-state-events .delta-chips { display: flex; }
