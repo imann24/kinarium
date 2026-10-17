@@ -1,6 +1,6 @@
 import { communityStats, recordCommunityChange } from './community-state';
 import { addGoodwill, goodwill, repairRefusals } from './goodwill';
-import { recordRepair } from './relationship-story';
+import { markArc, recordRepair } from './relationship-story';
 import { recordResidentChange, residentStats } from './resident-state';
 import type { Character, Conversation, LogEntry, Relationship, WorldState } from './types';
 
@@ -80,7 +80,7 @@ export function finishRepair(world: WorldState, entry: LogEntry, interrupted: bo
   repair.applied = true;
   if (repair.phase === 'gesture') return finishGesture(world, entry, r, interrupted);
   r.lastRepairMinute = world.minute;
-  if (interrupted) { entry.text += ' Repair paused; no trust or wellbeing restored.'; return; }
+  if (interrupted) { entry.text += ' The conversation was cut short before either could finish.'; return; }
   // A stale plan cannot settle a newer disagreement or reward the same repair twice.
   if (r.repairedConflictId === repair.conflictId || (r.unresolvedConflict && r.unresolvedConflict.id !== repair.conflictId)) return;
   if (repair.phase === 'offer' && r.repairCommitment?.conflictId === repair.conflictId) return;
@@ -95,12 +95,18 @@ export function finishRepair(world: WorldState, entry: LogEntry, interrupted: bo
   const gain = repair.accepted ? (kept ? 7 : 1) : kept ? 2 : .5;
   r.trust = bound(r.trust + gain);
   r.affinity = bound(r.affinity + (repair.accepted ? 2 : 0), -100);
-  recordRepair(r, entry, topic, r.affinity - previous);
+  const arc = recordRepair(r, entry, topic, r.affinity - previous);
   addGoodwill(r, kept ? 2 : 1, world.minute);
+  if (!repair.accepted) r.lastRefusedMinute = world.minute;
+  // Turning points lead the story: the first time they agree to try, and the repair completing.
+  if (repair.accepted && repair.phase === 'offer' && arc.accepted === 0) entry.highlight = 'first-offer';
   // Refusals lengthen the wait before asking again; acceptance resets it.
   r.repairRefusals = repair.accepted ? undefined : { conflictId: repair.conflictId, count: repairRefusals(r, repair.conflictId) + 1 };
   if (repair.accepted && repair.phase === 'offer') r.repairCommitment = { conflictId: repair.conflictId, initiatorId: entry.characters[0] };
-  if (repair.accepted && repair.phase === 'follow-through') { r.repairedConflictId = repair.conflictId; r.repairCommitment = undefined; r.unresolvedConflict = undefined; r.easedMinute = undefined; r.repairRefusals = undefined; }
+  if (repair.accepted && repair.phase === 'follow-through') {
+    r.repairedConflictId = repair.conflictId; r.repairCommitment = undefined; r.unresolvedConflict = undefined; r.easedMinute = undefined; r.repairRefusals = undefined;
+    markArc(r, repair.conflictId, 'settled', entry); entry.highlight = 'settled';
+  }
   if (repair.accepted) {
     const beforeCommunity = communityStats(world);
     const followThrough = repair.phase === 'follow-through';
@@ -117,7 +123,8 @@ export function finishRepair(world: WorldState, entry: LogEntry, interrupted: bo
     recordCommunityChange(world, beforeCommunity, followThrough ? 'Repair: choice respected' : 'Repair: tension acknowledged', entry.id);
     r.lastConnectionMinute = world.minute;
   }
-  entry.text += repair.accepted ? ` ${repair.phase === 'follow-through' ? 'A respected choice rebuilds some trust' : 'They agree to try asking first'}; mood and belonging improve, and house tension eases. The disagreement is not erased.` : kept ? ' They asked first, as promised, and the choice of space is respected; the kept promise rebuilds a little trust and goodwill.' : ' The request for space is respected, which builds a little goodwill.';
+  // The journal tells what happened between them; score changes live in the explanations.
+  entry.text += repair.accepted ? ` ${repair.phase === 'follow-through' ? 'A respected choice settles their disagreement, though they are still cautious.' : 'They agree to try asking first. The disagreement is not erased.'}` : kept ? ' They asked first, as promised, and the choice of space is respected.' : ' The request for space is respected.';
 }
 
 /**
@@ -133,6 +140,7 @@ function finishGesture(world: WorldState, entry: LogEntry, r: Relationship, inte
   const topic = repair.topic ?? r.unresolvedConflict.topic;
   if (repair.accepted) { r.trust = bound(r.trust + 1); r.affinity = bound(r.affinity + 3, -100); }
   recordRepair(r, entry, topic, r.affinity - previous);
+  if (!repair.accepted) r.lastRefusedMinute = world.minute;
   // A gift given without pressure counts for something even when it is declined.
   addGoodwill(r, repair.accepted ? 1 : .5, world.minute);
   if (repair.accepted) {
@@ -148,5 +156,5 @@ function finishGesture(world: WorldState, entry: LogEntry, r: Relationship, inte
     recordCommunityChange(world, beforeCommunity, 'Peace offering accepted', entry.id);
     r.lastConnectionMinute = world.minute;
   }
-  entry.text += repair.accepted ? ' The offering is accepted; a little trust returns, though the disagreement is still open.' : ' The offering is declined and left without pressure, which still builds a little goodwill.';
+  entry.text += repair.accepted ? ' The offering is accepted, though the disagreement is still open.' : ' The offering is declined and left without pressure.';
 }

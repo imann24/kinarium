@@ -16,3 +16,41 @@
 .world-sidebar[hidden] {
   display: none;
 }
+
+/* Story highlights and folded repair attempts. */
+.journal-highlight {
+  display: inline-block;
+  margin-bottom: 4px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 9px;
+  letter-spacing: .2px;
+  color: var(--accent, #6c835e);
+  background: var(--surface-soft, #eef3e5);
+}
+.journal-entry.highlighted .timeline-icon {
+  color: var(--accent, #6c835e);
+}
+.journal-arc {
+  margin-top: 6px;
+  font-size: 11px;
+  line-height: 1.7;
+  font-style: italic;
+  color: var(--secondary, #7c8870);
+}
+.journal-arc-earlier {
+  margin-top: 4px;
+  font-size: 10px;
+  color: var(--muted, #8b9182);
+}
+.journal-arc-earlier summary {
+  cursor: pointer;
+}
+.journal-arc-earlier ul {
+  margin: 6px 0 0;
+  padding-left: 14px;
+}
+.journal-arc-earlier li {
+  margin-bottom: 6px;
+  line-height: 1.7;
+}

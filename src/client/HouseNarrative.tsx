@@ -10,8 +10,8 @@ export default function HouseNarrative({ world }: { world: WorldState }) {
     <div className="house-narrative-copy">
       <p>{narrative.atmosphere}</p>
       {narrative.moments.length ? <p>{narrative.moments.map(moment => <span key={moment.id}>{moment.text} <small>({gameTime(moment.minute)})</small>{' '}</span>)}</p> : <p>{narrative.empty}</p>}
-      <p className="insights-note">Selected retained moments · last six simulation hours. Records may be incomplete.</p>
-      <details><summary>About this reading</summary><p>Whole house, including recorded interactions with residents now away. Selected moments from the last six simulation hours; current atmosphere uses the house’s togetherness and tension scores. The statistics filters do not change this reading.</p><p>{narrative.coverage} This is a selection, not a complete history or an explanation of anyone’s feelings.</p></details>
+      <p className="insights-note">Turning points from the last simulated day lead, then other retained moments from the last six hours. Records may be incomplete.</p>
+      <details><summary>About this reading</summary><p>Whole house, including recorded interactions with residents now away. Turning points (a disagreement settled, an agreement to try, a turn for the better, a new friendship) from the last simulated day come first, then selected moments from the last six simulation hours; current atmosphere uses the house’s togetherness and tension scores. The statistics filters do not change this reading.</p><p>{narrative.coverage} This is a selection, not a complete history or an explanation of anyone’s feelings.</p></details>
     </div>
   </section>;
 }

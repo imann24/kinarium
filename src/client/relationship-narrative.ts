@@ -77,6 +77,13 @@ export function relationshipNarrative(r: Relationship, a: Character, b: Characte
     const reasons = [top && `${lower(connectionPoint(top).title)} brought them together`, sore && `${lower(disagreementPoint(sore).title)} ${sore.mendedMinute === undefined ? 'still pulls them apart' : 'once pulled them apart'}`].filter(Boolean);
     story.push(`${arc}: ${reasons.join(', while ')}.`);
   }
+  const arc = s?.arcs?.at(-1);
+  if (arc && arc.attempts) {
+    const space = arc.spaceGiven ? `, and ${arc.spaceGiven === 1 ? 'one request' : `${arc.spaceGiven} requests`} for space ${arc.spaceGiven === 1 ? 'was' : 'were'} honored` : '';
+    const tries = arc.attempts === 1 ? 'one attempt' : `${arc.attempts} attempts`;
+    story.push(arc.state === 'settled' ? `Their disagreement about ${lower(arc.topic)} settled after ${tries} at repair${space}.`
+      : `Repairing their disagreement about ${lower(arc.topic)} has taken ${tries} so far${space}.${arc.state === 'eased' ? ' The goodwill between them is easing it.' : ''}`);
+  }
   const kind = bondKind(r);
   const currentStates: Record<BondKind, string> = {
     close: 'Today they are close', warm: 'Today they are fond of each other but cautious',

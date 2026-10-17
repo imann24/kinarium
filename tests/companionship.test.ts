@@ -58,7 +58,7 @@ describe('quiet companionship', () => {
     world.minute += 120; sit(world);
     expect(a.belonging).toBeGreaterThan(30); expect(a.belonging).toBeLessThan(31);
     expect(r.unresolvedConflict?.id).toBe(99); expect(r.repairedConflictId).toBeUndefined(); expect(r.trust).toBe(80);
-    expect(a.memories[0].tone).toBe('neutral'); expect(world.history.at(-1)?.text).toContain('disagreement and trust are unchanged');
+    expect(a.memories[0].tone).toBe('neutral'); expect(world.history.at(-1)?.text).toContain('their disagreement is still open');
   });
   it.each(['distance', 'away', 'travel', 'conversation'] as const)('breaks the interval on %s', reason => {
     const { world, a, b } = fixture();

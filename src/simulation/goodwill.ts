@@ -1,5 +1,5 @@
 import { communityStats, recordCommunityChange } from './community-state';
-import { relationshipStory } from './relationship-story';
+import { markArc, relationshipStory } from './relationship-story';
 import { recordResidentChange, residentStats } from './resident-state';
 import type { LogEntry, Relationship, WorldState } from './types';
 
@@ -20,6 +20,7 @@ export function addGoodwill(r: Relationship, amount: number, minute: number) {
   r.goodwill = Math.max(0, Math.min(GOODWILL_MAX, goodwill(r) + amount));
   if (isEased(r)) r.easedMinute ??= minute;
   else r.easedMinute = undefined;
+  if (r.unresolvedConflict) markArc(r, r.unresolvedConflict.id, isEased(r) ? 'eased' : 'open');
 }
 
 /** A fresh disagreement costs some goodwill and restarts the wait before it can settle. */
@@ -47,6 +48,7 @@ export function settleEasedConflict(world: WorldState, r: Relationship, entry: L
   const conflict = r.unresolvedConflict;
   if (!conflict || !isEased(r) || r.easedMinute === undefined || world.minute - r.easedMinute < SETTLE_DELAY) return false;
   r.repairedConflictId = conflict.id;
+  markArc(r, conflict.id, 'settled', entry); entry.highlight = 'settled';
   r.unresolvedConflict = undefined; r.repairCommitment = undefined; r.easedMinute = undefined; r.repairRefusals = undefined;
   for (const t of relationshipStory(r).disagreements) if (t.topic === conflict.topic) t.mendedMinute = world.minute;
   const beforeCommunity = communityStats(world);

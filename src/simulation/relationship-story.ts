@@ -1,5 +1,7 @@
-import type { LogEntry, Relationship, RelationshipPerspective, RelationshipStory, RelationshipThread, WorldState } from './types';
+import type { LogEntry, Relationship, RelationshipPerspective, RelationshipStory, RelationshipThread, RepairArc, WorldState } from './types';
 
+/** The few most recent disagreements whose repair is remembered as a story. */
+export const REPAIR_ARC_LIMIT = 3;
 /** Per side, so a long friendship still keeps its few defining subjects rather than every chat. */
 export const RELATIONSHIP_THREAD_LIMIT = 5;
 const QUOTE_LIMIT = 220;
@@ -46,10 +48,38 @@ export function recordSharedEvent(r: Relationship, name: string, delta: number, 
   else recordThread(r, 'disagreements', name, 'event', -delta, event);
 }
 
-/** Called only for revealed repair exchanges that reached their end. */
+export function repairArc(r: Relationship, conflictId: number, topic: string, event: Pick<LogEntry, 'id' | 'minute'>): RepairArc {
+  const story = relationshipStory(r);
+  const arcs = story.arcs ??= [];
+  let arc = arcs.find(a => a.conflictId === conflictId);
+  if (!arc) {
+    arc = { conflictId, topic, attempts: 0, accepted: 0, spaceGiven: 0, state: 'open', firstMinute: event.minute, lastMinute: event.minute, lastEventId: event.id };
+    arcs.push(arc);
+    if (arcs.length > REPAIR_ARC_LIMIT) arcs.splice(0, arcs.length - REPAIR_ARC_LIMIT);
+  }
+  return arc;
+}
+/** Marks how a disagreement's repair stands; never reopens a settled one. */
+export function markArc(r: Relationship, conflictId: number, state: RepairArc['state'], event?: Pick<LogEntry, 'id' | 'minute'>) {
+  const arc = r.story?.arcs?.find(a => a.conflictId === conflictId);
+  if (!arc || arc.state === 'settled') return;
+  arc.state = state;
+  if (event) Object.assign(arc, { lastMinute: event.minute, lastEventId: event.id });
+}
+
+/** Called only for revealed repair exchanges that reached their end. Returns the arc before this attempt. */
 export function recordRepair(r: Relationship, entry: LogEntry, topic: string, delta: number) {
   const repair = entry.conversation!.repair!;
   const [initiator, responder] = entry.characters;
+  const arc = repairArc(r, repair.conflictId, topic, entry);
+  const before = { ...arc };
+  Object.assign(arc, { attempts: arc.attempts + 1, lastMinute: entry.minute, lastEventId: entry.id });
+  if (repair.accepted) arc.accepted++; else arc.spaceGiven++;
+  recordRepairPerspective(r, entry, topic, delta, initiator, responder);
+  return before;
+}
+function recordRepairPerspective(r: Relationship, entry: LogEntry, topic: string, delta: number, initiator: string, responder: string) {
+  const repair = entry.conversation!.repair!;
   if (repair.phase === 'offer' || repair.phase === 'gesture') perspective(r, initiator).repairsOffered++;
   if (!repair.accepted) {
     perspective(r, responder).spaceRequested++;

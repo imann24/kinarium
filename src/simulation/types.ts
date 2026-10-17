@@ -38,12 +38,24 @@ export interface RelationshipPerspective {
   reachedOut: number; repairsOffered: number; spaceRequested: number; promisesKept: number;
   warmWords?: RememberedWords; hardWords?: RememberedWords;
 }
+/** The course of repair for one disagreement, so repeated attempts read as one story. */
+export interface RepairArc {
+  conflictId: number; topic: string;
+  /** Bids, follow-throughs and peace offerings that reached their end. */
+  attempts: number; accepted: number;
+  /** Requests for space, each one honored. */
+  spaceGiven: number;
+  state: 'open' | 'eased' | 'settled';
+  firstMinute: number; lastMinute: number; lastEventId: number;
+}
 /** Bounded, durable relationship history; absent in older saves and for pairs with no shared moments. */
 export interface RelationshipStory {
   beginning?: { minute: number; eventId: number; topic: string; tone: 'warm' | 'tense' };
   friendsMinute?: number;
   connections: RelationshipThread[]; disagreements: RelationshipThread[];
   perspectives: Record<string, RelationshipPerspective>;
+  /** Newest last; absent in older saves. */
+  arcs?: RepairArc[];
 }
 export interface Relationship {
   a: string; b: string; affinity: number; trust: number; encounters: number; lastMinute: number;
@@ -56,6 +68,8 @@ export interface Relationship {
   goodwill?: number;
   /** When goodwill first eased the current conflict; cleared by a new conflict. */
   easedMinute?: number;
+  /** When a repair bid or offering was last declined; cleared once warmth follows. */
+  lastRefusedMinute?: number;
   /** Latest quarrel, including flare-ups of an open disagreement; absent in older saves. */
   lastQuarrelMinute?: number;
   /** Refused repair attempts on one conflict, for backing off between bids. */
@@ -74,7 +88,10 @@ export interface Conversation {
   repair?: { conflictId: number; phase: 'offer' | 'follow-through' | 'gesture'; accepted: boolean; applied?: boolean; topic?: string };
   planned?: { speakerId: string; text: string }[]; generationAttempted?: boolean;
 }
+export type StoryHighlight = 'first-offer' | 'settled' | 'friendship' | 'turnaround';
 export interface LogEntry { id: number; minute: number; kind: LogKind; text: string; characters: string[]; generated?: boolean; conversation?: Conversation;
+  /** A turning point worth leading the story with; absent for ordinary moments and older saves. */
+  highlight?: StoryHighlight;
   /** The house event definition behind an `event` entry; older saves are matched by text. */
   eventDefinitionId?: string; }
 /** A resident's intention, prompted by a house event, to make a peace offering to someone they are at odds with. */

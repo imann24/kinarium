@@ -53,13 +53,13 @@ describe('distrust and repair', () => {
     finish(world); expect(r.trust).toBe(13); expect(r.affinity).toBeLessThan(0);
     expect(repairScene(world, a, b, r, 0)).toBeUndefined();
     expect(a.memories[0].text).toContain('I’ll wait and listen');
-    expect(action.text).toContain('rebuilds some trust');
+    expect(action.text).toContain('settles their disagreement'); expect(action.highlight).toBe('settled');
   });
   it('respects refusal, interruption and new conflict without awarding unperformed actions', () => {
     const { world, a, b, r } = conflictFixture(); world.minute += 120;
     const rejected = beginConversation(world, a, b, true, repairScene(world, a, b, r, .99)!);
     finish(world); expect(r.trust).toBe(5.5); expect(r.goodwill).toBe(1); expect(r.repairCommitment).toBeUndefined();
-    expect(rejected.text).toContain('builds a little goodwill');
+    expect(rejected.text).toContain('request for space is respected'); expect(rejected.text).not.toMatch(/trust|goodwill/);
     // A refusal makes the next bid wait six hours.
     world.minute += 240; expect(repairScene(world, a, b, r, 0)).toBeUndefined();
     world.minute += 120;
@@ -88,7 +88,7 @@ describe('distrust and repair', () => {
     expect(a.mood).toBe(before.mood + 1); expect(world.tension).toBe(before.tension - .5);
     expect(r.unresolvedConflict).toBeDefined();
     expect(a.stateChanges?.at(-1)).toMatchObject({ cause: 'Repair: tension acknowledged', eventId: offer.id, belonging: 1 });
-    expect(a.memories[0].text).toContain('mood and belonging improve');
+    expect(a.memories[0].text).toContain('agree to try asking first'); expect(offer.highlight).toBe('first-offer');
     const trust = r.trust;
     finishRepair(world, offer, false); expect(r.trust).toBe(trust); expect(a.belonging).toBe(before.belonging + 1);
     world.minute += 120;
@@ -107,7 +107,7 @@ describe('distrust and repair', () => {
       expect(a.belonging).toBe(before.belonging); expect(a.mood).toBe(before.mood); expect(world.tension).toBe(before.tension);
       expect(r.unresolvedConflict).toBeDefined(); expect(r.repairCommitment).toBeUndefined();
       expect(a.memories[0].tone).toBe('neutral'); expect(repairScene(world, a, b, r, 0)).toBeUndefined();
-      expect(entry.text).toContain(interrupted ? 'no trust or wellbeing restored' : 'builds a little goodwill');
+      expect(entry.text).toContain(interrupted ? 'cut short' : 'request for space is respected');
       // Only the honored refusal counts; the interrupted bid adds nothing.
       expect(r.trust).toBe(5.5); expect(r.goodwill).toBe(1);
     }
