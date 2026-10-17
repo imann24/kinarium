@@ -71,10 +71,14 @@ export interface Conversation {
   /** Saved procedural arc; absent in legacy threads. Never treated as revealed dialogue. */
   sceneId?: string; fallbackTurns?: string[];
   /** `topic` names the original disagreement; absent in older saves. */
-  repair?: { conflictId: number; phase: 'offer' | 'follow-through'; accepted: boolean; applied?: boolean; topic?: string };
+  repair?: { conflictId: number; phase: 'offer' | 'follow-through' | 'gesture'; accepted: boolean; applied?: boolean; topic?: string };
   planned?: { speakerId: string; text: string }[]; generationAttempted?: boolean;
 }
-export interface LogEntry { id: number; minute: number; kind: LogKind; text: string; characters: string[]; generated?: boolean; conversation?: Conversation; }
+export interface LogEntry { id: number; minute: number; kind: LogKind; text: string; characters: string[]; generated?: boolean; conversation?: Conversation;
+  /** The house event definition behind an `event` entry; older saves are matched by text. */
+  eventDefinitionId?: string; }
+/** A resident's intention, prompted by a house event, to make a peace offering to someone they are at odds with. */
+export interface PendingGesture { fromId: string; toId: string; conflictId: number; eventId: number; eventName: string; minute: number; }
 export interface WorldSettings { mode: TimeMode; populationCap: number; }
 export interface WorldState {
   version: 1; slug: string; name: string; description: string; templateId: string; createdAt: number;
@@ -89,6 +93,8 @@ export interface WorldState {
   cooldowns: Record<string, number>; lastRitualDay: number;
   /** After a material gift, supplies ease worries until this minute; absent in older saves. */
   reliefUntil?: number;
+  /** Peace offerings residents decided on after a house event, given when the pair next meets. */
+  pendingGestures?: PendingGesture[];
 }
 export interface WorldSummary { slug: string; name: string; description: string; templateId: string; createdAt: number; population: number; populationCap: number; mode: TimeMode; protected: boolean; cohesion: number; }
 export interface Presence { id: string; name: string; color: string; }

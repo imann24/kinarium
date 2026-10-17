@@ -52,3 +52,9 @@ export const EVENTS: EventDefinition[] = [
 ];
 export const TRAITS = ['kind', 'curious', 'reserved', 'spirited', 'practical'] as const;
 export const COLORS = ['#ba7357', '#758969', '#d7ad55', '#6d9297', '#aa819b', '#7981a8', '#ba8e71', '#819b78'];
+
+/** The definition behind a recorded house event. Older saves lack the id, so fall back to the event's own text. */
+export function eventDefinition(entry: { eventDefinitionId?: string; text: string } | undefined) {
+  if (!entry) return undefined;
+  return EVENTS.find(e => e.id === entry.eventDefinitionId) ?? EVENTS.find(e => e.text === entry.text);
+}
