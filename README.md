@@ -325,3 +325,87 @@ Quiet company requires 12 continuously observed simulation minutes nearby withou
 ### Dialogue engagement
 
 Moderate fatigue (energy 10–29) now produces a shorter exchange that retains its concrete topic and opinion; severe exhaustion below 10 can still end it. Pair contact is possible from energy 10, and group listeners need 15 (25 for reserved residents). Low mood can sound candid rather than automatically withdrawing. AI prompts favor specific opinions, playful disagreement, vulnerable admissions and meaningful bids for connection, while preserving refusal and grounded memories. Procedural taste/invitation scenes and varied repair openings add similar options without inference. More contact can also create more disagreement; these changes do not guarantee harmony or improve repair acceptance odds.
+
+## House administration
+
+Open `/admin` to list houses (including password-protected houses), identify them
+by name and exact slug, and permanently delete one. Every admin data/mutation
+request requires an authenticated server-side session. The sign-in shell is
+public; it contains no house data or credentials. Administration fails closed
+until the server secret **`KINARIUM_ADMIN_PASSWORD`** is configured.
+
+### Configure the server secret yourself
+
+Use a long, unique, randomly generated password (at least 32 characters). In the
+Cloudflare dashboard, select **Workers & Pages → kinarium → Settings → Variables
+and Secrets → Add**, choose **Secret**, enter `KINARIUM_ADMIN_PASSWORD` as the name,
+and enter your password as its value. Save/deploy the secret using Cloudflare's
+prompt. Do not put it in plaintext Wrangler `vars`, a `VITE_*` variable, GitHub
+source, a build variable, a URL, or logs.
+
+Alternatively, from this repository, authenticate Wrangler to your Cloudflare
+account and run:
+
+```sh
+pnpm exec wrangler secret put KINARIUM_ADMIN_PASSWORD --env ""
+```
+
+Paste the value at Wrangler's hidden interactive prompt, never in the command
+line. The empty environment selects this repository's production `kinarium`
+Worker rather than `env.local`. This command updates the deployed Worker; the
+owner should run it when ready. See [Cloudflare's secret configuration guide](https://developers.cloudflare.com/workers/configuration/secrets/).
+No credential value is included in this repository or configured by the PR.
+
+Production admin access requires HTTPS. Sign-in creates a random, host-only,
+Secure, HttpOnly, SameSite=Strict cookie with a 30-minute absolute expiry; only a
+secret-bound hash is stored on the server. The password stays out of browser
+storage. Sign out revokes the current session. Changing/removing the server
+secret invalidates existing sessions once the updated Worker is serving requests.
+Writes (including sign-in/sign-out) require an exact same-origin `Origin` header;
+cross-site requests are rejected. Persistent limits allow at most 5 sign-in
+attempts per connection and 50 globally per 15 minutes, including successful
+attempts. A distributed attack can temporarily prevent sign-in; wait for the
+window indicated by `Retry-After`. Use the same hostname throughout a session.
+
+### Deletion and retries
+
+Deletion requires typing the **exact slug**, without trimming or case folding,
+and pressing the explicitly destructive confirmation button. It cannot be undone.
+The directory first permanently retires that slug and removes only its listing.
+The room then atomically records a tombstone and erases its state, history,
+password/session data, limits, and players; clears cached state; cancels pending
+inference; closes sockets; disables automatic socket replies; and deletes its
+alarm. Already-issued AI requests may finish at the provider, but their results
+are discarded and further turns are not requested. In-flight commands/init are
+serialized with deletion; late index/init/seed responses cannot restore listings.
+
+A successful response means room cleanup was acknowledged. If a request fails,
+refresh `/admin` before deciding whether to retry. **Cleanup pending** means the
+address is retired but cleanup is not confirmed; the room may still be running
+if the cleanup call did not reach it. Retry the same slug (with the same typed
+confirmation) until it is marked deleted. Repeated requests are safe, including
+a lost success response. Nothing automatically restores or silently resets a
+house. A small permanent slug/tombstone record is retained in both objects to
+prevent resurrection; all house content is erased. Deleted slugs **cannot be
+reused**, including `the-common-house`, which will no longer be auto-seeded.
+Choose a different slug for a new house. Do not manually clear tombstones or roll
+back to code that does not honor them. Cloudflare's platform retention/backups are
+outside this application's deletion operation.
+
+### Local admin verification
+
+Use disposable local storage, never production houses. Set a throwaway
+`KINARIUM_ADMIN_PASSWORD` in ignored `.dev.vars.local`, run `pnpm build`, then:
+
+```sh
+pnpm exec wrangler dev --env local --port 8794 --persist-to .wrangler/admin-test
+# In another terminal, with Playwright installed (or PLAYWRIGHT_MODULE set):
+node --env-file=.dev.vars.local scripts/test-admin.mjs
+```
+
+The browser test only accepts localhost/127.0.0.1 and deletes disposable fixtures
+and the local default house. Loopback HTTP uses a distinct HttpOnly local cookie;
+remote HTTP admin requests are rejected. For missing-secret behavior, start with
+no local secret and verify `/api/admin/houses` returns 503. Unit tests cover
+session expiry/rotation, guess limits, failures/retries, in-flight inference,
+alarm/index/init races, permanent retirement, default seeding, and isolation.

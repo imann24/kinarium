@@ -1,3 +1,4 @@
+import { AdminAccess, adminRequestAllowed } from './admin';
 import { refreshResidentSummaries } from '../simulation/resident-summary';
 import { deployedVersion } from './build-version';
 import { HouseDetailsConflict } from '../simulation/house-details';
@@ -11,7 +12,7 @@ import { applyConversationPlan, dailyConversationLimit } from './conversation-po
 import { availableEvents, consumeEvent, eventBudget } from '../simulation/event-budget';
 import { assertAppropriate, isAppropriate } from '../simulation/content-filter';
 
-interface Env extends LLMConfig { WORLDS: DurableObjectNamespace<WorldRoom>; DIRECTORY: DurableObjectNamespace<WorldDirectory>; ASSETS: Fetcher; }
+export interface Env extends LLMConfig { KINARIUM_ADMIN_PASSWORD?: string; WORLDS: DurableObjectNamespace<WorldRoom>; DIRECTORY: DurableObjectNamespace<WorldDirectory>; ASSETS: Fetcher; }
 type Stored = { world: WorldState; password?: { salt: string; hash: string }; persistedLog: number; llmDay: string; llmCalls: number; lastLLM: number; };
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const directory = (env: Env) => env.DIRECTORY.get(env.DIRECTORY.idFromName('public-directory'));
@@ -21,7 +22,28 @@ const internal = (path: string, data?: unknown) => new Request(`https://internal
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
+    if (/^\/admin\/?$/.test(url.pathname)) {
+      const asset = await env.ASSETS.fetch(request);
+      const response = new Response(asset.body, asset);
+      response.headers.set('Cache-Control', 'no-store');
+      response.headers.set('Content-Security-Policy', "frame-ancestors 'none'");
+      response.headers.set('Referrer-Policy', 'no-referrer');
+      return response;
+    }
     if (!url.pathname.startsWith('/api/')) return env.ASSETS.fetch(request);
+    if (url.pathname === '/api/admin' || url.pathname.startsWith('/api/admin/')) {
+      if (!adminRequestAllowed(request)) return json({ error: 'A same-origin, secure admin request is required.' }, 403);
+      try {
+        if (request.method === 'POST') {
+          let payload: Record<string, unknown>;
+          try { payload = await body(request); } catch { return json({ error: 'Invalid admin request.' }, 400); }
+          const headers = new Headers(request.headers); headers.delete('Content-Length');
+          request = new Request(request, { headers, body: JSON.stringify(payload) });
+        }
+        return await directory(env).fetch(request);
+      }
+      catch { return json({ error: 'Administration is temporarily unavailable. Refresh the list before retrying.' }, 503); }
+    }
     if (!validOrigin(request)) return json({ error: 'Cross-origin requests are not allowed.' }, 403);
     // Consume bounded input before crossing the Durable Object boundary. An early
     // auth rejection must not leave a forwarded client stream being read after response.
@@ -44,26 +66,63 @@ export default {
 } satisfies ExportedHandler<Env>;
 
 export class WorldDirectory extends DurableObject<Env> {
+  private admin: AdminAccess;
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
+    this.admin = new AdminAccess(ctx.storage.sql, env.KINARIUM_ADMIN_PASSWORD);
+    ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS deletions (slug TEXT PRIMARY KEY, completed INTEGER NOT NULL DEFAULT 0)');
     ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS worlds (slug TEXT PRIMARY KEY, summary TEXT, updated INTEGER NOT NULL DEFAULT 0)');
     ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS limits (key TEXT PRIMARY KEY, count INTEGER NOT NULL, expires INTEGER NOT NULL)');
   }
+  private retired(slug: string) { return this.ctx.storage.sql.exec('SELECT slug FROM deletions WHERE slug=?', slug).toArray().length > 0; }
+  private async administer(request: Request): Promise<Response> {
+    const rejected = await this.admin.authorize(request);
+    if (rejected) return rejected;
+    const url = new URL(request.url);
+    if (url.pathname === '/api/admin/houses' && request.method === 'GET') {
+      const after = url.searchParams.get('after') || '';
+      const rows = this.ctx.storage.sql.exec<{ slug: string; summary: string | null; completed: number | null }>(
+        'SELECT slug,summary,NULL AS completed FROM worlds WHERE slug > ? UNION ALL SELECT slug,NULL AS summary,completed FROM deletions WHERE slug > ? ORDER BY slug LIMIT 101', after, after).toArray();
+      return json({ houses: rows.slice(0, 100).map(({ slug, summary, completed }) => ({ slug, summary: summary ? JSON.parse(summary) : null, status: completed === null ? 'active' : completed ? 'deleted' : 'pending' })), next: rows.length > 100 ? rows[99].slug : null });
+    }
+    const match = url.pathname.match(/^\/api\/admin\/houses\/([a-z0-9-]{1,48})\/delete$/);
+    if (!match || !SLUG.test(match[1]) || request.method !== 'POST') return json({ error: 'Not found.' }, 404);
+    const slug = match[1];
+    let input: Record<string, unknown>;
+    try { input = await body(request); } catch { return json({ error: 'Invalid deletion request.' }, 400); }
+    if (input.confirmation !== slug) return json({ error: 'Type the exact house slug to confirm permanent deletion.' }, 400);
+    if (!this.retired(slug) && !this.ctx.storage.sql.exec('SELECT slug FROM worlds WHERE slug=?', slug).toArray().length) return json({ error: 'House not found.' }, 404);
+    // Retire first: delayed index/init responses cannot republish this identity.
+    this.ctx.storage.transactionSync(() => {
+      this.ctx.storage.sql.exec('INSERT INTO deletions(slug) VALUES(?) ON CONFLICT(slug) DO NOTHING', slug);
+      this.ctx.storage.sql.exec('DELETE FROM worlds WHERE slug=?', slug);
+    });
+    try {
+      const response = await room(this.env, slug).fetch(internal('/delete', { slug }));
+      if (!response.ok) throw new Error('Room cleanup incomplete');
+      this.ctx.storage.sql.exec('UPDATE deletions SET completed=1 WHERE slug=?', slug);
+      return json({ ok: true, slug, status: 'deleted' });
+    } catch {
+      return json({ error: 'The address is retired, but room cleanup is not confirmed. Refresh and retry deletion for this same slug.', slug, status: 'pending' }, 503);
+    }
+  }
   async fetch(request: Request): Promise<Response> {
     const path = new URL(request.url).pathname;
+    if (path === '/api/admin' || path.startsWith('/api/admin/')) return this.administer(request);
     if (path === '/index') {
       const { summary, revision } = await request.json() as { summary: WorldSummary; revision: number };
+      if (this.retired(summary.slug)) return json({ error: 'This address is permanently retired.' }, 410);
       this.ctx.storage.sql.exec('INSERT INTO worlds(slug,summary,updated) VALUES(?,?,?) ON CONFLICT(slug) DO UPDATE SET summary=excluded.summary, updated=excluded.updated WHERE excluded.updated >= worlds.updated', summary.slug, JSON.stringify(summary), revision);
       return json({ ok: true });
     }
     try {
       if (request.method === 'GET') {
         const seed = this.ctx.storage.sql.exec('SELECT summary FROM worlds WHERE slug=?', 'the-common-house').toArray();
-        if (!seed[0]?.summary) {
+        if (!seed[0]?.summary && !this.retired('the-common-house')) {
           const response = await room(this.env, 'the-common-house').fetch(internal('/init', { slug: 'the-common-house', name: 'The Common House', description: 'An open door, a pot of tea, and a few lives slowly intertwining.', mode: 'fast-forward', populationCap: 12 }));
-          if (!response.ok) throw new Error('Could not open the common house.');
+          if (!response.ok && !this.retired('the-common-house')) throw new Error('Could not open the common house.');
           const summary = await response.json() as WorldSummary;
-          this.ctx.storage.sql.exec('INSERT INTO worlds(slug,summary) VALUES(?,?) ON CONFLICT(slug) DO NOTHING', summary.slug, JSON.stringify(summary));
+          if (!this.retired('the-common-house')) this.ctx.storage.sql.exec('INSERT INTO worlds(slug,summary) VALUES(?,?) ON CONFLICT(slug) DO NOTHING', summary.slug, JSON.stringify(summary));
         }
         return json({ worlds: this.ctx.storage.sql.exec<{ summary: string }>('SELECT summary FROM worlds WHERE summary IS NOT NULL ORDER BY updated DESC, slug ASC LIMIT 500').toArray().map(row => JSON.parse(row.summary)) });
       }
@@ -82,6 +141,7 @@ export class WorldDirectory extends DurableObject<Env> {
       this.ctx.storage.sql.exec('DELETE FROM limits WHERE expires < ?', now);
       const key = await digest(ip); const limit = this.ctx.storage.sql.exec<{ count: number }>('SELECT count FROM limits WHERE key=?', key).toArray()[0];
       if ((limit?.count ?? 0) >= 10) return json({ error: 'World creation is limited to 10 worlds per hour from this connection.' }, 429);
+      if (this.retired(slug)) return json({ error: 'That world address is permanently retired. Choose a new slug.' }, 409);
       if (this.ctx.storage.sql.exec('SELECT slug FROM worlds WHERE slug=?', slug).toArray().length) return json({ error: 'That world address is already taken.' }, 409);
       this.ctx.storage.sql.exec('INSERT INTO worlds(slug) VALUES(?)', slug);
       this.ctx.storage.sql.exec('INSERT INTO limits(key,count,expires) VALUES(?,1,?) ON CONFLICT(key) DO UPDATE SET count=count+1', key, now + 3_600_000);
@@ -89,6 +149,7 @@ export class WorldDirectory extends DurableObject<Env> {
         const response = await room(this.env, slug).fetch(internal('/init', { slug, name, description, password, mode, populationCap, templateId }));
         if (!response.ok) throw new Error('Could not create the world. Try again.');
         const summary = await response.json() as WorldSummary;
+        if (this.retired(slug)) return json({ error: 'This address is permanently retired.' }, 410);
         this.ctx.storage.sql.exec('UPDATE worlds SET summary=?,updated=? WHERE slug=?', JSON.stringify(summary), now, slug);
         return json(summary, 201);
       } catch (error) { this.ctx.storage.sql.exec('DELETE FROM worlds WHERE slug=? AND summary IS NULL', slug); throw error; }
@@ -98,21 +159,26 @@ export class WorldDirectory extends DurableObject<Env> {
 
 export class WorldRoom extends DurableObject<Env> {
   private data: Stored | undefined;
+  private deleted = false;
   private generatingConversation = false;
+  private generationAbort: AbortController | undefined;
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
     ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS state (id INTEGER PRIMARY KEY CHECK(id=1), payload TEXT NOT NULL)');
     ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS history (id INTEGER PRIMARY KEY, payload TEXT NOT NULL)');
     ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS sessions (token TEXT PRIMARY KEY, expires INTEGER NOT NULL)');
     ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS limits (key TEXT PRIMARY KEY, count INTEGER NOT NULL, expires INTEGER NOT NULL)');
+    ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS tombstone (id INTEGER PRIMARY KEY CHECK(id=1))');
+    this.deleted = ctx.storage.sql.exec('SELECT id FROM tombstone WHERE id=1').toArray().length > 0;
     const row = ctx.storage.sql.exec<{ payload: string }>('SELECT payload FROM state WHERE id=1').toArray()[0];
-    if (row) this.data = JSON.parse(row.payload);
+    if (row && !this.deleted) this.data = JSON.parse(row.payload);
     ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS players (id TEXT PRIMARY KEY, events TEXT NOT NULL, seen INTEGER NOT NULL)');
     ctx.storage.sql.exec('CREATE INDEX IF NOT EXISTS players_seen ON players(seen)');
-    ctx.setWebSocketAutoResponse(new WebSocketRequestResponsePair('ping', 'pong'));
+    if (this.deleted) ctx.setWebSocketAutoResponse();
+    else ctx.setWebSocketAutoResponse(new WebSocketRequestResponsePair('ping', 'pong'));
   }
   private save(extra?: () => void) {
-    if (!this.data) return;
+    if (this.deleted || !this.data) return;
     const data = this.data;
     this.ctx.storage.transactionSync(() => {
       extra?.();
@@ -147,21 +213,23 @@ export class WorldRoom extends DurableObject<Env> {
     return { models: modelOptions(this.env), world: this.data!.world, protected: !!this.data!.password, presence: [...unique.values()], serverNow: now, playerEvents: eventBudget(this.playerEvents(playerId), now) };
   }
   private broadcast() {
+    if (this.deleted || !this.data) return;
     for (const ws of this.ctx.getWebSockets()) {
       const { playerKey } = ws.deserializeAttachment() as Presence & { playerKey?: string };
       try { ws.send(JSON.stringify({ type: 'snapshot', ...this.snapshot(playerKey) })); } catch { ws.close(1011, 'Reconnect to the world'); }
     }
   }
   private async schedule() {
-    if (!this.data) return;
+    if (this.deleted || !this.data) return;
     const occupied = this.ctx.getWebSockets().length > 0;
     if (occupied || this.data.world.settings.mode === 'persistent') {
       const desired = Date.now() + (occupied ? TICK_MS : 60_000);
       const current = await this.ctx.storage.getAlarm();
+      if (this.deleted || !this.data) return;
       if (!current || current > desired) await this.ctx.storage.setAlarm(desired);
     } else await this.ctx.storage.deleteAlarm();
   }
-  private index() { if (this.data) this.ctx.waitUntil(directory(this.env).fetch(internal('/index', { summary: summarize(this.data.world, !!this.data.password), revision: Date.now() })).then(() => undefined).catch(error => console.error('Directory update failed', error))); }
+  private index() { if (!this.deleted && this.data) this.ctx.waitUntil(directory(this.env).fetch(internal('/index', { summary: summarize(this.data.world, !!this.data.password), revision: Date.now() })).then(() => undefined).catch(error => console.error('Directory update failed', error))); }
   private limited(key: string, max: number) {
     const now = Date.now(); this.ctx.storage.sql.exec('DELETE FROM limits WHERE expires < ?', now);
     const row = this.ctx.storage.sql.exec<{ count: number }>('SELECT count FROM limits WHERE key=?', key).toArray()[0];
@@ -176,15 +244,33 @@ export class WorldRoom extends DurableObject<Env> {
     return this.ctx.storage.sql.exec('SELECT token FROM sessions WHERE token=? AND expires>?', hash, Date.now()).toArray().length > 0;
   }
   async fetch(request: Request): Promise<Response> {
+    return this.ctx.blockConcurrencyWhile(() => this.handleRequest(request));
+  }
+  private async handleRequest(request: Request): Promise<Response> {
     const url = new URL(request.url);
-    if (url.pathname === '/init') return this.ctx.blockConcurrencyWhile(async () => {
+    if (url.pathname === '/delete' && request.method === 'POST') {
+      // A durable tombstone and data erasure commit together. Do not deleteAll:
+      // erasing the tombstone would allow stale /init calls to reset the house.
+      this.ctx.storage.transactionSync(() => {
+        this.ctx.storage.sql.exec('INSERT INTO tombstone(id) VALUES(1) ON CONFLICT(id) DO NOTHING');
+        for (const table of ['state', 'history', 'sessions', 'limits', 'players']) this.ctx.storage.sql.exec(`DELETE FROM ${table}`);
+      });
+      this.deleted = true; this.data = undefined;
+      this.generationAbort?.abort();
+      this.ctx.setWebSocketAutoResponse();
+      for (const ws of this.ctx.getWebSockets()) { try { ws.close(1008, 'This house was permanently deleted.'); } catch { /* Already closed. */ } }
+      await this.ctx.storage.deleteAlarm();
+      return json({ ok: true });
+    }
+    if (this.deleted) return json({ error: 'This house was permanently deleted. Its address cannot be reused.' }, 410);
+    if (url.pathname === '/init') {
       if (this.data) return json(summarize(this.data.world, !!this.data.password));
       const input = await request.json() as Parameters<typeof createWorld>[0] & { password?: string };
       const salt = crypto.randomUUID();
       const password = input.password ? { salt, hash: await passwordHash(input.password, salt) } : undefined;
       this.data = { world: createWorld(input, Date.now(), crypto.getRandomValues(new Uint32Array(1))[0]), password, persistedLog: 0, llmDay: '', llmCalls: 0, lastLLM: 0 };
       this.save(); await this.schedule(); return json(summarize(this.data.world, !!password));
-    });
+    }
     if (!this.data) return json({ error: 'This world does not exist yet.' }, 404);
     try {
       const ip = request.headers.get('CF-Connecting-IP') || 'local';
@@ -269,8 +355,9 @@ export class WorldRoom extends DurableObject<Env> {
     }
   }
   async alarm() {
-    if (!this.data) return;
+    if (this.deleted || !this.data) return;
     advance(this.data.world, Date.now()); this.save(); this.broadcast(); await this.schedule();
+    if (this.deleted || !this.data) return;
     if (this.data.world.minute % 30 < 2) this.index();
     if (this.generatingConversation || !isLLMConfigured(this.env) || !this.ctx.getWebSockets().length) return;
     const today = new Date().toISOString().slice(0, 10);
@@ -287,17 +374,19 @@ export class WorldRoom extends DurableObject<Env> {
     const turnCount = entry.conversation!.turns.length;
     this.data.llmCalls += calls; this.data.lastLLM = Date.now(); this.save();
     this.generatingConversation = true;
+    const controller = new AbortController(); this.generationAbort = controller;
     try {
-      const turns = await enrichConversation(this.env, structuredClone(this.data.world), structuredClone(entry));
+      const turns = await enrichConversation(this.env, structuredClone(this.data.world), structuredClone(entry), controller.signal);
+      if (this.deleted || !this.data) return;
       const current = this.data.world.history.find(e => e.id === entry.id);
       // Commands can replace the world while inference is in flight; never apply a stale plan.
       if (entry.characters.some((id, i) => this.data!.world.characters.find(c => c.id === id)?.model !== selections[i])) return;
       if (!applyConversationPlan(current, turnCount, turns)) return;
       this.save(); this.broadcast();
-    } finally { this.generatingConversation = false; }
+    } finally { this.generatingConversation = false; this.generationAbort = undefined; }
   }
 
-  async webSocketMessage(ws: WebSocket, message: string | ArrayBuffer) { if (message === 'ping') ws.send('pong'); else ws.close(1008, 'Use the world command API.'); }
+  async webSocketMessage(ws: WebSocket, message: string | ArrayBuffer) { if (this.deleted) { ws.close(1008, 'This house was permanently deleted.'); return; } if (message === 'ping') ws.send('pong'); else ws.close(1008, 'Use the world command API.'); }
   async webSocketClose(ws: WebSocket) { ws.close(1000, 'See you soon'); this.broadcast(); await this.schedule(); }
   async webSocketError(ws: WebSocket) { ws.close(1011, 'Connection interrupted'); this.broadcast(); await this.schedule(); }
 }
