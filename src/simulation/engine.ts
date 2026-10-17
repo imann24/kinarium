@@ -10,6 +10,7 @@ import { advanceConversations, beginConversation, nearby as inConversationRange,
 import { memoryInfluence, rememberEvent } from './memories';
 import { recordEncounter, recordFriendship, recordSharedEvent } from './relationship-story';
 import { COLORS, EVENTS, TEMPLATES, TRAITS } from './catalog';
+import { validateAppearance } from './appearance';
 import type { Character, Command, LogEntry, LogKind, Relationship, WorldState, WorldSummary, WorldTemplate } from './types';
 
 export const TICK_MS = 4_000;
@@ -229,6 +230,12 @@ export function applyCommand(s: WorldState, command: Command, now: number) {
       // Already revealed turns remain historical; discard pending text from the old model.
       for (const entry of s.history) if (entry.characters.includes(c.id) && entry.conversation?.status === 'active') delete entry.conversation.planned;
       break;
+    }
+    case 'set-appearance': {
+      const c = s.characters.find(c => c.id === command.characterId);
+      if (!c) throw new Error('That character could not be found.');
+      const { color, appearance } = validateAppearance(command);
+      c.color = color; c.appearance = appearance; break;
     }
     case 'set-away': {
       const c = s.characters.find(c => c.id === command.characterId);

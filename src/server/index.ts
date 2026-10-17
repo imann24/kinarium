@@ -5,6 +5,7 @@ import { HouseDetailsConflict } from '../simulation/house-details';
 import { DurableObject } from 'cloudflare:workers';
 import { activeCharacters, advance, applyCommand, createWorld, summarize, TICK_MS } from '../simulation/engine';
 import { TEMPLATES, TRAITS } from '../simulation/catalog';
+import { validateAppearance } from '../simulation/appearance';
 import type { Command, LogEntry, Presence, Snapshot, TimeMode, WorldState, WorldSummary } from '../simulation/types';
 import { body, digest, equal, json, passwordHash, string, validOrigin } from './security';
 import { enrichConversation, isLLMConfigured, modelOptions, validateModelSelection, conversationCallCount, type LLMConfig } from './llm';
@@ -353,6 +354,7 @@ export class WorldRoom extends DurableObject<Env> {
       }
       case 'set-model': return { type: input.type, characterId: string(input.characterId, 30), model: validateModelSelection(this.env, input.model) };
       case 'set-away': if (typeof input.away !== 'boolean') throw new Error('Specify whether the character is away.'); return { type: input.type, characterId: string(input.characterId, 30), away: input.away };
+      case 'set-appearance': return { type: input.type, characterId: string(input.characterId, 30), ...validateAppearance(input) };
       case 'trigger-event': return { type: input.type, eventId: string(input.eventId, 40) };
       case 'house-details': assertAppropriate(input.name, 'house name'); assertAppropriate(input.description, 'description'); return { type: input.type, name: input.name as string, description: input.description as string, expectedRevision: input.expectedRevision as number };
       case 'settings': return { type: input.type, mode: input.mode as TimeMode, populationCap: input.populationCap as number };

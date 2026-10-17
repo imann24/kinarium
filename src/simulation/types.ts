@@ -23,7 +23,11 @@ export interface Character {
   speech?: string; speechUntil?: number;
   /** Journal entry that produced this utterance; absent for legacy/unlinked speech. */
   speechConversationId?: number;
+  /** Chosen look; absent until someone edits it, so the sprite falls back to its id-based look. */
+  appearance?: ResidentAppearance;
 }
+/** Indexes into the sprite's fixed skin, hair style and hair color options. */
+export interface ResidentAppearance { skinTone: number; hairStyle: number; hairColor: number; }
 /** One subject that repeatedly moved a pair closer or further apart. `impact` is affinity moved, always positive. */
 export interface RelationshipThread {
   topic: string; source: 'conversation' | 'event' | 'repair'; count: number; impact: number;
@@ -121,6 +125,7 @@ export type Command =
   | { type: 'add-character'; name?: string; trait?: Trait; backstory?: string }
   | { type: 'set-model'; characterId: string; model?: string }
   | { type: 'set-away'; characterId: string; away: boolean }
+  | { type: 'set-appearance'; characterId: string; color: string; appearance: ResidentAppearance }
   | { type: 'trigger-event'; eventId: string }
   | { type: 'settings'; mode: TimeMode; populationCap: number };
 export interface WorldTemplate {
