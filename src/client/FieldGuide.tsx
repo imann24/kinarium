@@ -1,21 +1,69 @@
-/** Keep this guide aligned with shipped controls and the server conversation policy. */
+import { ChevronDown } from 'lucide-react';
+import './field-guide.css';
+
+const SECTIONS = [
+  {
+    title: 'Meet the residents',
+    open: true,
+    body: (
+      <p>
+        Click anyone in the house—or open <b>Residents</b>—to see their backstory, what they’re up to, and how their <b>mood</b>, <b>energy</b>, and <b>belonging</b> are shifting.
+      </p>
+    ),
+  },
+  {
+    title: 'Conversations & relationships',
+    body: (
+      <p>
+        Click a speech bubble to read the exchange or jump to it in the <b>Journal</b>. Friendly company builds <b>affinity</b> and <b>trust</b> over time, while tense moments take a one-on-one chat to mend.
+      </p>
+    ),
+  },
+  {
+    title: 'Journal, bonds & insights',
+    body: (
+      <p>
+        The <b>Journal</b> records conversations and milestones as they happen. Check <b>Bonds</b> to see how housemates get along, or open <b>Community insights</b> for a wider view of the house.
+      </p>
+    ),
+  },
+  {
+    title: 'Give the house a nudge',
+    body: (
+      <p>
+        Welcome someone new, let a resident take time away (their memories and relationships stay safe), or trigger up to <b>3 house events every 5 minutes</b>.
+      </p>
+    ),
+  },
+  {
+    title: 'Shared worlds, time & AI',
+    body: (
+      <p>
+        Everyone in a world sees the same live house and shares its controls. Choose <b>Always on</b> or <b>Catch-up</b> time in <b>World settings</b>, or pick a resident’s <b>Dialogue model</b> for optional AI-extended chats.
+      </p>
+    ),
+  },
+];
+
 export default function FieldGuide() {
-  return <div className="guide-copy">
-    <p>Watch a shared community unfold, then give it a nudge. There is no score to win.</p>
-    <h3>Meet someone.</h3>
-    <p>Select a resident in the house or open Residents. Their profile shows mood, energy and belonging; open “What affects these values” for current pressures and recorded changes. Traits and state shape encounters and dialogue. Background describes life before the house; Story so far and its sources draw on retained memories, not a complete lifetime.</p>
-    <h3>Follow a conversation.</h3>
-    <p>Select a speech bubble to expand it, then choose “Open conversation” for that exact thread. The dialog follows revealed turns and offers “View in journal”; it does not jump to another exchange. Some speech has no linked conversation. Dismiss a bubble with ×; use Escape to close a dialog.</p>
-    <p>Up to four residents can gather when everyone is within 20 map units on the same floor. Warm conversations can gain nearby listeners before the first reply and before AI planning starts. Energy, mood, temperament, and trust affect joining. Departures pause the gathering; disagreements and repair stay between two people. Joining alone does not grant friendship or repair trust.</p>
-    <p>Repair takes time: residents can name tension, offer to listen, and later respect a choice. Mood, temperament and trust affect willingness; a refusal leaves the disagreement open. Completed repair can restore belonging and ease tension. Quiet time nearby can also be restorative when both residents feel comfortable, especially with trusted company. Unresolved conflict limits that comfort. Repeated contact has recovery limits; silence and friendly chat do not settle a disagreement.</p>
-    <p>Dialogue starts with built-in lines. When AI is configured and an observer is connected, an eligible early conversation can receive one generated continuation of 3–7 turns, revealed over time. Exhausted participants, groups, or pairs using different models get 3 generated turns. Generated turns are marked “AI dialogue.” Traits, state, relationships and relevant memories inform the writing; generated words do not themselves change world state.</p>
-    <details><summary>AI availability and limits</summary><p>The checked-in default is Cloudflare Workers AI; deployed overrides are not verified here. Operators can configure an OpenAI-compatible provider; ordinary local development disables AI. Each world allows up to 240 requests per UTC day by default (configurable), with at least 8 seconds between continuation attempts and one attempt per thread. A same-model pair continuation uses one request; a group or mixed-model continuation reserves three, sharing a 6-second timeout. Missing configuration, exhausted limits, failed or rejected responses leave built-in dialogue available. AI is not guaranteed for every conversation.</p><p>In a resident’s profile, “Dialogue model” offers the server’s allowed models or Default. Your selection is saved for that resident and affects future generated dialogue; history stays intact. Groups and mixed-model pairs route each generated turn through its speaker’s model. Operators set the comma-separated LLM_ALLOWED_MODELS list and LLM_DEFAULT_MODEL; a removed model falls back to the default.</p></details>
-    <h3>Read the world’s history.</h3>
-    <p>Use Journal filters, expand conversations and load older entries. Select linked resident names to open profiles. Bonds shows encounters between residents currently at home; affinity and trust are different measures. Open Insights to explore community statistics, connection groups and recent recorded moments. Choose “Everyone, including away” to inspect saved relationships. Written summaries are deterministic readings of saved records, not new AI narration. Retained records and summaries may be incomplete.</p>
-    <h3>Make room for change.</h3>
-    <p>Introduce someone within the population cap, or open a profile to let them take time away. Confirm the departure; welcome them back from Residents → Away when there is room. Their memories and relationships stay saved. Choose an event to influence the house: each observer gets 3 events per world in a rolling 5-minute window, with a shared 45-second cooldown. The allowance display shows when another event is available.</p>
-    <h3>Share the controls.</h3>
-    <p>Open the “here” player list to change your observer name and see who is connected. Observers are people watching, not residents. Everyone admitted to a world can change it; passwords protect entry, with no owner-only controls. World settings lets you edit the house name and description, population cap and time mode. Use the journal toggle, fullscreen and theme controls to make watching comfortable.</p>
-    <p><b>Always on:</b> the empty world advances in one-minute batches. <b>Catch-up:</b> it advances when someone returns. After a long absence, only the most recent simulated day is replayed in detail.</p>
-  </div>;
+  return (
+    <div className="guide-copy">
+      <p className="guide-lead">
+        Watch a little community live at its own pace, and give it a gentle nudge when you like. There’s no score and nothing to win.
+      </p>
+      <div className="guide-list">
+        {SECTIONS.map(section => (
+          <details key={section.title} className="guide-item" open={section.open}>
+            <summary>
+              <span>{section.title}</span>
+              <ChevronDown size={17} aria-hidden="true" className="guide-chevron" />
+            </summary>
+            <div className="guide-item-body">
+              {section.body}
+            </div>
+          </details>
+        ))}
+      </div>
+    </div>
+  );
 }
