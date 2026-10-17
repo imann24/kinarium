@@ -12,6 +12,9 @@ const metrics = [
   { key: 'resources', label: 'Shared resources', Icon: Sprout, color: '#8ca8a3', description: (n: number) => n > 60 ? 'Enough to share' : n > 25 ? 'Making things stretch' : 'The cupboards feel bare' },
 ] as const;
 
+// Tension is the only stat where a rise is bad.
+const changeTone = (metric: CommunityMetric, delta: number) => delta === 0 ? '' : (delta > 0) === (metric !== 'tension') ? 'good' : 'bad';
+
 export default function CommunityMetrics({ world }: { world: WorldState }) {
   const id = useId(), root = useRef<HTMLElement>(null), panel = useRef<HTMLDivElement>(null);
   const buttons = useRef<Partial<Record<CommunityMetric, HTMLButtonElement | null>>>({});
@@ -79,7 +82,7 @@ export default function CommunityMetrics({ world }: { world: WorldState }) {
       <p>{detail.summary}</p>
       <p className="metric-headline"><b>Right now:</b> {detail.headline}</p>
       <h4>Recent changes</h4>
-      {detail.recent.length ? <ul className="metric-changes">{detail.recent.map(change => <li key={`${change.eventId}:${change.minute}`}><span>{change.cause}</span><b>{signedMetric(change[active])}</b><small>{gameTime(change.minute)}</small></li>)}</ul> : <p className="metric-note">None recorded in the last six simulation hours.</p>}
+      {detail.recent.length ? <ul className="metric-changes">{detail.recent.map(change => <li key={`${change.eventId}:${change.minute}`}><span>{change.cause}</span><b className={changeTone(active, change[active])}>{signedMetric(change[active])}{changeTone(active, change[active]) && <span className="sr-only"> ({changeTone(active, change[active]) === 'good' ? 'moves the community in a good direction' : 'moves the community in a worse direction'})</span>}</b><small>{gameTime(change.minute)}</small></li>)}</ul> : <p className="metric-note">None recorded in the last six simulation hours.</p>}
       <details className="metric-more" onToggle={relayout}><summary>Read more about current pressures</summary>
         <p className="metric-note">Per simulation step (2 minutes), using current positions. Movement and new encounters can change these.</p>
         <ul>{detail.current.map(text => <li key={text}>{text}</li>)}</ul></details>

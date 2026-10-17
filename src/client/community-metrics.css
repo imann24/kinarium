@@ -12,6 +12,8 @@
 .metric-details li { margin:7px 0; }
 .metric-details .metric-changes { padding:0; list-style:none; }
 .metric-changes li { display:grid; grid-template-columns:1fr auto; column-gap:12px; border-top:1px solid var(--line); padding-top:7px; }
+.metric-changes b.good { color:var(--change-good); }
+.metric-changes b.bad { color:var(--change-bad); }
 .metric-changes small { grid-column:1 / -1; color:var(--muted); }
 .metric-details .metric-headline b { font-weight:600; }
 .metric-more { margin-top:10px; border-top:1px solid var(--line); padding-top:6px; }

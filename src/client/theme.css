@@ -13,6 +13,8 @@
   --focus: #52684a;
   --scene-caption: #5e6b54;
   --scene-label: #585b49;
+  --change-good: #3d6b3a;
+  --change-bad: #98462a;
 }
 :root[data-theme='dark'] {
   color-scheme: dark;
@@ -44,6 +46,8 @@
   --scene-outline: #8ba17b;
   --scene-selection: #e0f2a8;
   --resident-leg-outline: #c5cfba;
+  --change-good: #a9d18e;
+  --change-bad: #f0a37f;
   color: var(--text);
   background: var(--page);
 }
