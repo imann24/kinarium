@@ -79,3 +79,5 @@
 @media(max-width:540px){.relationship-columns,.relationship-views{grid-template-columns:1fr}}
 
 .bond-tone-warm{background:#b4aa73}.bond-tone-trusted{background:#769d98}.bond-tone-familiar{background:#aaa49a}.bond-tone-repairing{background:#af91aa}
+
+.insights-filter option:disabled { color: #7f8a82; }
