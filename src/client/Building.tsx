@@ -3,6 +3,7 @@ import { residentStacks } from './resident-stacks';
 import { useId, type CSSProperties } from 'react';
 import type { Character, WorldState } from '../simulation/types';
 import { TEMPLATES } from '../simulation/catalog';
+import { HAIR_COLORS, HAIR_STYLES, residentAppearance, SKIN_TONES } from '../simulation/appearance';
 import { useBuildingMotion } from './useBuildingMotion';
 import ResidentSpeech from './ResidentSpeech';
 
@@ -102,8 +103,8 @@ function LayoutMask({ templateId, span, y, sky }: { templateId: string; span?: r
       : <>{Array.from({ length: Math.ceil(h / 16) }, (_, row) => <path key={row} d={`M${x} ${y + 16 + row * 16}h${w}`} stroke="#a29a82" strokeWidth="1.5"/>)}<path d={`M${x} ${y}v${h}M${x + w} ${y}v${h}`} stroke="#9a927a" strokeWidth="4"/></>}
   </g>)}</g>;
 }
-export function Person({ character, small = false }: { character: Pick<Character, 'color' | 'name' | 'id'>; small?: boolean }) {
-  const variant = Number(character.id.replace(/\D/g, '')) % 3;
+export function Person({ character, small = false }: { character: Pick<Character, 'color' | 'name' | 'id' | 'appearance'>; small?: boolean }) {
+  const look = residentAppearance(character);
   return <g transform={small ? 'scale(.8)' : undefined}>
     <ellipse cy="1" rx="16" ry="4" fill="#514d3d" opacity=".1"/>
     {/* Keep the original trousers visible over dark walls without recoloring them. */}
@@ -111,8 +112,8 @@ export function Person({ character, small = false }: { character: Pick<Character
     <path d="M-7-11-8 0M7-11 8 0" stroke="#555b50" strokeWidth="5" strokeLinecap="round"/>
     <path d="M-13-13q0-25 13-25t13 25Z" fill={character.color}/>
     <path d="M-13-28-18-15M13-28 18-17" stroke={character.color} strokeWidth="6" strokeLinecap="round"/>
-    <circle cy="-43" r="12" fill={variant === 1 ? '#be896b' : '#edc8a2'}/>
-    <path d={variant === 0 ? 'M-12-44q-5-17 12-15t12 17l-6-9q-8 6-18 7' : variant === 1 ? 'M-12-45q-4-14 12-14t12 15q-5-7-12-7t-12 6' : 'M-13-44q-2-14 12-15t14 15l-7-7-5 7-5-7-9 7'} fill={variant === 2 ? '#917253' : '#534f41'}/>
+    <circle cy="-43" r="12" fill={SKIN_TONES[look.skinTone]}/>
+    <path d={HAIR_STYLES[look.hairStyle]} fill={HAIR_COLORS[look.hairColor]}/>
     <circle cx="-4" cy="-42" r="1.2" fill="#514538"/><circle cx="4" cy="-42" r="1.2" fill="#514538"/>
     <path d="M-2-37q2 2 4 0" fill="none" stroke="#986f54" strokeWidth="1"/>
   </g>;
