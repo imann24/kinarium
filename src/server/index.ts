@@ -99,10 +99,12 @@ export class WorldDirectory extends DurableObject<Env> {
     });
     try {
       const response = await room(this.env, slug).fetch(internal('/delete', { slug }));
-      if (!response.ok) throw new Error('Room cleanup incomplete');
+      // 410 means the room already holds its tombstone from an earlier attempt.
+      if (!response.ok && response.status !== 410) throw new Error(`Room cleanup returned ${response.status}: ${(await response.text()).slice(0, 200)}`);
       this.ctx.storage.sql.exec('UPDATE deletions SET completed=1 WHERE slug=?', slug);
       return json({ ok: true, slug, status: 'deleted' });
-    } catch {
+    } catch (error) {
+      console.error('House deletion cleanup failed', slug, error);
       return json({ error: 'The address is retired, but room cleanup is not confirmed. Refresh and retry deletion for this same slug.', slug, status: 'pending' }, 503);
     }
   }
@@ -256,9 +258,12 @@ export class WorldRoom extends DurableObject<Env> {
         for (const table of ['state', 'history', 'sessions', 'limits', 'players']) this.ctx.storage.sql.exec(`DELETE FROM ${table}`);
       });
       this.deleted = true; this.data = undefined;
-      this.generationAbort?.abort();
-      this.ctx.setWebSocketAutoResponse();
-      for (const ws of this.ctx.getWebSockets()) { try { ws.close(1008, 'This house was permanently deleted.'); } catch { /* Already closed. */ } }
+      // The tombstone is committed. Socket teardown is best-effort so one bad
+      // connection cannot block completion; alarm removal still fails (retryably).
+      const attempt = async (step: string, fn: () => unknown) => { try { await fn(); } catch (error) { console.error(`House deletion cleanup step failed: ${step}`, error); } };
+      await attempt('abort generation', () => this.generationAbort?.abort());
+      await attempt('auto response', () => this.ctx.setWebSocketAutoResponse());
+      for (const ws of this.ctx.getWebSockets()) await attempt('close socket', () => ws.close(1008, 'This house was permanently deleted.'));
       await this.ctx.storage.deleteAlarm();
       return json({ ok: true });
     }
@@ -387,6 +392,6 @@ export class WorldRoom extends DurableObject<Env> {
   }
 
   async webSocketMessage(ws: WebSocket, message: string | ArrayBuffer) { if (this.deleted) { ws.close(1008, 'This house was permanently deleted.'); return; } if (message === 'ping') ws.send('pong'); else ws.close(1008, 'Use the world command API.'); }
-  async webSocketClose(ws: WebSocket) { ws.close(1000, 'See you soon'); this.broadcast(); await this.schedule(); }
-  async webSocketError(ws: WebSocket) { ws.close(1011, 'Connection interrupted'); this.broadcast(); await this.schedule(); }
+  async webSocketClose(ws: WebSocket) { try { ws.close(1000, 'See you soon'); } catch { /* Already closed. */ } this.broadcast(); await this.schedule(); }
+  async webSocketError(ws: WebSocket) { try { ws.close(1011, 'Connection interrupted'); } catch { /* Already closed. */ } this.broadcast(); await this.schedule(); }
 }

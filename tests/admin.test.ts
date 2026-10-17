@@ -97,6 +97,17 @@ describe('admin authentication and isolation', () => {
 });
 
 describe('permanent house deletion', () => {
+  it('completes even when a socket close throws', async () => {
+    const app = setup(); await app.create('stuck'); const cookie = await app.login();
+    const target = app.getRoom('stuck');
+    target.state.sockets.push({ close: vi.fn(() => { throw new Error('socket gone'); }) } as unknown as WebSocket);
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const url = '/api/admin/houses/stuck/delete';
+    expect((await app.fetch(req(url, { confirmation: 'stuck' }, cookie))).status).toBe(200);
+    expect((await app.fetch(req(url, { confirmation: 'stuck' }, cookie))).status).toBe(200);
+    expect(app.dc.sql.exec("SELECT completed FROM deletions WHERE slug='stuck'").toArray()).toEqual([{ completed: 1 }]);
+    await expect(target.instance.webSocketClose({ close: () => { throw new Error('closed'); } } as unknown as WebSocket)).resolves.toBeUndefined();
+  });
   it('requires exact confirmation, removes only the chosen house and is idempotent', async () => {
     const app = setup(); await app.create('delete-me'); await app.create('keep-me'); const cookie = await app.login();
     const target = app.getRoom('delete-me'); const other = JSON.stringify(app.getRoom('keep-me').state.sql.exec('SELECT * FROM state').toArray());
