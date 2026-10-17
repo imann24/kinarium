@@ -11,3 +11,8 @@
 .resident-modal .detail-columns .form-foot{margin-top:11px}
 .resident-modal .resident-state{margin-top:0}
 @media(min-width:860px){.resident-modal .detail-columns{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);column-gap:48px;align-items:start}}
+.resident-modal .detail-columns>div>.model-selection{margin-top:22px}
+.resident-modal .model-selection label{display:block;font-size:11px;color:var(--secondary,#7d8e6c)}
+.resident-modal .model-selection select{min-height:36px;margin-top:6px;padding:6px 10px;font-size:12px}
+.resident-modal .model-selection p{font-size:10px;line-height:1.6;margin-top:6px}
+.resident-modal .resident-state{margin-bottom:0}
