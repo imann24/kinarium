@@ -2,6 +2,7 @@
 .site-header.world-site-header {
   height: 56px;
   min-height: 56px;
+  max-width: 1560px;
   padding: 0 32px;
 }
 .world-site-header .brand { font-size: 24px; }
