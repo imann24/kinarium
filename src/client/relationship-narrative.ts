@@ -1,6 +1,6 @@
 import { gameTime } from '../simulation/engine';
 import type { Character, Relationship, RelationshipPerspective, RelationshipThread, RememberedWords, Trait } from '../simulation/types';
-import { bondKind } from './community-insights';
+import { bondKind, type BondKind } from './relationship-label';
 
 export interface StoryPoint { key: string; title: string; detail: string; mended?: string; }
 export interface ResidentView { from: Character; to: Character; feeling: string; details: string[]; words?: RememberedWords & { tone: 'warm' | 'tense' }; }
@@ -36,10 +36,13 @@ function view(r: Relationship, from: Character, to: Character): ResidentView {
   const mine = r.story?.perspectives[from.id] ?? empty, theirs = r.story?.perspectives[to.id] ?? empty;
   const kind = bondKind(r);
   const feeling = kind === 'unmet' ? `${from.name} hasn’t really met ${to.name} yet.`
-    : kind === 'close' ? r.trust > 60 ? `${from.name} counts ${to.name} among the people they trust most here.` : `${from.name} is fond of ${to.name}, though trust is still catching up.`
+    : kind === 'close' ? r.trust > 60 ? `${from.name} counts ${to.name} among the people they trust most here.` : `${from.name} is fond of ${to.name}, and feels able to trust them.`
     : kind === 'strained' ? r.trust < 25 ? `${from.name} is wary of ${to.name} and keeps a careful distance.` : `${from.name} finds ${to.name} difficult, but hasn’t given up on them.`
-    : r.trust > 55 ? `${from.name} trusts ${to.name}, even if they aren’t close yet.` : `${from.name} is still making up their mind about ${to.name}.`;
-  const tone = kind === 'close' ? 'warm' : kind === 'strained' ? 'tense' : 'neutral';
+    : kind === 'repairing' ? `${from.name} knows a promise to repair their disagreement is still awaiting follow-through.`
+    : kind === 'warm' ? `${from.name} is fond of ${to.name}, though trust is still catching up.`
+    : kind === 'familiar' ? `${from.name} knows ${to.name}, but they are not close at present.`
+    : r.trust > 55 ? `${from.name} trusts ${to.name}, without feeling close to them.` : `${from.name} is still making up their mind about ${to.name}.`;
+  const tone = kind === 'close' || kind === 'warm' ? 'warm' : kind === 'strained' || kind === 'repairing' ? 'tense' : 'neutral';
   const details = kind === 'unmet' ? [] : [`To ${from.name}, ${to.name} is ${impressions[to.trait][tone]}.`];
   if (mine.reachedOut >= 2 && mine.reachedOut >= theirs.reachedOut * 2) details.push(`${from.name} is usually the one to seek ${to.name} out.`);
   else if (theirs.reachedOut >= 2 && theirs.reachedOut >= mine.reachedOut * 2) details.push(`${from.name} has noticed ${to.name} tends to come to them first.`);
@@ -74,7 +77,13 @@ export function relationshipNarrative(r: Relationship, a: Character, b: Characte
     story.push(`${arc}: ${reasons.join(', while ')}.`);
   }
   const kind = bondKind(r);
-  const now = kind === 'close' ? 'Today they are growing close' : kind === 'strained' ? 'Today the connection is strained' : kind === 'forming' ? 'Today they are still getting to know each other' : 'For now they are yet to meet';
+  const currentStates: Record<BondKind, string> = {
+    close: 'Today they are close', warm: 'Today they are fond of each other but cautious',
+    trusted: 'Today they trust each other without being close', familiar: 'Today they are familiar but distant',
+    repairing: 'Today a repair is promised but still awaits follow-through', strained: 'Today the connection is strained',
+    forming: 'Today they are still getting to know each other', unmet: 'For now they are yet to meet',
+  };
+  const now = currentStates[kind];
   const trust = r.trust > 60 ? 'trust runs deep' : r.trust < 25 ? 'trust is thin' : 'trust is steady but modest';
   let current = kind === 'unmet' ? `${now}.` : `${now}, and ${trust}.`;
   if (r.unresolvedConflict) current += ` Their disagreement about ${lower(r.unresolvedConflict.topic)} from ${gameTime(r.unresolvedConflict.minute)} is still unresolved.`;

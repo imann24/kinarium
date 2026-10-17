@@ -38,7 +38,7 @@ describe('Bonds presence projection', () => {
   });
   it('ignores missing endpoints and unmet pairs without deleting history or changing sort order', () => {
     const world = fixture();
-    expect(render(world).indexOf('A budding friendship')).toBeLessThan(render(world).indexOf('A difficult connection'));
+    expect(render(world).indexOf('Close ·')).toBeLessThan(render(world).indexOf('Strained ·'));
     world.characters = world.characters.filter(c => c.id !== 'c1');
     const before = structuredClone(world);
     expect(count(world)).toBe(0);
