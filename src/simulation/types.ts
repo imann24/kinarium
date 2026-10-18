@@ -123,6 +123,7 @@ export interface Snapshot { models?: { allowed: string[]; defaultModel: string |
 export type Command =
   | { type: 'house-details'; name: string; description: string; expectedRevision: number }
   | { type: 'add-character'; name?: string; trait?: Trait; backstory?: string }
+  | { type: 'rename-character'; characterId: string; name: string }
   | { type: 'set-model'; characterId: string; model?: string }
   | { type: 'set-away'; characterId: string; away: boolean }
   | { type: 'set-appearance'; characterId: string; color: string; appearance: ResidentAppearance }

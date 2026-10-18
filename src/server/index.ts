@@ -1,3 +1,4 @@
+import { residentNames, validateResidentName } from '../simulation/resident-name';
 import { AdminAccess, adminRequestAllowed } from './admin';
 import { refreshResidentSummaries } from '../simulation/resident-summary';
 import { deployedVersion } from './build-version';
@@ -352,6 +353,7 @@ export class WorldRoom extends DurableObject<Env> {
         assertAppropriate(name, 'name'); assertAppropriate(backstory, 'backstory');
         return { type: input.type, name, trait: trait as typeof TRAITS[number] | undefined, backstory };
       }
+      case 'rename-character': return { type: input.type, characterId: string(input.characterId, 30), name: validateResidentName(input.name) };
       case 'set-model': return { type: input.type, characterId: string(input.characterId, 30), model: validateModelSelection(this.env, input.model) };
       case 'set-away': if (typeof input.away !== 'boolean') throw new Error('Specify whether the character is away.'); return { type: input.type, characterId: string(input.characterId, 30), away: input.away };
       case 'set-appearance': return { type: input.type, characterId: string(input.characterId, 30), ...validateAppearance(input) };
@@ -375,6 +377,7 @@ export class WorldRoom extends DurableObject<Env> {
     if (!entry) return;
     const calls = conversationCallCount(this.env, this.data.world, entry);
     if (this.data.llmCalls + calls > limit) return;
+    const names = residentNames(this.data.world);
     const selections = entry.characters.map(id => this.data!.world.characters.find(c => c.id === id)?.model);
     // Reserve every possible request before I/O. Failed requests never create retry storms.
     entry.conversation!.generationAttempted = true;
@@ -387,6 +390,7 @@ export class WorldRoom extends DurableObject<Env> {
       if (this.deleted || !this.data) return;
       const current = this.data.world.history.find(e => e.id === entry.id);
       // Commands can replace the world while inference is in flight; never apply a stale plan.
+      if (residentNames(this.data.world) !== names) return;
       if (entry.characters.some((id, i) => this.data!.world.characters.find(c => c.id === id)?.model !== selections[i])) return;
       if (!applyConversationPlan(current, turnCount, turns)) return;
       this.save(); this.broadcast();

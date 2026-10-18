@@ -55,7 +55,11 @@ try {
     const rejected = await fetch(`${origin}/api/worlds/${slug}/commands`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({type:'set-model',characterId:'c1',model:'not-allowed'}) });
     assert.equal(rejected.status,400);
     await request(`/worlds/${slug}/commands`, {type:'set-model',characterId:'c1',model:snapshot.models.defaultModel});
+    await request(`/worlds/${slug}/commands`, {type:'rename-character',characterId:'c1',name:'  Ellis  '});
     const { world } = await request(`/worlds/${slug}`);
+    assert.equal(world.characters[0].name,'Ellis');
+    assert.equal(world.characters[0].backstory,snapshot.world.characters[0].backstory);
+    assert.equal(world.characters[0].trait,snapshot.world.characters[0].trait);
     assert.equal(world.characters[0].model,snapshot.models.defaultModel);
     saved.push({ slug, world });
   }
@@ -98,9 +102,13 @@ try {
     assert.deepEqual(updated.models,expectedModels);
     assert.equal(updated.world.characters[0].model,allowed[2]);
     assert.deepEqual((await broadcast).models,expectedModels);
+    const renamed = receive();
+    await request(`/worlds/${slug}/commands`,{type:'rename-character',characterId:'c1',name:'Nora'});
+    const live = (await renamed).world.characters[0];
+    assert.equal(live.id,'c1'); assert.equal(live.name,'Nora');
   } finally { ws.close(); }
   console.log('PASS: changed local runtime configuration reaches existing Durable Objects, HTTP snapshots, command responses and WebSocket broadcasts without resetting saved worlds.');
-  console.log('PASS: all template identities, away state, model selections, memories and ID counters survive a real SQLite runtime restart; later introductions remain unique.');
+  console.log('PASS: renamed identities across all templates, away state, model selections, memories and ID counters survive a real SQLite runtime restart; later introductions remain unique.');
 } finally {
   await stop();
   await rm(storage, { recursive: true, force: true });
