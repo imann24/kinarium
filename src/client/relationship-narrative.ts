@@ -2,8 +2,8 @@ import { gameTime } from '../simulation/engine';
 import type { Character, Relationship, RelationshipPerspective, RelationshipThread, RememberedWords, Trait } from '../simulation/types';
 import { bondKind, type BondKind } from './relationship-label';
 
-export interface StoryPoint { key: string; title: string; detail: string; mended?: string; }
-export interface ResidentView { from: Character; to: Character; feeling: string; details: string[]; words?: RememberedWords & { tone: 'warm' | 'tense' }; }
+export interface StoryPoint { key: string; title: string; detail: string; mended?: string; source: RelationshipThread['source']; count: number; impact: number; }
+export interface ResidentView { from: Character; to: Character; feeling: string; details: string[]; impression?: string; tone: 'warm' | 'tense' | 'neutral'; words?: RememberedWords & { tone: 'warm' | 'tense' }; }
 export interface RelationshipNarrative { story: string[]; connections: StoryPoint[]; disagreements: StoryPoint[]; views: [ResidentView, ResidentView]; recorded: boolean; }
 
 const lower = (topic: string) => topic.charAt(0).toLowerCase() + topic.slice(1);
@@ -23,13 +23,14 @@ const impressions: Record<Trait, Record<'warm' | 'tense' | 'neutral', string>> =
 function connectionPoint(t: RelationshipThread): StoryPoint {
   const title = t.source === 'event' ? t.topic : t.source === 'repair' ? `Making amends after “${lower(t.topic)}”` : `Talking about ${lower(t.topic)}`;
   const what = t.source === 'event' ? `Shared ${times(t.count)}` : t.source === 'repair' ? `Worked on ${times(t.count)}` : `Came up ${times(t.count)}`;
-  return { key: `${t.source}:${t.topic}`, title, detail: `${what}, drawing them ${points(t.impact)} closer · last on ${gameTime(t.lastMinute)}` };
+  return { key: `${t.source}:${t.topic}`, title, detail: `${what}, drawing them ${points(t.impact)} closer · last on ${gameTime(t.lastMinute)}`,
+    source: t.source, count: t.count, impact: t.impact };
 }
 function disagreementPoint(t: RelationshipThread): StoryPoint {
   const title = t.source === 'event' ? t.topic : `Clashing over ${lower(t.topic)}`;
   const what = t.source === 'event' ? `Strained them ${times(t.count)}` : `Flared up ${times(t.count)}`;
   return { key: `${t.source}:${t.topic}`, title, detail: `${what}, pushing them ${points(t.impact)} apart · last on ${gameTime(t.lastMinute)}`,
-    mended: t.mendedMinute === undefined ? undefined : `Mended on ${gameTime(t.mendedMinute)}` };
+    mended: t.mendedMinute === undefined ? undefined : `Mended on ${gameTime(t.mendedMinute)}`, source: t.source, count: t.count, impact: t.impact };
 }
 
 function view(r: Relationship, from: Character, to: Character): ResidentView {
@@ -44,7 +45,8 @@ function view(r: Relationship, from: Character, to: Character): ResidentView {
     : kind === 'familiar' ? `${from.name} knows ${to.name}, but they are not close at present.`
     : r.trust > 55 ? `${from.name} trusts ${to.name}, without feeling close to them.` : `${from.name} is still making up their mind about ${to.name}.`;
   const tone = kind === 'close' || kind === 'warm' ? 'warm' : kind === 'strained' || kind === 'repairing' ? 'tense' : 'neutral';
-  const details = kind === 'unmet' ? [] : [`To ${from.name}, ${to.name} is ${impressions[to.trait][tone]}.`];
+  const impression = kind === 'unmet' ? undefined : impressions[to.trait][tone];
+  const details = impression ? [`To ${from.name}, ${to.name} is ${impression}.`] : [];
   if (mine.reachedOut >= 2 && mine.reachedOut >= theirs.reachedOut * 2) details.push(`${from.name} is usually the one to seek ${to.name} out.`);
   else if (theirs.reachedOut >= 2 && theirs.reachedOut >= mine.reachedOut * 2) details.push(`${from.name} has noticed ${to.name} tends to come to them first.`);
   if (theirs.promisesKept) details.push(`${from.name} saw ${to.name} keep their word after a disagreement.`);
@@ -56,7 +58,7 @@ function view(r: Relationship, from: Character, to: Character): ResidentView {
   const [first, second] = preferHard ? [mine.hardWords, mine.warmWords] : [mine.warmWords, mine.hardWords];
   const heard = first ?? second;
   const words = heard && { ...heard, tone: heard === mine.hardWords ? 'tense' as const : 'warm' as const };
-  return { from, to, feeling, details, words };
+  return { from, to, feeling, details, impression, tone, words };
 }
 
 /** A deterministic reading of recorded relationship facts; it never invents motives or events. */
