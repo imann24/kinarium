@@ -3,7 +3,7 @@ import { advanceQuietCompanionship } from './companionship';
 import { separateStandingResidents } from './standing';
 import { bestTrust, residentDrift, residentStats, recordResidentChange } from './resident-state';
 import { contactWillingness, repairScene } from './repair';
-import { advanceGestures, reactToEvent } from './event-reactions';
+import { advanceGestures, choosePartners, reactToEvent } from './event-reactions';
 import { GOODWILL_DECAY_PER_DAY, isEased, settleEasedConflict } from './goodwill';
 import { updateHouseDetails } from './house-details';
 import { advanceConversations, beginConversation, nearby as inConversationRange, isConversing, interruptConversations } from './conversations';
@@ -257,7 +257,11 @@ export function applyCommand(s: WorldState, command: Command, now: number) {
       const people = activeCharacters(s);
       const occasion = log(s, 'event', event.text, people.map(c => c.id)); occasion.eventDefinitionId = event.id;
       recordCommunityChange(s, beforeCommunity, event.name, occasion.id);
-      for (const c of people) { const before = residentStats(c); c.mood = clamp(c.mood + event.mood); recordResidentChange(c, before, s.minute, event.name, occasion.id); if (event.tone === 'kind') c.destination = 0; }
+      const destination = event.floor ?? (event.tone === 'kind' ? 0 : undefined);
+      for (const c of people) {
+        const before = residentStats(c); c.mood = clamp(c.mood + event.mood); c.energy = clamp(c.energy + (event.energy ?? 0));
+        recordResidentChange(c, before, s.minute, event.name, occasion.id); if (destination !== undefined) c.destination = destination;
+      }
       // Material relief is felt in mood and calm; trust moves only when people actually share a moment.
       if (event.relational === 'relief') s.reliefUntil = s.minute + RELIEF_MINUTES;
       if (event.relational === 'gathering' || event.relational === 'strain') for (let i = 0; i < people.length; i++) for (let j = i + 1; j < people.length; j++) {
@@ -266,10 +270,19 @@ export function applyCommand(s: WorldState, command: Command, now: number) {
         const [affinity, trust] = event.relational === 'strain' ? [-2, -2] : open ? [3, 1] : [1, 0];
         r.affinity = clamp(r.affinity + affinity, -100, 100); recordSharedEvent(r, event.name, r.affinity - previous, occasion); r.trust = clamp(r.trust + trust);
       }
+      // Chore partners: only the matched pairs work side by side, so the gain is concentrated where it is rarest.
+      const partners = event.relational === 'pairing' ? choosePartners(people, (a, b) => relationship(s, a.id, b.id)) : [];
+      partners.forEach(([a, b], i) => {
+        const r = relationship(s, a.id, b.id); const previous = r.affinity;
+        r.affinity = clamp(r.affinity + 4, -100, 100); recordSharedEvent(r, event.name, r.affinity - previous, occasion); r.trust = clamp(r.trust + 2);
+        r.encounters++; r.lastMinute = s.minute;
+        for (const c of [a, b]) if (!c.inElevator) c.destination = i % TEMPLATES[s.templateId].floors.length;
+      });
       // Then each resident responds in their own way; some decide to make a peace offering.
       const { reactions, gestures } = reactToEvent(s, event, occasion, people);
       const shown = reactions.filter(x => x.label !== 'kept to themselves').slice(0, 3);
       if (shown.length) occasion.text += ` ${shown.map(x => `${x.character.name} ${x.label}`).join('; ')}.`;
+      if (partners.length) occasion.text += ` ${partners.slice(0, 3).map(([a, b]) => `${a.name} and ${b.name}`).join(', ')}${partners.length > 3 ? ', among others,' : ''} pair up for the chores.`;
       for (const g of gestures.slice(0, 2)) occasion.text += ` ${g.from.name} goes looking for ${g.to.name}.`;
       break;
     }

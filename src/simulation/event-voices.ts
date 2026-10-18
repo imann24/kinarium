@@ -45,12 +45,33 @@ export const EVENT_REPLIES: Record<string, Record<Trait, string>> = {
     spirited: 'Sitting still is a challenge I can laugh about. I’d try a few breaths, rather than aim for perfection.',
     kind: 'I like a pause where nobody needs me to fix anything. I’d like to let myself have that.',
   },
+  'quiet-day': {
+    practical: 'I keep noticing small jobs. Leaving one undone for a day is a stranger kind of rest than sleep.',
+    reserved: 'Easy. Nobody needing an answer from me is the most restful thing this house can offer.',
+    curious: 'I rest by noticing things. I just don’t have to turn them into conversation straight away.',
+    spirited: 'Harder than I expected. I like company, and a quiet day can feel like being left out of something.',
+    kind: 'I struggle to stop checking on people. I’m learning that their rest doesn’t depend on me.',
+  },
   'new-project': {
     practical: 'Possibility, if we can make clear what we are deciding. An argument about everything at once is hard to use.',
     reserved: 'Both. I’d want time to find my view before the loudest ideas become the whole conversation.',
     curious: 'Possibility. Different opinions can reveal questions the first plan missed.',
     spirited: 'Possibility, though I’m impatient to try things. I know that impatience can crowd out a careful objection.',
     kind: 'Both. I care about how we disagree as well as what we decide to grow.',
+  },
+  'chore-partners': {
+    practical: 'Shared work gives me something to say. I’d rather learn about someone through a job than through small talk.',
+    reserved: 'I liked having a reason to be beside someone. The work filled the silence so I didn’t have to.',
+    curious: 'You learn how a person thinks from the way they fold a towel. I didn’t expect that.',
+    spirited: 'Fun, once we stopped being polite about it. A little teasing made the chore go faster.',
+    kind: 'I worried about giving my partner the worse half. I’d like to trust that we can just split it fairly.',
+  },
+  'clearing-air': {
+    practical: 'Uncomfortable, but useful. A disagreement with a name is easier to work on than a mood in the hallway.',
+    reserved: 'Hard. I need time after saying something like that before I can talk about it again.',
+    curious: 'I learned how many disagreements started from a misunderstanding. That doesn’t make them less real.',
+    spirited: 'I said more than I meant to. I’d still rather say it than let it simmer.',
+    kind: 'I wanted everyone to feel safe, and it couldn’t be comfortable for everyone. I’m learning that’s all right.',
   },
   'power-outage': {
     practical: 'Not knowing what information is reliable. A small clear fact helps me more than confident guessing.',

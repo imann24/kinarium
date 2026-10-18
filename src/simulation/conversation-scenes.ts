@@ -138,7 +138,10 @@ export function chooseConversationScene(world: WorldState, a: Character, b: Char
       'community-gathering': 'After that gathering, what kind of conversation would you like more of around here?',
       'vulnerable-share': 'That share out makes me wonder: what would you like to be a little more honest about, if you chose to share?',
       'group-meditation': 'After that quiet pause, what do you make of trying to slow down together?',
+      'quiet-day': 'After a whole quiet day, I’m curious: does doing nothing come easily to you?',
       'new-project': 'The garden plan has brought out different opinions. Is that possibility or trouble to you?',
+      'chore-partners': 'Being paired up for chores was unexpected. What was it like working with someone new?',
+      'clearing-air': 'After clearing the air, how do you feel about saying hard things in front of everyone?',
       'power-outage': 'After the lights went out, I keep thinking about how uncertainty affects us. What is hardest for you?',
       rumor: 'That rumor is bothering me. How do we talk about uncertainty without spreading it?',
     };

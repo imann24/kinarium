@@ -13,7 +13,7 @@ import ResidentState from './ResidentState';
 import HouseDetailsForm from './HouseDetailsForm';
 import React, { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { ArrowLeft, ArrowRight, ArrowUpRight, Asterisk, BookOpen, Check, ChevronDown, CircleHelp, Clock3, DoorOpen, Gift, Globe2, Heart, Infinity as InfinityIcon, Leaf, LockKeyhole, Maximize, Maximize2, MessageCircle, Minimize, Moon, Plus, Search, Settings2, Soup, Sparkles, Sprout, Users, X, Zap } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ArrowUpRight, Armchair, Asterisk, BookOpen, Check, ChevronDown, CircleHelp, Clock3, DoorOpen, Gift, Globe2, Handshake, Heart, Infinity as InfinityIcon, Leaf, LockKeyhole, Maximize, Maximize2, MessageCircle, Minimize, Moon, Plus, Search, Settings2, Soup, Sparkles, Sprout, Users, Wind, X, Zap } from 'lucide-react';
 import { EVENTS, TEMPLATES, TRAITS } from '../simulation/catalog';
 import { activeCharacters, createWorld, gameTime } from '../simulation/engine';
 import type { Character, Command, LogEntry, Snapshot, TimeMode, WorldState, WorldSummary } from '../simulation/types';
@@ -45,7 +45,7 @@ import './phone-landscape.css';
 import './resident-modal.css';
 import { isAppropriate } from '../simulation/content-filter';
 
-const icons = { soup: Soup, gift: Gift, moon: Moon, sprout: Sprout, zap: Zap, message: MessageCircle };
+const icons = { soup: Soup, gift: Gift, moon: Moon, sprout: Sprout, zap: Zap, message: MessageCircle, armchair: Armchair, handshake: Handshake, wind: Wind };
 const templateExamples = Object.fromEntries(Object.keys(TEMPLATES).map(templateId => [templateId, createWorld({ slug: 'example', name: 'A little world', templateId }, 0, 125)]));
 const example = templateExamples['common-house'];
 const getError = (error: unknown) => error instanceof Error ? error.message : 'Something went wrong. Please try again.';
