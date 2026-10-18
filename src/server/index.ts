@@ -110,6 +110,22 @@ export class WorldDirectory extends DurableObject<Env> {
       return json({ error: 'The address is retired, but room cleanup is not confirmed. Refresh and retry deletion for this same slug.', slug, status: 'pending' }, 503);
     }
   }
+  // Entries indexed before directory previews carried residents would keep the
+  // template's figures until their house next re-indexed, which a catch-up house
+  // nobody visits never does. Ask those rooms once; the stored summary then has residents.
+  private async backfillResidents(worlds: WorldSummary[]) {
+    const legacy = worlds.filter(w => !w.residents).slice(0, 50);
+    await Promise.all(legacy.map(async w => {
+      try {
+        const response = await room(this.env, w.slug).fetch(internal('/summary'));
+        if (!response.ok) return;
+        const summary = await response.json() as WorldSummary;
+        if (summary.slug !== w.slug || !summary.residents) return;
+        this.ctx.storage.sql.exec('UPDATE worlds SET summary=? WHERE slug=?', JSON.stringify(summary), w.slug);
+        Object.assign(w, summary);
+      } catch (error) { console.error('Directory preview backfill failed', w.slug, error); }
+    }));
+  }
   async fetch(request: Request): Promise<Response> {
     const path = new URL(request.url).pathname;
     if (path === '/api/admin' || path.startsWith('/api/admin/')) return this.administer(request);
@@ -128,7 +144,9 @@ export class WorldDirectory extends DurableObject<Env> {
           const summary = await response.json() as WorldSummary;
           if (!this.retired('the-common-house')) this.ctx.storage.sql.exec('INSERT INTO worlds(slug,summary) VALUES(?,?) ON CONFLICT(slug) DO NOTHING', summary.slug, JSON.stringify(summary));
         }
-        return json({ worlds: this.ctx.storage.sql.exec<{ summary: string }>('SELECT summary FROM worlds WHERE summary IS NOT NULL ORDER BY updated DESC, slug ASC LIMIT 500').toArray().map(row => JSON.parse(row.summary)) });
+        const worlds = this.ctx.storage.sql.exec<{ summary: string }>('SELECT summary FROM worlds WHERE summary IS NOT NULL ORDER BY updated DESC, slug ASC LIMIT 500').toArray().map(row => JSON.parse(row.summary) as WorldSummary);
+        await this.backfillResidents(worlds);
+        return json({ worlds });
       }
       const input = await body(request);
       const name = string(input.name, 60); const slug = string(input.slug, 48);
@@ -279,6 +297,7 @@ export class WorldRoom extends DurableObject<Env> {
       this.save(); await this.schedule(); return json(summarize(this.data.world, !!password));
     }
     if (!this.data) return json({ error: 'This world does not exist yet.' }, 404);
+    if (url.pathname === '/summary') return json(summarize(this.data.world, !!this.data.password));
     try {
       const ip = request.headers.get('CF-Connecting-IP') || 'local';
       if (url.pathname.endsWith('/unlock') && request.method === 'POST') {
