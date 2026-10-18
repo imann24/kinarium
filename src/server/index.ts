@@ -5,7 +5,7 @@ import { deployedVersion } from './build-version';
 import { HouseDetailsConflict } from '../simulation/house-details';
 import { DurableObject } from 'cloudflare:workers';
 import { activeCharacters, advance, applyCommand, createWorld, summarize, TICK_MS } from '../simulation/engine';
-import { TEMPLATES, TRAITS } from '../simulation/catalog';
+import { EVENTS, TEMPLATES, TRAITS } from '../simulation/catalog';
 import { validateAppearance } from '../simulation/appearance';
 import type { Command, LogEntry, Presence, Snapshot, TimeMode, WorldState, WorldSummary } from '../simulation/types';
 import { body, digest, equal, json, passwordHash, string, validOrigin } from './security';
@@ -232,7 +232,7 @@ export class WorldRoom extends DurableObject<Env> {
     const unique = new Map<string, Presence>();
     for (const ws of this.ctx.getWebSockets()) { const p = ws.deserializeAttachment() as Presence; if (p) unique.set(p.id, { id: p.id, name: p.name, color: p.color }); }
     const now = Date.now();
-    return { models: modelOptions(this.env), world: this.data!.world, protected: !!this.data!.password, presence: [...unique.values()], serverNow: now, playerEvents: eventBudget(this.playerEvents(playerId), now) };
+    return { models: modelOptions(this.env), world: this.data!.world, protected: !!this.data!.password, presence: [...unique.values()], serverNow: now, playerEvents: eventBudget(this.playerEvents(playerId), now), eventIds: EVENTS.map(e => e.id) };
   }
   private broadcast() {
     if (this.deleted || !this.data) return;

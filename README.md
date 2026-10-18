@@ -160,6 +160,17 @@ without `detailsRevision` start at revision zero and can be renamed in place.
 A merged PR alone does not deploy this repository: Cloudflare deployment is
 managed separately.
 
+### New events right after a release
+
+Cloudflare releases a new Worker version eventually consistently: the page and
+its assets can update minutes before a particular world's Durable Object
+restarts on the new code (see Cloudflare's Durable Objects known issues, "Code
+updates"). During that window the old object rejects a new event id with
+`Unknown event.`. To avoid offering it, each snapshot carries `eventIds`, the
+events the world's own server can run, and the event picker shows only the
+client's events in that list. When the object restarts it drops its sockets;
+the reconnect snapshot lists the new events and they appear without a reload.
+
 For a local reproduction, build the current frontend and run
 `node scripts/test-house-details-upgrade.mjs` with an available Playwright
 installation (`PLAYWRIGHT_MODULE` and `CHROMIUM_PATH` may select existing tools).

@@ -125,7 +125,10 @@ export interface WorldSummary {
   residents?: ResidentPreview[]; elevatorFloor?: number;
 }
 export interface Presence { id: string; name: string; color: string; }
-export interface Snapshot { models?: { allowed: string[]; defaultModel: string | null }; world: WorldState; presence: Presence[]; protected: boolean; serverNow: number; playerEvents: import('./event-budget').PlayerEventBudget; }
+export interface Snapshot { models?: { allowed: string[]; defaultModel: string | null }; world: WorldState; presence: Presence[]; protected: boolean; serverNow: number; playerEvents: import('./event-budget').PlayerEventBudget;
+  // Event ids this world's server can run. Code updates reach a world's Durable Object minutes after the
+  // page itself, so the client offers only these; absent from servers that predate the field.
+  eventIds?: string[]; }
 export type Command =
   | { type: 'house-details'; name: string; description: string; expectedRevision: number }
   | { type: 'add-character'; name?: string; trait?: Trait; backstory?: string }

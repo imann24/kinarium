@@ -10,6 +10,13 @@ export const TONE_FILTERS: { tone: ToneFilter; label: string }[] = [
   ...(Object.keys(TONE_LABELS) as EventTone[]).map(tone => ({ tone, label: TONE_LABELS[tone] })),
 ];
 
+/** The client's events that the world's server also knows. A freshly shipped page can reach a house whose server is still on the previous release. */
+export function serverEvents(events: EventDefinition[], serverIds?: readonly string[]): EventDefinition[] {
+  if (!serverIds) return events;
+  const known = new Set(serverIds);
+  return events.filter(e => known.has(e.id));
+}
+
 export interface EventEffect { key: string; label: string; value: number; good: boolean }
 const EFFECTS = [
   { key: 'cohesion', label: 'Togetherness' },
