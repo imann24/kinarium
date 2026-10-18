@@ -46,7 +46,7 @@ try {
     await page.clock.fastForward(20_000);
     const remaining = Number(await progress.getAttribute('aria-valuenow'));
     assert(remaining >= 24 && remaining <= 25);
-    const scale = await progress.locator('span').evaluate(el => Number(el.style.transform.match(/scaleX\((.+)\)/)[1]));
+    const scale = await progress.locator('span').evaluate(el => parseFloat(el.style.width) / 100);
     assert(scale > .5 && scale < .57);
     // Simulation races ahead, clears speech, and keeps rerendering: reading time survives.
     snapshot.world.minute += 10000;
