@@ -136,7 +136,7 @@ export default function Building({ world, selected, onSelect, onOpenConversation
   const night = world.minute % 1440 >= 1200 || world.minute % 1440 < 360;
   // The live frame trims only scenery margins; keep the sun, outside plants,
   // resident speech, elevator and bottom caption inside it. Previews keep their original frame.
-  return <svg className={`building ${miniature ? 'miniature' : ''}`} viewBox={onSelect ? '32 24 856 594' : '0 0 920 630'} role={onSelect ? 'group' : 'img'} aria-label={miniature ? `${template.name} template illustration` : `${world.name}, ${template.name}, with ${people.length} residents`}>
+  return <svg className={`building ${miniature ? 'miniature' : ''}`} viewBox={onSelect ? '32 24 856 594' : '0 0 920 630'} role={onSelect ? 'group' : 'img'} aria-label={miniature ? (world.slug === 'example' ? `${template.name} template illustration` : `${world.name}, with ${people.length} resident${people.length === 1 ? '' : 's'} at home`) : `${world.name}, ${template.name}, with ${people.length} residents`}>
     <defs>
       <linearGradient id={skyId} x2="0" y2="1"><stop stopColor={night ? 'var(--sky-night, #bfc9c8)' : harbor ? 'var(--sky-harbor, #d5e5e9)' : template.id === 'makers-house' ? 'var(--sky-makers, #eee2da)' : 'var(--sky-day, #e7ecdf)'}/><stop offset="1" stopColor="var(--sky-horizon, #f0eee2)"/></linearGradient>
       <pattern id={wallId} width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r=".6" fill="#8e9078" opacity=".12"/></pattern>

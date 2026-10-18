@@ -299,6 +299,8 @@ export function applyCommand(s: WorldState, command: Command, now: number) {
   separateStandingResidents(s);
 }
 export function summarize(s: WorldState, protectedWorld: boolean): WorldSummary {
-  return { slug: s.slug, name: s.name, description: s.description, templateId: s.templateId, createdAt: s.createdAt, population: activeCharacters(s).length, populationCap: s.settings.populationCap, mode: s.settings.mode, protected: protectedWorld, cohesion: Math.round(s.cohesion) };
+  return { slug: s.slug, name: s.name, description: s.description, templateId: s.templateId, createdAt: s.createdAt, population: activeCharacters(s).length, populationCap: s.settings.populationCap, mode: s.settings.mode, protected: protectedWorld, cohesion: Math.round(s.cohesion),
+    residents: activeCharacters(s).map(c => ({ id: c.id, name: c.name, color: c.color, ...(c.appearance && { appearance: c.appearance }), floor: c.floor, x: Math.round(c.x * 10) / 10, ...(c.inElevator && { inElevator: true as const }) })),
+    elevatorFloor: s.elevatorFloor };
 }
 export function gameTime(minute: number) { return `Day ${Math.floor(minute / 1440) + 1} · ${String(Math.floor(minute % 1440 / 60)).padStart(2, '0')}:${String(minute % 60).padStart(2, '0')}`; }
