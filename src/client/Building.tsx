@@ -3,7 +3,7 @@ import { residentStacks } from './resident-stacks';
 import { useId, type CSSProperties } from 'react';
 import type { Character, WorldState } from '../simulation/types';
 import { TEMPLATES } from '../simulation/catalog';
-import { HAIR_COLORS, HAIR_STYLES, residentAppearance, SKIN_TONES } from '../simulation/appearance';
+import { eyeColor, HAIR_COLORS, HAIR_STYLES, residentAppearance, SKIN_TONES } from '../simulation/appearance';
 import { useBuildingMotion } from './useBuildingMotion';
 import ResidentSpeech from './ResidentSpeech';
 
@@ -114,7 +114,7 @@ export function Person({ character, small = false }: { character: Pick<Character
     <path d="M-13-28-18-15M13-28 18-17" stroke={character.color} strokeWidth="6" strokeLinecap="round"/>
     <circle cy="-43" r="12" fill={SKIN_TONES[look.skinTone]}/>
     <path d={HAIR_STYLES[look.hairStyle]} fill={HAIR_COLORS[look.hairColor]}/>
-    <circle cx="-4" cy="-42" r="1.2" fill="#514538"/><circle cx="4" cy="-42" r="1.2" fill="#514538"/>
+    <circle cx="-4" cy="-42" r="1.2" fill={eyeColor(look.skinTone)}/><circle cx="4" cy="-42" r="1.2" fill={eyeColor(look.skinTone)}/>
     <path d="M-2-37q2 2 4 0" fill="none" stroke="#986f54" strokeWidth="1"/>
   </g>;
 }

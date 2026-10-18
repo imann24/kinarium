@@ -1,8 +1,9 @@
-import { useId, useRef, useState } from 'react';
+import { useId, useRef, useState, type ReactNode } from 'react';
 import { Pencil } from 'lucide-react';
 import './resident-name.css';
 
-export function ResidentNameEditor({ name, busy, onSave }: { name: string; busy: boolean; onSave: (name: string) => Promise<unknown> }) {
+/** `beside` sits next to the edit button and hides with it while the name form is open. */
+export function ResidentNameEditor({ name, busy, onSave, beside }: { name: string; busy: boolean; onSave: (name: string) => Promise<unknown>; beside?: ReactNode }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(name);
   const [error, setError] = useState('');
@@ -12,7 +13,7 @@ export function ResidentNameEditor({ name, busy, onSave }: { name: string; busy:
   const id = useId();
   const close = () => { setEditing(false); setError(''); requestAnimationFrame(() => trigger.current?.focus()); };
   return <div className="resident-name-editor">
-    <button ref={trigger} type="button" className="back-link" hidden={editing} disabled={busy} aria-label={`Edit ${name}’s name`} onClick={() => { setDraft(name); setError(''); setEditing(true); }}><Pencil size={13} aria-hidden="true"/> Edit name</button>
+    <div className="resident-edit-actions" hidden={editing}><button ref={trigger} type="button" className="back-link" disabled={busy} aria-label={`Edit ${name}’s name`} onClick={() => { setDraft(name); setError(''); setEditing(true); }}><Pencil size={13} aria-hidden="true"/> Edit name</button>{beside}</div>
     {editing && <form onKeyDown={e => { if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); if (!submitting.current) close(); } }} onSubmit={async e => {
       e.preventDefault();
       if (busy || submitting.current) return;
