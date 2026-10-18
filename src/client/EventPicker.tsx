@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
-import { Armchair, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, ArrowUpRight, BedDouble, CalendarX, Cake, ChevronLeft, ChevronRight, Droplets, GalleryHorizontalEnd, Gift, Handshake, HeartCrack, LayoutGrid, Megaphone, MessageCircle, Moon, PackageSearch, Receipt, ShoppingBasket, Shuffle, Soup, Sprout, Thermometer, UserMinus, Vote, Wind, Zap } from 'lucide-react';
+import { Armchair, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, ArrowUpRight, BedDouble, CalendarX, Cake, ChevronLeft, ChevronRight, Clock3, Droplets, GalleryHorizontalEnd, Gift, Handshake, HeartCrack, LayoutGrid, Megaphone, MessageCircle, Moon, PackageSearch, Receipt, ShoppingBasket, Shuffle, Soup, Sprout, Thermometer, UserMinus, Vote, Wind, Zap } from 'lucide-react';
 import type { EventDefinition } from '../simulation/catalog';
-import { EVENT_VIEW_KEY, TONE_FILTERS, TONE_LABELS, eventEffects, filterEvents, initialEventView, type EventView, type ToneFilter } from './event-effects';
+import { EVENT_VIEW_KEY, TONE_FILTERS, TONE_LABELS, countdown, eventEffects, filterEvents, initialEventView, waitLeft, type EventView, type EventWait, type ToneFilter } from './event-effects';
 import './event-picker.css';
 
 export const EVENT_ICONS = {
@@ -11,15 +11,22 @@ export const EVENT_ICONS = {
 };
 const iconFor = (event: EventDefinition) => EVENT_ICONS[event.icon as keyof typeof EVENT_ICONS] ?? Sprout;
 
+/** What a resting card says instead of inviting a tap. */
+function waitLabel(wait: EventWait, now: number) {
+  const left = countdown(wait.readyAt - now);
+  return wait.reason === 'world' ? `Settling · ready in ${left}` : `Allowance spent · back in ${left}`;
+}
+
 function savedView() {
   try { return localStorage.getItem(EVENT_VIEW_KEY); } catch { return null; /* Storage may be unavailable, or this is a server render. */ }
 }
 
 /**
  * The player-triggered events, as a swipeable card deck (the default on phones) or the original
- * grid. Either way one tap introduces an event; the deck also shows what each one moves.
+ * grid. Either way one tap introduces an event; the deck also shows what each one moves. While
+ * the world settles or the allowance is spent, every card shows the wait and how long is left.
  */
-export default function EventPicker({ events, disabled, phone, onPick }: { events: EventDefinition[]; disabled: boolean; phone: boolean; onPick: (id: string) => void }) {
+export default function EventPicker({ events, disabled, phone, wait, now = 0, onPick }: { events: EventDefinition[]; disabled: boolean; phone: boolean; wait?: EventWait; now?: number; onPick: (id: string) => void }) {
   // An explicit choice sticks; until then the layout follows the screen.
   const [saved, setSaved] = useState(savedView);
   const view = initialEventView(saved, phone);
@@ -37,12 +44,14 @@ export default function EventPicker({ events, disabled, phone, onPick }: { event
       </div>
     </div>
     {view === 'deck'
-      ? <EventDeck key={tone} events={shown} disabled={disabled} onPick={onPick}/>
-      : <div className="event-grid">{shown.map(event => { const Icon = iconFor(event); return <button key={event.id} data-event-id={event.id} className={`event-card ${event.tone}`} title={event.description} disabled={disabled} onClick={() => onPick(event.id)}><span className="event-icon"><Icon size={20} strokeWidth={1.5}/></span><b>{event.name}</b><small>{event.description}</small><ArrowUpRight size={14} className="event-arrow"/></button>; })}</div>}
+      ? <EventDeck key={tone} events={shown} disabled={disabled || !!wait} wait={wait} now={now} onPick={onPick}/>
+      : <div className="event-grid">{shown.map(event => { const Icon = iconFor(event); return <button key={event.id} data-event-id={event.id} className={`event-card ${event.tone}${wait ? ' waiting' : ''}`} title={wait ? waitLabel(wait, now) : event.description} disabled={disabled || !!wait} onClick={() => onPick(event.id)}><span className="event-icon"><Icon size={20} strokeWidth={1.5}/></span><b>{event.name}</b><small>{event.description}</small>{wait
+        ? <span className={`event-wait ${wait.reason}`}><Clock3 size={11} aria-hidden/><span className="sr-only">{waitLabel(wait, now)}</span><span aria-hidden>{countdown(wait.readyAt - now)}</span></span>
+        : <ArrowUpRight size={14} className="event-arrow"/>}</button>; })}</div>}
   </div>;
 }
 
-function EventDeck({ events, disabled, onPick }: { events: EventDefinition[]; disabled: boolean; onPick: (id: string) => void }) {
+function EventDeck({ events, disabled, wait, now, onPick }: { events: EventDefinition[]; disabled: boolean; wait?: EventWait; now: number; onPick: (id: string) => void }) {
   const track = useRef<HTMLDivElement>(null);
   const [view, setView] = useState({ active: 0, first: 0, last: 0, atStart: true, atEnd: events.length < 2 });
   const [drawn, setDrawn] = useState<string>();
@@ -122,12 +131,14 @@ function EventDeck({ events, disabled, onPick }: { events: EventDefinition[]; di
         onClickCapture={e => { if (dragged.current) { e.preventDefault(); e.stopPropagation(); } }} aria-label="Events" role="group">
         {events.map((event, i) => {
           const Icon = iconFor(event);
-          return <button key={event.id} type="button" data-event-id={event.id} className={`deck-card ${event.tone}${i === active ? ' active' : ''}${drawn === event.id ? ' drawn' : ''}`} disabled={disabled} onClick={() => onPick(event.id)}>
-            <span className="deck-card-top"><span className="deck-icon"><Icon size={24} strokeWidth={1.5}/></span><span className="deck-tone" aria-hidden>{TONE_LABELS[event.tone]}</span></span>
+          return <button key={event.id} type="button" data-event-id={event.id} className={`deck-card ${event.tone}${i === active ? ' active' : ''}${drawn === event.id ? ' drawn' : ''}${wait ? ' waiting' : ''}`} disabled={disabled} onClick={() => onPick(event.id)}>
+            <span className="deck-card-top"><span className="deck-icon"><Icon size={24} strokeWidth={1.5}/></span><span className="deck-tone" aria-hidden>{TONE_LABELS[event.tone]}</span>{wait && <span className="deck-wait-bar" aria-hidden><i style={{ width: `${waitLeft(wait, now) * 100}%` }}/></span>}</span>
             <b>{event.name}</b>
             <small>{event.description}</small>
             <span className="deck-effects">{eventEffects(event).map(effect => <span key={effect.key} className={`deck-effect ${effect.good ? 'good' : 'bad'}`}>{effect.value > 0 ? <ArrowUp size={11} aria-hidden/> : <ArrowDown size={11} aria-hidden/>}{effect.label} {effect.value > 0 ? '+' : '−'}{Math.abs(effect.value)}</span>)}</span>
-            <span className="deck-cta">Introduce <ArrowUpRight size={14} aria-hidden/></span>
+            {wait
+              ? <span className={`deck-cta deck-wait ${wait.reason}`}><Clock3 size={13} aria-hidden/>{waitLabel(wait, now)}</span>
+              : <span className="deck-cta">Introduce <ArrowUpRight size={14} aria-hidden/></span>}
           </button>;
         })}
       </div>

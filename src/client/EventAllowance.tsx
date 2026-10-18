@@ -1,10 +1,6 @@
 import { Clock3 } from 'lucide-react';
 import { availableEvents, type PlayerEventBudget } from '../simulation/event-budget';
-
-function countdown(ms: number) {
-  const seconds = Math.max(0, Math.ceil(ms / 1000));
-  return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
-}
+import { countdown } from './event-effects';
 
 export default function EventAllowance({ budget, now, worldReadyAt }: { budget: PlayerEventBudget; now: number; worldReadyAt: number }) {
   const remaining = availableEvents(budget, now);
