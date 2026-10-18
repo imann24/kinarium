@@ -117,7 +117,13 @@ export interface WorldState {
   /** Peace offerings residents decided on after a house event, given when the pair next meets. */
   pendingGestures?: PendingGesture[];
 }
-export interface WorldSummary { slug: string; name: string; description: string; templateId: string; createdAt: number; population: number; populationCap: number; mode: TimeMode; protected: boolean; cohesion: number; }
+/** Just enough of a resident to draw them in a directory preview. */
+export interface ResidentPreview { id: string; name: string; color: string; appearance?: ResidentAppearance; floor: number; x: number; inElevator?: true; }
+export interface WorldSummary {
+  slug: string; name: string; description: string; templateId: string; createdAt: number; population: number; populationCap: number; mode: TimeMode; protected: boolean; cohesion: number;
+  /** Residents at home when the summary was taken; absent in summaries indexed before previews existed. */
+  residents?: ResidentPreview[]; elevatorFloor?: number;
+}
 export interface Presence { id: string; name: string; color: string; }
 export interface Snapshot { models?: { allowed: string[]; defaultModel: string | null }; world: WorldState; presence: Presence[]; protected: boolean; serverNow: number; playerEvents: import('./event-budget').PlayerEventBudget; }
 export type Command =

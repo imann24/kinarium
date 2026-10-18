@@ -12,7 +12,7 @@ import UpdateBanner from './UpdateBanner';
 import { HEARTBEAT_MS } from './heartbeat';
 import ResidentState from './ResidentState';
 import HouseDetailsForm from './HouseDetailsForm';
-import React, { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ArrowLeft, ArrowRight, ArrowUpRight, Armchair, Asterisk, BookOpen, Check, ChevronDown, CircleHelp, Clock3, DoorOpen, Gift, Globe2, Handshake, Heart, Infinity as InfinityIcon, Leaf, LockKeyhole, Maximize, Maximize2, MessageCircle, Minimize, Moon, Plus, Search, Settings2, Soup, Sparkles, Sprout, Users, Wind, X, Zap } from 'lucide-react';
 import { EVENTS, TEMPLATES, TRAITS } from '../simulation/catalog';
@@ -21,6 +21,7 @@ import type { Character, Command, LogEntry, Snapshot, TimeMode, WorldState, Worl
 import Building, { Person } from './Building';
 import ConversationThread from './ConversationThread';
 import { useMediaQuery } from './useMediaQuery';
+import { previewWorld } from './world-preview';
 import ConversationModal from './ConversationModal';
 import EventAllowance from './EventAllowance';
 import AwayConfirmation from './AwayConfirmation';
@@ -49,6 +50,10 @@ import { isAppropriate } from '../simulation/content-filter';
 const icons = { soup: Soup, gift: Gift, moon: Moon, sprout: Sprout, zap: Zap, message: MessageCircle, armchair: Armchair, handshake: Handshake, wind: Wind };
 const templateExamples = Object.fromEntries(Object.keys(TEMPLATES).map(templateId => [templateId, createWorld({ slug: 'example', name: 'A little world', templateId }, 0, 125)]));
 const example = templateExamples['common-house'];
+function WorldPreview({ summary }: { summary: WorldSummary }) {
+  const world = useMemo(() => previewWorld(templateExamples[summary.templateId] ?? example, summary), [summary]);
+  return <Building world={world} miniature/>;
+}
 const getError = (error: unknown) => error instanceof Error ? error.message : 'Something went wrong. Please try again.';
 function Logo() { return <a href="/" className="brand" aria-label="Kinarium home"><span className="brand-mark"><i/><i/><i/><i/></span>kinarium<span className="alpha">a living playground</span></a>; }
 function App() {
@@ -80,7 +85,7 @@ function Directory() {
   return <main className="directory">
     <section className="intro"><div className="intro-copy"><p className="eyebrow"><Asterisk className="tiny-star" size={13} strokeWidth={2.4} aria-hidden/> AN OPEN-ENDED COMMUNITY SIMULATION</p><h1>Little worlds.<br/><em>A life of their own.</em></h1><p>A few neighbors. A shared roof. Stories that happen<br className="desktop-break"/> when you leave a little room for life.</p><div className="intro-actions"><button className="primary" onClick={() => setCreate(true)}><Plus size={17}/> Create a world</button><a href="#worlds" className="quiet-link">Find your little corner <ArrowRight size={16}/></a></div><div className="intro-foot"><span><Leaf size={14}/> No goals. Just possibilities.</span><span><Users size={14}/> Better, together.</span></div></div>{!mobile && <div className="intro-art"><Building world={example} miniature/><div className="art-caption"><span className="status-dot"/> A world starts with an open door.</div></div>}</section>
     <section id="worlds" className="worlds-section"><div className="section-top"><div><p className="eyebrow">SOMEWHERE TO BELONG</p><h2>The neighborhood <span>{worlds.length.toString().padStart(2, '0')}</span></h2></div><label className="search"><Search size={16}/><input aria-label="Search worlds" placeholder="Find a world…" value={query} onChange={e => setQuery(e.target.value)}/></label></div><div className="directory-filters"><div className="pills">{[['all','All worlds'],['open','Open doors'],['persistent','Always on']].map(([id,label]) => <button key={id} className={filter === id ? 'selected' : ''} onClick={() => setFilter(id)}>{label}</button>)}</div><span>Small places. Shared stories.</span></div>
-      {error ? <div className="error-box">{error} <button onClick={load}>Try again</button></div> : loading ? <div className="loading">Opening the neighborhood…</div> : <div className="world-grid">{filtered.map((w, i) => <a className="world-card" href={`/w/${w.slug}`} key={w.slug}><div className={`card-art art-${i%3}`}><Building world={{ ...templateExamples[w.templateId], name: w.name }} miniature/><span className="card-badge">{w.protected ? <LockKeyhole size={12}/> : <DoorOpen size={12}/>} {w.protected ? 'Password protected' : 'Everyone welcome'}</span></div><div className="card-body"><div className="card-title"><h3>{w.name}</h3><ArrowUpRight size={20}/></div><p>{w.description}</p><div className="card-meta"><span><Users size={14}/>{w.population} / {w.populationCap} residents</span><span>{w.mode === 'persistent' ? <InfinityIcon size={15}/> : <Clock3 size={13}/>} {w.mode === 'persistent' ? 'Always on' : 'Catch-up'}</span></div></div></a>)}<button className="new-world-card" onClick={() => setCreate(true)}><span className="new-world-icon"><Plus size={26} strokeWidth={1.3}/></span><h3>A world of your own</h3><p>Same small beginning.<br/>An entirely different story.</p><span className="quiet-link">Make room for possibility <ArrowRight size={15}/></span></button></div>}
+      {error ? <div className="error-box">{error} <button onClick={load}>Try again</button></div> : loading ? <div className="loading">Opening the neighborhood…</div> : <div className="world-grid">{filtered.map((w, i) => <a className="world-card" href={`/w/${w.slug}`} key={w.slug}><div className={`card-art art-${i%3}`}><WorldPreview summary={w}/><span className="card-badge">{w.protected ? <LockKeyhole size={12}/> : <DoorOpen size={12}/>} {w.protected ? 'Password protected' : 'Everyone welcome'}</span></div><div className="card-body"><div className="card-title"><h3>{w.name}</h3><ArrowUpRight size={20}/></div><p>{w.description}</p><div className="card-meta"><span><Users size={14}/>{w.population} / {w.populationCap} residents</span><span>{w.mode === 'persistent' ? <InfinityIcon size={15}/> : <Clock3 size={13}/>} {w.mode === 'persistent' ? 'Always on' : 'Catch-up'}</span></div></div></a>)}<button className="new-world-card" onClick={() => setCreate(true)}><span className="new-world-icon"><Plus size={26} strokeWidth={1.3}/></span><h3>A world of your own</h3><p>Same small beginning.<br/>An entirely different story.</p><span className="quiet-link">Make room for possibility <ArrowRight size={15}/></span></button></div>}
       {!loading && !error && filtered.length === 0 && <p className="muted">No worlds match this search. There’s always room for a new one.</p>}
     </section><footer><Logo/><span>A small experiment in being together.</span><span>Nothing to win. Everything to discover. <Sprout size={15}/></span></footer>
     {create && <CreateWorld onClose={() => setCreate(false)}/>}
