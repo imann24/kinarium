@@ -1,0 +1,15 @@
+/* The scene takes pinches itself so they zoom the house, not the page. */
+.world-stage .building { touch-action: pan-x pan-y; }
+/* Zoomed in, one finger pans the house; the toolbar and footer still scroll the page. */
+.world-stage.scene-zoomed .building { touch-action: none; cursor: grab; }
+.world-stage.scene-panning .building { cursor: grabbing; }
+.scene-zoom-controls { display:flex; align-items:center; border:1px solid #d8dfcb; border-radius:5px; overflow:hidden; }
+.scene-zoom-controls button { display:grid; place-items:center; width:34px; height:34px; color:#65765b; touch-action:manipulation; }
+.scene-zoom-controls button + button { border-left:1px solid #d8dfcb; }
+.scene-zoom-controls button:hover:not(:disabled) { background:#eef2e6; }
+.scene-zoom-controls button:focus-visible { outline-offset:-3px; }
+:root[data-theme='dark'] .scene-zoom-controls, :root[data-theme='dark'] .scene-zoom-controls button + button { border-color:var(--control-border); }
+:root[data-theme='dark'] .scene-zoom-controls button { color:var(--accent); }
+:root[data-theme='dark'] .scene-zoom-controls button:hover:not(:disabled) { background:var(--surface-hover); color:var(--text); }
+/* Phones zoom with a pinch; keep only the way back so the toolbar stays on one line. */
+@media (max-width:450px) { .scene-zoom-controls button:not(.scene-zoom-reset) { display:none; } .scene-zoom-controls:not(:has(.scene-zoom-reset)) { display:none; } }

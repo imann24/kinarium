@@ -1,5 +1,6 @@
 /* Keep name and count readable when the full house is fitted to a phone.
-   Move right-edge labels inward so cabin occupants do not lose their badge. */
+   Move right-edge labels inward so cabin occupants do not lose their badge.
+   Zooming the scene enlarges them anyway, so shrink the boost back as --scene-zoom grows. */
 @media (max-width: 600px) {
-  .resident-name-tag { transform: translate(var(--name-tag-shift), -12px) scale(3); }
+  .resident-name-tag { transform: translate(var(--name-tag-shift), -12px) scale(max(1, calc(3 / var(--scene-zoom, 1)))); }
 }
