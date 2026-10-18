@@ -1,4 +1,5 @@
 import type { EventDefinition, EventTone } from '../simulation/catalog';
+import { availableEvents, type PlayerEventBudget } from '../simulation/event-budget';
 
 export type EventView = 'deck' | 'grid';
 export type ToneFilter = 'all' | EventTone;
@@ -40,3 +41,24 @@ export const filterEvents = (events: EventDefinition[], tone: ToneFilter) => ton
 export function initialEventView(saved: string | null, phone: boolean): EventView {
   return saved === 'deck' || saved === 'grid' ? saved : phone ? 'deck' : 'grid';
 }
+
+/** Minutes and seconds left, as m:ss. */
+export function countdown(ms: number) {
+  const seconds = Math.max(0, Math.ceil(ms / 1000));
+  return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
+}
+
+/** Why the event cards are resting, and until when: the world settling after the last event, or the player's allowance being spent. */
+export interface EventWait { reason: 'world' | 'allowance'; readyAt: number; total: number }
+
+/** The longest wait between now and the next event, or nothing when one could be introduced now. */
+export function eventWait(now: number, world: { readyAt: number; total: number }, budget: PlayerEventBudget): EventWait | undefined {
+  const waits: EventWait[] = [];
+  if (world.readyAt > now) waits.push({ reason: 'world', ...world });
+  const refill = budget.refillsAt.find(at => at > now);
+  if (availableEvents(budget, now) === 0 && refill !== undefined) waits.push({ reason: 'allowance', readyAt: refill, total: budget.windowMs });
+  return waits.sort((a, b) => b.readyAt - a.readyAt)[0];
+}
+
+/** How much of the wait is left, from 1 (just started) to 0 (ready). */
+export const waitLeft = (wait: EventWait, now: number) => Math.max(0, Math.min(1, (wait.readyAt - now) / wait.total));

@@ -38,6 +38,17 @@
 .deck-effect.bad{color:var(--change-bad)}
 .deck-cta{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;color:var(--tone);padding:4px 15px 0}
 .deck-card:disabled .deck-cta{color:var(--muted)}
+/* Resting cards: the face fades and greys, and the countdown takes over from the call to action. */
+.deck-card.waiting,.deck-card.waiting:not(.active){opacity:1;border-style:dashed}
+.deck-card.waiting :is(.deck-card-top,b,small,.deck-effects){filter:grayscale(.75);opacity:.55}
+.deck-card-top{position:relative}
+.deck-wait-bar{position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--line)}
+.deck-wait-bar i{display:block;height:100%;margin-left:auto;background:var(--secondary);transition:width 1s linear}
+.deck-card.waiting .deck-wait{align-self:stretch;margin:2px 12px 0;padding:7px 10px;border-radius:8px;gap:6px;background:var(--surface-soft);color:var(--secondary);font-variant-numeric:tabular-nums}
+.event-card.waiting{opacity:1;border-style:dashed}
+.event-card.waiting>:not(.event-wait){filter:grayscale(.75);opacity:.6}
+.event-wait{position:absolute;right:10px;top:14px;display:inline-flex;align-items:center;gap:4px;font-size:10px;font-variant-numeric:tabular-nums;padding:3px 7px;border-radius:999px;background:var(--surface-soft);color:var(--secondary)}
+@media(prefers-reduced-motion:reduce){.deck-wait-bar i{transition:none}}
 
 .deck-controls{display:flex;align-items:center;gap:10px;padding:0 var(--page-gutter, 18px)}
 .deck-step{display:grid;place-items:center;width:36px;height:36px;flex:none;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--secondary);touch-action:manipulation}
