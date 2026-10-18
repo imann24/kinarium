@@ -44,10 +44,19 @@
 .deck-step:disabled{opacity:.4}
 .deck-position{flex:1;display:flex;flex-direction:column;gap:5px;font-size:10px;color:var(--muted);min-width:0}
 .deck-progress{height:3px;border-radius:2px;background:var(--surface-soft);overflow:hidden}
-.deck-progress i{display:block;height:100%;background:var(--accent);border-radius:2px;transition:width .25s}
+.deck-progress i{display:block;height:100%;background:var(--accent);border-radius:2px;transition:width .25s,margin-left .25s}
 .deck-draw{display:inline-flex;align-items:center;gap:6px;flex:none;min-height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--accent);font-size:11px;touch-action:manipulation}
 @media(hover:hover) and (pointer:fine){.deck-card:hover:not(:disabled){border-color:var(--tone);opacity:1}.deck-step:hover:not(:disabled),.deck-draw:hover:not(:disabled){background:var(--surface-hover)}}
 
-/* On larger screens the deck sits inside the page rather than bleeding to its edges. */
-@media(min-width:761px){.event-deck{margin:0}.deck-track{padding-inline:2px;scroll-padding-inline:2px;scroll-snap-type:x proximity}.deck-card{flex-basis:248px}.deck-controls{padding:0;max-width:520px}}
+/* On larger screens the deck sits inside the page, shows several cards at once, and can be paged with side arrows or dragged with a mouse. */
+.deck-viewport{position:relative}
+.deck-track:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:14px}
+.deck-side{display:none}
+@media(min-width:761px){.event-deck{margin:0}.deck-track{padding-inline:2px;scroll-padding-inline:2px;scroll-snap-type:x proximity}.deck-card{flex-basis:248px}.deck-card:not(.active){opacity:1}.deck-card.active:not(.drawn){border-color:var(--line);box-shadow:0 1px 2px rgba(60,70,50,.05)}.deck-controls{padding:0;max-width:520px}
+  .deck-side{display:grid;place-items:center;position:absolute;top:calc(50% - 30px);width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--accent);box-shadow:0 6px 18px rgba(60,70,50,.16);transition:opacity .2s;z-index:1}
+  .deck-side.previous{left:8px}.deck-side.next{right:8px}
+  .deck-side:disabled{opacity:0;pointer-events:none}
+  .deck-track.dragging{scroll-snap-type:none;cursor:grabbing;user-select:none}
+  .deck-track.dragging .deck-card{pointer-events:none}}
+@media(min-width:761px) and (hover:hover) and (pointer:fine){.deck-track{cursor:grab}.deck-side:hover:not(:disabled){background:var(--surface-hover)}}
 @media(max-width:380px){.deck-draw{padding:0 11px}.deck-card b{font-size:17px}}
