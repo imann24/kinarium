@@ -14,16 +14,17 @@ import ResidentState from './ResidentState';
 import HouseDetailsForm from './HouseDetailsForm';
 import React, { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Palette, ArrowLeft, ArrowRight, ArrowUpRight, Armchair, Asterisk, BookOpen, Check, ChevronDown, CircleHelp, Clock3, DoorOpen, Gift, Globe2, Handshake, Heart, Infinity as InfinityIcon, Leaf, LockKeyhole, Maximize, Maximize2, MessageCircle, Minimize, Moon, Plus, Search, Settings2, Soup, Sparkles, Sprout, Users, Wind, X, Zap } from 'lucide-react';
+import { Palette, ArrowLeft, ArrowRight, ArrowUpRight, Asterisk, BookOpen, Check, ChevronDown, CircleHelp, Clock3, DoorOpen, Globe2, Heart, Infinity as InfinityIcon, Leaf, LockKeyhole, Maximize, Maximize2, MessageCircle, Minimize, Moon, Plus, Search, Settings2, Sparkles, Sprout, Users, X, Zap } from 'lucide-react';
 import { EVENTS, TEMPLATES, TRAITS } from '../simulation/catalog';
 import { activeCharacters, createWorld, gameTime } from '../simulation/engine';
 import type { Character, Command, LogEntry, Snapshot, TimeMode, WorldState, WorldSummary } from '../simulation/types';
 import Building, { Person } from './Building';
 import ConversationThread from './ConversationThread';
-import { useMediaQuery } from './useMediaQuery';
+import { PHONE_QUERY, useMediaQuery } from './useMediaQuery';
 import { previewWorld } from './world-preview';
 import ConversationModal from './ConversationModal';
 import EventAllowance from './EventAllowance';
+import EventPicker from './EventPicker';
 import AwayConfirmation from './AwayConfirmation';
 import PersonalHistory from './PersonalHistory';
 import CommunityInsights from './CommunityInsights';
@@ -47,7 +48,6 @@ import './phone-landscape.css';
 import './resident-modal.css';
 import { isAppropriate } from '../simulation/content-filter';
 
-const icons = { soup: Soup, gift: Gift, moon: Moon, sprout: Sprout, zap: Zap, message: MessageCircle, armchair: Armchair, handshake: Handshake, wind: Wind };
 const templateExamples = Object.fromEntries(Object.keys(TEMPLATES).map(templateId => [templateId, createWorld({ slug: 'example', name: 'A little world', templateId }, 0, 125)]));
 const example = templateExamples['common-house'];
 function WorldPreview({ summary }: { summary: WorldSummary }) {
@@ -102,6 +102,7 @@ function CreateWorld({ onClose }: { onClose: () => void }) {
 function World({ slug, insights }: { slug: string; insights: boolean }) {
   const fullscreen = useWorldFullscreen();
   const journalPanel = useJournalPanel();
+  const phone = useMediaQuery(PHONE_QUERY);
   const [conversationRequest, setConversationRequest] = useState<{ id: number; entry?: LogEntry }>();
   const [openConversation, setOpenConversation] = useState<{ id: number; entry?: LogEntry }>();
   useFullscreenCanvas(fullscreen.ref, fullscreen.isFullscreen, journalPanel.collapsed);
@@ -161,7 +162,7 @@ function World({ slug, insights }: { slug: string; insights: boolean }) {
       <aside id="world-journal-panel" className="world-sidebar" aria-label="World journal and residents" hidden={journalPanel.collapsed}><div className="sidebar-tabs"><button className={tab==='journal'?'active':''} onClick={()=>setTab('journal')}><BookOpen size={14}/> Journal</button><button className={tab==='residents'?'active':''} onClick={()=>setTab('residents')}><Users size={14}/> Residents</button><button className={tab==='bonds'?'active':''} onClick={()=>setTab('bonds')}><Heart size={14}/> Bonds</button></div><div className="journal-panel" hidden={tab!=='journal'}><Journal world={w} onOpenConversation={entry=>setOpenConversation({id:entry.id,entry})} conversationRequest={conversationRequest} onSelect={id=>{setSelected(id);setTab('residents');}}/></div>{tab==='journal' ? null : tab==='bonds' ? <Bonds world={w} onSelect={id=>{setSelected(id);setTab('residents');}}/> : resident ? <CharacterDetail onEditAppearance={()=>{setError('');setAppearanceTarget(resident.id);}} onRename={name=>command({type:'rename-character',characterId:resident.id,name},true)} models={snapshot.models} onModel={model=>void command({type:'set-model',characterId:resident.id,model})} world={w} character={resident} onSelect={id=>{setSelected(id);setTab('residents');}} onBack={()=>setSelected(undefined)} onExpand={()=>setExpandedResident(true)} busy={pending} onAway={()=>{if(resident.away)void command({type:'set-away',characterId:resident.id,away:false});else {setError('');setAwayTarget(resident.id);}}}/> : <Residents world={w} onSelect={setSelected} onAdd={()=>setModal('add')}/>}</aside>
     </div>
     <CommunityMetrics world={w}/>
-    <section className="events-section"><div className="events-heading"><div><p className="eyebrow">A GENTLE HAND IN THE STORY</p><h2>Invite a little possibility.</h2></div><span>{remaining ? `Let the moment settle · ${remaining}s` : 'You set the scene. They take it from there.'}</span></div><EventAllowance budget={budget} now={now} worldReadyAt={w.cooldowns.events || 0}/><div className="event-grid">{EVENTS.map(event=>{const Icon=icons[event.icon as keyof typeof icons];return <button key={event.id} className={`event-card ${event.tone}`} title={event.description} disabled={pending || remaining>0 || allowance===0 || !connected} onClick={()=>void command({type:'trigger-event',eventId:event.id})}><span className="event-icon"><Icon size={20} strokeWidth={1.5}/></span><b>{event.name}</b><small>{event.description}</small><ArrowUpRight size={14} className="event-arrow"/></button>;})}</div></section><div className="world-footnote"><Leaf size={13}/> Nothing to win. A lot to notice.<span>Changes are saved as life unfolds.</span></div>
+    <section className="events-section"><div className="events-heading"><div><p className="eyebrow">A GENTLE HAND IN THE STORY</p><h2>Invite a little possibility.</h2></div><span>{remaining ? `Let the moment settle · ${remaining}s` : 'You set the scene. They take it from there.'}</span></div><EventAllowance budget={budget} now={now} worldReadyAt={w.cooldowns.events || 0}/><EventPicker events={EVENTS} phone={phone} disabled={pending || remaining>0 || allowance===0 || !connected} onPick={eventId=>void command({type:'trigger-event',eventId})}/></section><div className="world-footnote"><Leaf size={13}/> Nothing to win. A lot to notice.<span>Changes are saved as life unfolds.</span></div>
     </>}
     {openConversation !== undefined && <ConversationModal key={`${w.slug}:${openConversation.id}`} world={w} conversationId={openConversation.id} initialEntry={openConversation.entry} onClose={()=>setOpenConversation(undefined)} onJournal={entry=>{setOpenConversation(undefined);setConversationRequest({id:entry.id,entry});setTab('journal');journalPanel.setCollapsed(false);}} onSelect={id=>{setOpenConversation(undefined);setSelected(id);setTab('residents');journalPanel.setCollapsed(false);}}/>}
     {expandedResident && !insights && tab==='residents' && residentModal(()=>setExpandedResident(false))}

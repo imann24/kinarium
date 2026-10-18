@@ -5,6 +5,7 @@ import { separateStandingResidents } from './standing';
 import { bestTrust, residentDrift, residentStats, recordResidentChange } from './resident-state';
 import { contactWillingness, repairScene } from './repair';
 import { advanceGestures, choosePartners, reactToEvent } from './event-reactions';
+import { eventConsequences } from './event-consequences';
 import { GOODWILL_DECAY_PER_DAY, isEased, settleEasedConflict } from './goodwill';
 import { updateHouseDetails } from './house-details';
 import { advanceConversations, beginConversation, nearby as inConversationRange, isConversing, interruptConversations } from './conversations';
@@ -280,11 +281,15 @@ export function applyCommand(s: WorldState, command: Command, now: number) {
         r.encounters++; r.lastMinute = s.minute;
         for (const c of [a, b]) if (!c.inElevator) c.destination = i % TEMPLATES[s.templateId].floors.length;
       });
+      // Who the event singles out, and the pairs it moves in its own particular way.
+      const consequences = eventConsequences(s, event, occasion, people, (a, b) => relationship(s, a.id, b.id));
       // Then each resident responds in their own way; some decide to make a peace offering.
-      const { reactions, gestures } = reactToEvent(s, event, occasion, people);
-      const shown = reactions.filter(x => x.label !== 'kept to themselves').slice(0, 3);
+      const { reactions, gestures } = reactToEvent(s, event, occasion, people, consequences.focus);
+      // Those singled out are named by the consequences themselves, so the journal shows bystanders here.
+      const shown = reactions.filter(x => x.label !== 'kept to themselves' && !consequences.focus.has(x.character.id)).slice(0, 3);
       if (shown.length) occasion.text += ` ${shown.map(x => `${x.character.name} ${x.label}`).join('; ')}.`;
       if (partners.length) occasion.text += ` ${partners.slice(0, 3).map(([a, b]) => `${a.name} and ${b.name}`).join(', ')}${partners.length > 3 ? ', among others,' : ''} pair up for the chores.`;
+      for (const line of consequences.text) occasion.text += ` ${line}`;
       for (const g of gestures.slice(0, 2)) occasion.text += ` ${g.from.name} goes looking for ${g.to.name}.`;
       break;
     }

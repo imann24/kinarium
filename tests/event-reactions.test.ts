@@ -134,6 +134,6 @@ describe('peace offerings after a house event', () => {
 
 describe('event definitions', () => {
   it('give every event a relational kind', () => {
-    for (const e of EVENTS) expect(['gathering', 'relief', 'neutral', 'strain', 'rest', 'pairing', 'airing']).toContain(e.relational);
+    for (const e of EVENTS) expect(['gathering', 'relief', 'neutral', 'strain', 'rest', 'pairing', 'airing', 'crowding', 'suspicion', 'quarrel', 'scarcity', 'sleepless', 'betrayal', 'exclusion', 'letdown', 'faction', 'hardship', 'care', 'honor']).toContain(e.relational);
   });
 });
