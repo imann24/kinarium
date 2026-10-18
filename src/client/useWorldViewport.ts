@@ -16,7 +16,9 @@ export function useWorldViewport(stageRef: RefObject<HTMLElement | null>, ready:
       // Use the document position so scrolling never changes the house's scale.
       const top = canvas!.getBoundingClientRect().top + window.scrollY;
       const controls = footer!.getBoundingClientRect().height;
-      const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
+      // Undo pinch zoom's shrinking of the visual viewport so zooming the page never resizes the house.
+      const visual = window.visualViewport;
+      const viewportHeight = visual ? visual.height * visual.scale : window.innerHeight;
       // Leave 16px below the stage, plus its 1px bottom border.
       // Short screens can scroll instead of shrinking the scene to a sliver.
       const height = Math.max(160, Math.floor(viewportHeight - top - controls - 17));
