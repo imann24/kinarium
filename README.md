@@ -248,6 +248,30 @@ world requests, using the same Playwright configuration as other browser tests.
 
 Repair integration: completed repair currently changes relationship scores and house tension, not resident mood, energy or belonging directly. It therefore adds no direct resident-stat record; the new tension value is reflected in ongoing mood pressure. Ordinary encounter and house-event records retain their existing effects.
 
+### Resident names
+
+Open a resident profile and choose **Edit name** in the sidebar or expanded panel.
+Save applies a trimmed 1–30 character name through the existing world command API;
+Cancel or Escape leaves it unchanged. Everyone admitted to the house can rename
+residents, including those away. Explicit duplicates are allowed, as with manual
+introductions; IDs distinguish residents and automatic introductions avoid used names.
+
+Renaming preserves IDs, personalities, backstories, needs, relationships and recorded
+history. Current profile, speaker and relationship labels update for all viewers.
+Historical prose keeps its original wording. Unspoken AI plans are discarded and
+in-flight results based on old names are ignored; subsequent prompts use current
+names and explicitly distinguish them from names in older prose. No extra model
+calls or schema migration are needed.
+
+`pnpm test` covers validation, authorization, identity/history preservation, isolation,
+SQLite reconstruction and stale inference. `pnpm test:residents` checks real local
+runtime restarts and broadcasts. With Vite and Playwright available,
+`node tests/resident-name.browser.mjs` checks keyboard editing, cancellation, errors,
+repeated edits, two-viewer updates and 1440/390/320px light/dark layouts using local
+fixtures. Set `PLAYWRIGHT_MODULE`, `CHROMIUM_PATH` and optionally `SCREENSHOT_DIR`
+as with the other browser tests. These checks do not change production residents
+or measure live-model adherence to the prompt.
+
 ### Resident memory summaries
 
 The existing **Story so far**, defining moments, recent tension and retained-history

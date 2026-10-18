@@ -1,3 +1,4 @@
+import { renameResident } from './resident-name';
 import { communityDrift, communityStats, recordCommunityChange } from './community-state';
 import { advanceQuietCompanionship } from './companionship';
 import { separateStandingResidents } from './standing';
@@ -223,6 +224,7 @@ export function applyCommand(s: WorldState, command: Command, now: number) {
   switch (command.type) {
     case 'house-details': updateHouseDetails(s, command); break;
     case 'add-character': createCharacter(s, command.name, command.trait, command.backstory); break;
+    case 'rename-character': renameResident(s, command.characterId, command.name); return;
     case 'set-model': {
       const c = s.characters.find(c => c.id === command.characterId);
       if (!c) throw new Error('That character could not be found.');
