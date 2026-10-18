@@ -144,6 +144,18 @@ export function chooseConversationScene(world: WorldState, a: Character, b: Char
       'clearing-air': 'After clearing the air, how do you feel about saying hard things in front of everyone?',
       'power-outage': 'After the lights went out, I keep thinking about how uncertainty affects us. What is hardest for you?',
       rumor: 'That rumor is bothering me. How do we talk about uncertainty without spreading it?',
+      'burst-pipe': 'With all of us squeezed into one room after the pipe burst, how do you cope when there’s no space of your own?',
+      'missing-thing': 'Since that thing went missing, I keep noticing how suspicion changes a room. How do you live with not knowing?',
+      'shouting-match': 'That shouting match is still ringing in my ears. What do you do when voices start to rise?',
+      'lean-week': 'With the cupboards this bare, what does sharing fairly mean to you?',
+      'sleepless-night': 'After that sleepless night, I’m curious: what are you like when you’re running on nothing?',
+      'broken-confidence': 'After that confidence was passed around, I wonder: what makes you trust someone with something private?',
+      'left-out': 'Someone was left off that list. Have you ever been on the outside of something like that?',
+      'plans-fall-through': 'Our plans fell through. How do you handle a disappointment that nobody really caused?',
+      'house-vote': 'That vote split the house. Does losing a vote feel different to you from losing an argument?',
+      'unexpected-bill': 'That bill caught us all off guard. Does worrying together make it lighter or heavier for you?',
+      'someone-ill': 'With someone unwell, I keep thinking about care. Is it easier for you to look after people or to be looked after?',
+      'birthday-surprise': 'That birthday surprise was lovely. Do you like being made a fuss of, or would you rather not be?',
     };
     const opening = questions[definition.id];
     const reply = voice(b, EVENT_REPLIES[definition.id]);

@@ -50,8 +50,10 @@ describe('community score explanations', () => {
     applyCommand(world, { type: 'trigger-event', eventId: event.id }, 0);
     for (const metric of ['cohesion', 'tension', 'resources'] as const) {
       const recent = communityMetricDetails(world, metric).recent;
-      if (event[metric]) expect(recent[0]).toMatchObject({ cause: event.name, [metric]: event[metric] });
-      else expect(recent).toEqual([]);
+      // Residents' own responses are recorded separately, under their own cause.
+      const own = recent.filter(c => c.cause === event.name);
+      if (event[metric]) expect(own).toEqual([expect.objectContaining({ cause: event.name, [metric]: event[metric] })]);
+      else expect(own).toEqual([]);
     }
   });
   it('limits records and filters recent changes by score, time and actual nonzero effects', () => {

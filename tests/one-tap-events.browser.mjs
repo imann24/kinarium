@@ -26,7 +26,7 @@ try {
     const card = page.getByRole('button', { name: /A shared meal/ });
     await card.scrollIntoViewIfNeeded();
     await assert.doesNotReject(card.waitFor({ state: 'visible' }));
-    await page.waitForFunction(() => !document.querySelector('.event-card')?.disabled);
+    await page.waitForFunction(() => !document.querySelector('[data-event-id]')?.disabled);
     assert.equal(await page.evaluate(() => matchMedia('(hover:hover) and (pointer:fine)').matches), false, 'phone has no fine hover');
     assert.equal(await card.evaluate(el => getComputedStyle(el).touchAction), 'manipulation');
     await card.tap();
