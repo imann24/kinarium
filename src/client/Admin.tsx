@@ -63,7 +63,7 @@ export default function Admin() {
     {house.status !== 'deleted' && <button disabled={busy} onClick={() => { setSelected(house); setConfirmation(''); setError(''); setNotice(''); document.querySelector('.admin-page')?.scrollIntoView({ behavior: 'smooth' }); }}>{house.status === 'pending' ? 'Retry cleanup' : 'Delete…'}</button>}
   </li>;
   return <main className="admin-page">
-    <p className="eyebrow">ADMINISTRATION</p><h1>Manage houses</h1>
+    <h1>Manage houses</h1>
     <p>Deletion permanently removes a house, its residents, history, visitor sessions, and connections. This cannot be undone. Deleted addresses cannot be reused.</p>
     {error && <p className="error" role="alert">{error}</p>}
     {notice && <p role="status">{notice}</p>}

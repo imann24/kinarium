@@ -27,7 +27,7 @@ describe('theme bootstrap', () => {
     expect(storage.get('kinarium-theme')).toBe(expected);
     expect(root.dataset.theme).toBe(expected);
     expect(root.style.colorScheme).toBe(expected);
-    expect(meta.setAttribute).toHaveBeenCalledWith('content', dark ? '#18211d' : '#f8f8f2');
+    expect(meta.setAttribute).toHaveBeenCalledWith('content', dark ? '#2a1933' : '#43274f');
     expect(listeners.media).toBeUndefined();
   });
   it.each(['system', 'unexpected'])('migrates legacy/invalid %s values to a persistent binary choice', stored => {
@@ -85,8 +85,24 @@ describe('theme bootstrap', () => {
 
 // WCAG contrast checks for the shared dark palette and the unchanged semantic meter colors.
 const css = readFileSync(new URL('../src/client/theme.css', import.meta.url), 'utf8');
-const darkBlock = css.match(/:root\[data-theme='dark'\]\s*\{([^}]+)\}/)![1];
-const colors = Object.fromEntries([...darkBlock.matchAll(/--([\w-]+):\s*(#[\da-f]{6})/g)].map(([, key, value]) => [key, value]));
+const tokens = readFileSync(new URL('../src/client/festival-tokens.css', import.meta.url), 'utf8');
+function palette(theme: 'light' | 'dark') {
+  const declarations: Record<string, string> = {};
+  for (const source of [tokens, css]) {
+    for (const [, selector, block] of source.matchAll(/(:root(?:\[data-theme='dark'\])?)\s*\{([^}]+)\}/g)) {
+      if (selector.includes('dark') && theme !== 'dark') continue;
+      for (const [, key, value] of block.matchAll(/--([\w-]+):\s*([^;]+);/g)) declarations[key] = value.trim();
+    }
+  }
+  const resolve = (key: string): string => {
+    const value = declarations[key];
+    if (!value) throw new Error(`Missing color token: ${key}`);
+    const alias = value.match(/^var\(--([\w-]+)\)$/);
+    return alias ? resolve(alias[1]) : value;
+  };
+  return Object.fromEntries(Object.keys(declarations).map(key => [key, resolve(key)]));
+}
+const colors = palette('dark');
 function luminance(hex: string) {
   return hex.slice(1).match(/../g)!.map(v => parseInt(v, 16) / 255)
     .map(v => v <= .04045 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4)
@@ -109,12 +125,15 @@ it('keeps the resident leg silhouette visible against every dark room wall', () 
     }
   }
 });
-it('keeps dark text, controls and scene labels at accessible contrast', () => {
+it.each(['light', 'dark'] as const)('keeps %s interface text and controls at accessible contrast', theme => {
+  const colors = palette(theme);
   for (const bg of ['page', 'surface', 'surface-soft', 'surface-hover']) {
     for (const fg of ['text', 'secondary', 'muted', 'accent']) expect(contrast(colors[fg], colors[bg])).toBeGreaterThanOrEqual(4.5);
     expect(contrast(colors.focus, colors[bg])).toBeGreaterThanOrEqual(3);
     expect(contrast(colors['control-border'], colors[bg])).toBeGreaterThanOrEqual(3);
   }
+});
+it('keeps dark scene labels and semantic meter colors at accessible contrast', () => {
   expect(contrast(colors['scene-text'], colors['scene-bubble'])).toBeGreaterThanOrEqual(4.5);
   expect(contrast(colors['scene-caption'], colors['sky-horizon'])).toBeGreaterThanOrEqual(4.5);
   const track = css.match(/\.stat-track,\.bond-meter,\.allowance-meter>span\)\s*\{ background:(#[\da-f]{6})/)! [1];

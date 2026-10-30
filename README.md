@@ -49,6 +49,12 @@ The landing page uses a discovery-first neighborhood layout with a selectable ho
 
 Run `node tests/landing.browser.mjs` against `pnpm dev:client` with Playwright installed. Set `PLAYWRIGHT_MODULE` and `CHROMIUM_PATH` when using an external installation. The test intercepts directory requests and never writes a server world. It covers light/dark layouts at 1440, 1280, 390, and 320px, entry links, filters/search, preview selection, creation controls, the field guide, theme persistence, and empty/error states. Set `LANDING_SCREENSHOTS=.impeccable/review` to capture the main layouts.
 
+## Shared interface verification
+
+The house screens, insights, dialogs, field guide, and administration share the landing hero’s festival identity. `src/client/festival-tokens.css` owns the self-hosted fonts and brand colors; `theme.css` maps them to semantic interface roles; `app-chrome.css` applies the shared navigation, controls, typography, and panel treatments. Scene and resident colors retain their simulation meaning.
+
+Run `node tests/festival-ui.browser.mjs` against `pnpm dev:client` with Playwright installed (`PLAYWRIGHT_MODULE` and `CHROMIUM_PATH` may point to an external installation). It uses local fixtures for the house, insights, resident panel, settings, creation, field guide, admin sign-in, and password gate at 320, 390, 900, and 1440px in both themes. It checks overflow, primary/selected/toolbar contrast, journal toggling, and long house content. Set `SCREENSHOT_DIR=.impeccable/review` to capture desktop and phone evidence. No real worlds or admin sessions are changed. `tests/theme.test.ts` also checks resolved semantic color contrast in both themes.
+
 ## Architecture and technology choice
 
 **React + TypeScript + Vite** for the browser. **Cloudflare Workers + SQLite-backed Durable Objects** for the backend and database. Worker static assets serve the SPA from the same origin.

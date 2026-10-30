@@ -1,0 +1,196 @@
+:root .site-header {
+  max-width: none;
+  height: 86px;
+  min-height: 0;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  padding-block: 0;
+  padding-inline: max(32px, calc((100vw - 1440px) / 2));
+  background: var(--festival-plum);
+  border-bottom: 1px solid #795d85;
+  color: var(--festival-lilac);
+}
+:root .site-header .brand { font-family: 'Dela Gothic One', sans-serif; color: var(--festival-yellow); font-size: 25px; letter-spacing: -.03em; gap: 10px; }
+.site-header .brand-mark { transform: none; }
+.site-header .brand-mark i { background: var(--festival-mint); }
+.site-header .brand-mark i:nth-child(2), .site-header .brand-mark i:nth-child(3) { background: var(--festival-yellow); }
+:root .site-header .alpha { font: 11px Manrope, sans-serif; color: var(--festival-lilac); margin-left: 14px; }
+.site-header nav { width: auto; gap: 30px; font-weight: 600; }
+.site-header nav a { height: 86px; }
+.site-header nav a.active::after { background: var(--festival-yellow); height: 3px; }
+:root .site-header .text-button { font: inherit; }
+.site-header .header-note { display: none; }
+:root .site-header .theme-control { color: var(--festival-yellow); }
+:root .site-header :is(button,a):focus-visible { outline-color: var(--festival-yellow); }
+
+/* Shared chrome is compact in the house; the landing keeps its opening rhythm. */
+:root .site-header:not(.landing-header) { height:64px; min-height:64px; padding-inline:var(--page-gutter); }
+.site-header:not(.landing-header) nav a { height:64px; }
+:root .site-header:not(.landing-header) .brand { font-size:22px; }
+:root .site-header .theme-control:hover { background:color-mix(in srgb, var(--festival-lilac) 15%, transparent); }
+:root .site-header .text-button:hover { color:var(--festival-yellow); }
+:root .site-header { border-color:var(--festival-header-rule); }
+:root .fullscreen-site-header { color:var(--festival-ink); }
+.fullscreen-site-header .brand { font-family:var(--font-display); font-size:22px; }
+
+::selection { background:var(--festival-yellow); color:var(--festival-action-ink); }
+input, textarea { caret-color:var(--accent); }
+:root :is(.journal-scroll,.resident-list,.bonds-list,.character-detail) { scrollbar-color:var(--control-border) transparent; }
+:root :where(.world-page,.modal,.locked-world,.empty-page,.admin-page) :is(h1,h2,h3) { letter-spacing:-.025em; }
+:root :is(.world-heading h1,.events-heading h2,.modal > .modal-content > h2,.locked-world h1,.empty-page h1,.admin-page h1,.insights-heading h2) {
+  font-family:var(--font-display);
+  font-weight:400;
+  line-height:1.3;
+  text-wrap:balance;
+  overflow-wrap:anywhere;
+}
+:root .world-heading h1 { font-size:28px; }
+:root :is(.events-heading h2,.modal > .modal-content > h2) { font-size:26px; }
+:root :is(.locked-world h1,.empty-page h1,.admin-page h1,.insights-heading h2) { font-size:32px; }
+:root :is(.sidebar-intro h3,.character-heading h2) { font-family:var(--font-body); font-size:22px; font-weight:800; line-height:1.3; overflow-wrap:anywhere; }
+:root :is(.insights-panel h3,.house-narrative h3) { font-weight:800; }
+:root :is(.modal h4,.character-detail h4) { font-size:13px; font-weight:800; color:var(--text); }
+:root .eyebrow { font-size:11px; letter-spacing:0; text-transform:none; }
+
+/* Yellow invitations, plum selections, and the same quiet secondary action everywhere. */
+:root .primary, :root .stage-footer .primary, :root .resident-list .primary {
+  min-height:44px;
+  padding:12px 18px;
+  background:var(--festival-yellow);
+  border:1px solid var(--festival-action-ink);
+  border-radius:7px;
+  color:var(--festival-action-ink);
+  font-size:13px;
+  font-weight:800;
+  box-shadow:none;
+}
+:root .primary:hover:not(:disabled) { background:var(--festival-action-hover); border-color:var(--festival-action-ink); }
+:root .outline { min-height:44px; border-color:var(--control-border); color:var(--text); font-weight:700; border-radius:6px; }
+:root .icon-button { min-width:36px; min-height:36px; color:var(--accent); }
+:root :is(.world-view-nav a[aria-current=page],.journal-filters .selected,.sidebar-tabs button.active) {
+  color:var(--festival-yellow);
+  background:var(--festival-plum);
+  border-color:var(--festival-plum);
+  font-weight:700;
+}
+:root .world-view-nav a { border-radius:6px; }
+:root .world-view-nav a:hover { color:var(--festival-ink); background:var(--surface-hover); }
+:root .world-view-nav a[aria-current=page]:hover { color:var(--festival-yellow); background:var(--festival-plum); }
+:root :is(.journal-filters button,.sidebar-tabs button) { min-height:40px; font-size:11px; }
+.journal-filters { flex-wrap:wrap; gap:4px; }
+.sidebar-tabs { padding:6px; gap:4px; background:var(--surface-soft); }
+.sidebar-tabs button { border-radius:6px; }
+.sidebar-tabs button::after { display:none; }
+
+/* Keep the illustrated scene unchanged, framed by a compact festival toolbar. */
+:root .world-stage { border-color:var(--line); border-radius:12px; }
+:root .stage-toolbar { background:var(--festival-plum); color:var(--festival-lilac); border-color:var(--festival-header-rule); min-height:48px; }
+:root .stage-toolbar :is(.time-mode-status strong,.fullscreen-toggle,.scene-zoom-controls button) { color:var(--festival-yellow); }
+:root .stage-toolbar :is(.fullscreen-toggle,.scene-zoom-controls,.scene-zoom-controls button + button) { border-color:var(--festival-header-rule); }
+:root .stage-toolbar :is(.fullscreen-toggle:hover:not(:disabled),.scene-zoom-controls button:hover:not(:disabled)) { color:var(--festival-yellow); background:color-mix(in srgb,var(--festival-lilac) 15%,transparent); }
+:root .stage-toolbar :is(button,.time-mode-status):focus-visible { outline-color:var(--festival-yellow); }
+.stage-toolbar .status-dot { background:var(--festival-yellow); }
+:root .stage-footer { background:var(--surface-soft); }
+:root .stage-footer > span { font-size:11px; }
+:root .world-sidebar { border-color:var(--line); border-radius:12px; }
+:root .world-heading p { font-size:12px; line-height:1.65; max-width:72ch; overflow-wrap:anywhere; }
+:root .back-link { font-size:11px; }
+:root .world-heading .live-chip { font-family:var(--font-body); font-size:10px; font-weight:600; letter-spacing:0; }
+:root .sidebar-intro > p:not(.eyebrow) { font-size:12px; line-height:1.7; }
+:root .journal-entry p { font-size:12px; line-height:1.8; }
+:root .entry-meta { font-size:10px; }
+:root .entry-meta span:last-child { font-size:9px; }
+:root .character-name { color:var(--accent); text-decoration-color:var(--control-border); text-underline-offset:3px; }
+:root :is(.resident-row b,.bond-card b) { font-size:13px; font-weight:700; }
+:root :is(.resident-row small,.bond-card > small,.backstory,.current-activity,.small-bond,.memories p) { font-size:12px; }
+:root .resident-row { padding-block:15px; }
+:root :is(.resident-row,.small-bond) { border-color:var(--line); }
+:root .character-needs > div { font-size:11px; }
+:root .character-needs b { font-variant-numeric:tabular-nums; }
+:root .stat-track { background:var(--line); }
+:root .stat-track > span { background:var(--accent); }
+:root .community-stats { background:var(--surface-soft); }
+:root .stat > div:first-child { font-size:12px; }
+:root .stat p { font-size:11px; line-height:1.5; }
+
+/* Forms and reading surfaces use the same mint ground without extra card layers. */
+:root .modal { background:var(--surface); color:var(--text); border:1px solid var(--control-border); border-radius:12px; box-shadow:none; }
+:root .modal::backdrop { background:#25172fbb; backdrop-filter:none; }
+.modal-content { padding:36px; }
+:root .modal > .modal-content > h2 { margin:12px 24px 26px 0; }
+:root .modal-close { background:var(--surface-soft); border-radius:6px; }
+:root :is(form label,.guide-item > summary) { font-weight:700; }
+:root :is(input:not([type=range]):not([type=checkbox]),textarea,select) { background:var(--surface); color:var(--text); border-color:var(--control-border); border-radius:6px; min-height:44px; }
+:root input[type=range], :root input[type=checkbox] { accent-color:var(--accent); }
+:root .mode { background:var(--surface); border-color:var(--line); }
+:root .mode.selected { border-color:var(--accent); background:var(--surface-soft); }
+:root :is(.mode-check,.range-label b) { color:var(--accent); }
+:root :is(.mode b,.template-note b) { color:var(--text); font-weight:800; }
+:root :is(.mode small,form label small,.form-foot) { font-size:11px; }
+:root .template-preview { background:var(--surface-soft); border-color:var(--line); border-radius:8px; }
+:root .template-preview p { font-size:12px; }
+:root .guide-item { border:0; border-bottom:1px solid var(--line); border-radius:0; background:transparent; }
+:root .guide-item > summary { font-family:var(--font-body); font-size:15px; border-radius:0; padding-inline:0; }
+:root .guide-item[open] > summary { background:transparent; border:0; color:var(--accent); }
+.guide-item-body { padding:0 0 18px; }
+.guide-list { gap:0; }
+:root .guide-copy b { color:var(--text); font-weight:700; }
+:root .admin-login { background:var(--surface-soft); }
+:root .admin-page h2 { font-weight:800; }
+:root .locked-world .large-icon { background:var(--surface-soft); color:var(--accent); }
+
+/* Event meanings keep their colors; interaction styling belongs to the shared UI. */
+:root .event-allowance { background:var(--surface-soft); border-color:var(--line); }
+:root :is(.allowance-title b,.allowance-timers b) { color:var(--text); font-weight:700; }
+:root .allowance-meter > span { background:var(--line); }
+:root .allowance-meter i { background:var(--control-border); }
+:root .allowance-meter .ready i { background:var(--accent); }
+:root :is(.event-filters button,.event-view-toggle,.event-view-toggle button,.deck-draw) { border-radius:6px; }
+:root .event-filters button { min-height:40px; font-weight:700; }
+:root .event-filters button[aria-pressed=true] { background:var(--festival-plum); color:var(--festival-yellow); border-color:var(--festival-plum); }
+:root .event-card { border-radius:12px; transition:background .15s,border-color .15s; }
+:root .event-card b { color:var(--text); font-size:13px; font-weight:800; line-height:1.5; }
+:root .event-card small { font-size:12px; line-height:1.7; }
+:root .event-icon { background:transparent; color:var(--accent); padding:0; width:24px; height:24px; }
+:root .event-card.disruptive .event-icon { color:var(--change-bad); background:transparent; }
+:root .event-card.mixed .event-icon { color:var(--tone-mixed); background:transparent; }
+:root .event-arrow { color:var(--secondary); }
+:root .deck-card, :root .deck-card.active:not(.drawn), :root .deck-side { box-shadow:none; }
+:root .deck-card.active { border-color:var(--accent); }
+:root .deck-card.drawn { animation:none; border-color:var(--accent); }
+:root .deck-card b { font-family:var(--font-body); font-size:18px; font-weight:800; line-height:1.4; }
+:root .deck-card small { font-size:12px; }
+:root :is(.insights-panel,.insights-summary > div) { border-radius:12px; }
+:root .insights-summary strong { font-weight:800; font-variant-numeric:tabular-nums; }
+:root .house-narrative { border-left:0; border-block:1px solid var(--line); border-radius:0; }
+@media(hover:hover) and (pointer:fine) {
+  :root .event-card:hover:not(:disabled) { transform:none; background:var(--surface-soft); border-color:var(--control-border); }
+}
+@media(max-width:1100px) {
+  .site-header .alpha { display:none; }
+}
+@media(max-width:760px) {
+  :root .site-header { height:74px; min-height:74px; padding-inline:22px; }
+  :root .site-header .brand { font-size:22px; }
+  .site-header nav { gap:14px; width:auto; }
+  .site-header nav > a { display:none; }
+  :root .world-heading h1, :root .world-page:not(.world-fullscreen) .world-heading h1 { font-size:23px; }
+  :root .world-heading p { font-size:11px; }
+  :root .modal > .modal-content > h2, :root .events-heading h2 { font-size:23px; }
+  :root .insights-heading h2 { font-size:28px; }
+  :root .stat > div:first-child { font-size:10px; }
+  :root .stat p { font-size:10px; }
+  .modal-content { padding:28px 24px; }
+}
+@media(max-width:450px) {
+  :root .site-header, :root .site-header:not(.landing-header) { padding-inline:18px; }
+  :root .site-header .brand, :root .site-header:not(.landing-header) .brand { font-size:19px; gap:7px; }
+  .site-header nav { gap:9px; }
+  :root .world-page:not(.world-fullscreen) .world-heading h1 { font-size:21px; }
+  :root .stage-footer > span { font-size:11px; }
+  :root .stat > div:first-child { font-size:10px; flex-wrap:wrap; }
+  :root .stat b { margin-left:0; }
+  :root .stat p { font-size:10px; }
+  :root .event-card { padding:14px 12px; }
+  .modal-content { padding:26px 20px; }
+}
