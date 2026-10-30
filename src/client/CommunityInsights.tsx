@@ -45,7 +45,7 @@ export default function CommunityInsights({ world, onSelectResident }: { world: 
   const activityMax = Math.max(1, ...activity.buckets.flatMap(b => [b.conversations, b.conflicts]));
   const records = chosen ? pairRecords(activity.entries, chosen.a.id, chosen.b.id) : [];
   return <section className="community-insights" aria-labelledby="insights-title">
-    <div className="insights-heading"><div><p className="eyebrow">NOTICING LIFE TOGETHER</p><h2 id="insights-title">A community, in focus.</h2><p>Current feelings, familiar faces, and the moments on record.</p></div>
+    <div className="insights-heading"><div><h2 id="insights-title">A community, in focus.</h2><p>Current feelings, familiar faces, and the moments on record.</p></div>
       <label className="insights-scope">Current statistics for<select value={scope} onChange={e => { setScope(e.target.value as InsightScope); setSelected(undefined); }}><option value="home">Residents at home</option><option value="all">Everyone, including away</option></select></label></div>
     <p className="insights-note">{data.residents.length} residents in this view · {world.characters.filter(c => c.away).length} away in the world. Scores describe the simulation now; they are not goals.</p>
     <HouseNarrative world={world}/>
@@ -55,7 +55,7 @@ export default function CommunityInsights({ world, onSelectResident }: { world: 
       <div><span>Pairs who have met</span><strong>{data.met.length} <small>/ {data.possiblePairs}</small></strong><Meter value={data.possiblePairs ? data.met.length / data.possiblePairs * 100 : null}/><small>{data.possiblePairs ? `${data.notMet} pairs have no encounters yet` : 'Needs at least two residents'}</small></div>
       <div><span>Average trust · met pairs</span><strong>{score(data.trust)}</strong><Meter value={data.trust}/><small>{data.met.length ? `${data.encounters} encounters across these pairs, all time` : 'No recorded encounters yet'}</small></div>
     </div>
-    <section className="insights-panel insights-distribution" aria-labelledby="connections-overview"><div><p className="eyebrow">THE SOCIAL FABRIC</p><h3 id="connections-overview">Every connection has a beginning.</h3><p className="insights-note">All {data.possiblePairs} possible pairs in this view. Choose a group to explore its connections below.</p></div>
+    <section className="insights-panel insights-distribution" aria-labelledby="connections-overview"><div><h3 id="connections-overview">Every connection has a beginning.</h3><p className="insights-note">All {data.possiblePairs} possible pairs in this view. Choose a group to explore its connections below.</p></div>
       <div className="connection-stack" aria-hidden="true">{kinds.map(kind => <span key={kind} className={`bond-tone-${kind}`} style={{ width: `${data.possiblePairs ? distribution[kind] / data.possiblePairs * 100 : 0}%` }}/>)}</div>
       <div className="connection-key">{kinds.map(kind => <button key={kind} aria-pressed={filter === kind} onClick={() => { setFilter(filter === kind ? 'all' : kind); setSelected(undefined); }}><i className={`bond-tone-${kind}`} aria-hidden="true"/><span>{labels[kind]}</span><b>{distribution[kind]}</b></button>)}</div>
       {!data.possiblePairs && <p className="insights-empty">Welcome at least two residents to see the social fabric take shape.</p>}
