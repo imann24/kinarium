@@ -1,3 +1,5 @@
+@layer base, components, theme, interface;
+@layer components {
 .relationship-story{--chart-green:#72865f;--chart-blue:#718e98;--chart-clay:#b47761;--chart-neutral:#b7b8a8;--bond-color:var(--chart-neutral);min-width:0}
 :root[data-theme=dark] .relationship-story{--chart-green:#abc28c;--chart-blue:#94bbc5;--chart-clay:#daa78e;--chart-neutral:#718274}
 .relationship-story h5{font-size:12px;margin:22px 0 10px;letter-spacing:.02em}
@@ -45,8 +47,8 @@
 .relationship-points.apart .thread-bar i{background:var(--chart-clay)}
 
 .relationship-views{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px}
-.insights-pair .relationship-views article{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);border-left:3px solid var(--chart-neutral);border-radius:10px;padding:12px;margin:0;background:var(--surface);overflow-wrap:anywhere;font-size:12px;line-height:1.5}
-.insights-pair .relationship-views article.warm{border-left-color:var(--chart-green)}.insights-pair .relationship-views article.tense{border-left-color:var(--chart-clay)}
+.insights-pair .relationship-views article{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:12px;margin:0;background:var(--surface);overflow-wrap:anywhere;font-size:12px;line-height:1.5}
+
 .view-avatar{flex-shrink:0;width:40px;height:44px;border-radius:50%;padding:6px 6px 0;overflow:hidden}.view-avatar svg{width:100%;height:100%}
 .relationship-views article>div{min-width:0}.relationship-views article small{font-size:10px;color:var(--muted)}
 .view-impression{font-family:var(--serif);font-size:15px;line-height:1.4;margin:2px 0 0}
@@ -65,7 +67,7 @@
 .bond-full-story summary{display:inline-flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;font-weight:500;color:var(--accent);list-style:none}
 .bond-full-story summary::-webkit-details-marker{display:none}
 .bond-full-story[open] summary{margin-bottom:12px}
-.relationship-prose{border-left:3px solid var(--accent);padding-left:14px;overflow-wrap:anywhere}.relationship-prose p{font-size:13px;line-height:1.75;margin:0 0 8px}
+.relationship-prose{overflow-wrap:anywhere}.relationship-prose p{font-size:13px;line-height:1.75;margin:0 0 8px}
 .view-feeling{font-size:12px;line-height:1.7;margin:10px 0 0}
 .relationship-story .insights-note{font-size:11px;line-height:1.6;color:var(--muted);margin:10px 0 0}
 
@@ -74,4 +76,6 @@
   .bond-portrait-figure{width:58px;height:64px;padding:8px 8px 0}
   .bond-link{padding-top:21px}.bond-line{top:37px}
   .bond-badge{font-size:11px;padding:6px 9px}
+}
+
 }

@@ -1,26 +1,57 @@
 ---
-name: "Kinarium — Neighborhood festival"
-description: "A shared neighborhood festival identity: plum landmarks, mint surfaces, pale yellow invitations, and legible everyday controls."
+name: "Kinarium — Natural-history diorama"
+description: "A quiet frame for a living miniature: ivory and olive grounds, forest actions, sage selections, and readable Manrope controls."
 colors:
-  festival-plum: "#43274f"
-  festival-ink: "#35233d"
-  festival-yellow: "#f2f3a6"
-  festival-mint: "#dce9cc"
-  festival-ground: "#eef3e7"
-  festival-subtle: "#536047"
-  festival-rule: "#b7c6aa"
-  festival-lilac: "#dacbe3"
-  festival-plum-dark: "#2a1933"
-  festival-ink-dark: "#e5edda"
-  festival-mint-dark: "#303f34"
-  festival-ground-dark: "#222c27"
-  festival-subtle-dark: "#c3cfb9"
-  festival-rule-dark: "#5e705e"
-  festival-action-hover: "#fffec9"
-  festival-stage-rule: "#a38baf"
-  festival-header-rule: "#795d85"
+  page: "#f4f3ec"
+  surface: "#fffef8"
+  surface-soft: "#e9ecdf"
+  surface-hover: "#dfe6d6"
+  text: "#29382e"
+  secondary: "#52604e"
+  muted: "#596550"
+  line: "#c9d0be"
   control-border: "#748168"
-  control-border-dark: "#829578"
+  accent: "#3e5b43"
+  focus: "#3e5b43"
+  action: "#3e5b43"
+  action-hover: "#2d4733"
+  action-ink: "#fffef8"
+  selected: "#dfe8d4"
+  selected-ink: "#2c4a34"
+  hero: "#e7e9dc"
+  hero-ink: "#29382e"
+  hero-muted: "#52604e"
+  danger: "#943f2c"
+  danger-soft: "#f5e8df"
+  warning: "#75601f"
+  warning-soft: "#f1ead4"
+  good: "#38633d"
+  good-soft: "#e4eddc"
+  page-dark: "#1d251f"
+  surface-dark: "#252f27"
+  surface-soft-dark: "#2e3a2e"
+  surface-hover-dark: "#394636"
+  text-dark: "#edf0e2"
+  secondary-dark: "#c5cdb8"
+  muted-dark: "#b7c3aa"
+  line-dark: "#4b5846"
+  control-border-dark: "#8b997e"
+  accent-dark: "#b9cda4"
+  focus-dark: "#d9e7bf"
+  action-dark: "#c2d2ac"
+  action-hover-dark: "#dbe6c9"
+  action-ink-dark: "#233424"
+  selected-dark: "#394935"
+  selected-ink-dark: "#e1ebcd"
+  hero-dark: "#283326"
+  hero-ink-dark: "#edf0e2"
+  hero-muted-dark: "#c5cdb8"
+  danger-dark: "#f0b69a"
+  danger-soft-dark: "#46342b"
+  warning-dark: "#decd8d"
+  warning-soft-dark: "#3c3928"
+  good-dark: "#b6d49f"
+  good-soft-dark: "#30402d"
 typography:
   display:
     fontFamily: "Dela Gothic One, sans-serif"
@@ -30,43 +61,34 @@ typography:
     letterSpacing: "-.04em"
   headline:
     fontFamily: "Dela Gothic One, sans-serif"
-    fontSize: "clamp(27px,3vw,42px)"
-    fontWeight: 400
+    fontSize: "clamp(27px, 3vw, 42px)"
     lineHeight: 1.25
     letterSpacing: "-.035em"
-  app-page:
-    fontFamily: "Dela Gothic One, sans-serif"
-    fontSize: "32px"
-    fontWeight: 400
-    lineHeight: 1.3
-    letterSpacing: "-.025em"
   world-title:
-    fontFamily: "Dela Gothic One, sans-serif"
+    fontFamily: "Manrope, sans-serif"
     fontSize: "28px"
-    fontWeight: 400
-    lineHeight: 1.3
-    letterSpacing: "-.025em"
-  app-heading:
-    fontFamily: "Dela Gothic One, sans-serif"
+    fontWeight: 750
+    lineHeight: 1.25
+    letterSpacing: "-.035em"
+  insights-title:
+    fontFamily: "Manrope, sans-serif"
+    fontSize: "30px"
+    fontWeight: 750
+    lineHeight: 1.15
+    letterSpacing: "-.035em"
+  dialog-title:
+    fontFamily: "Manrope, sans-serif"
     fontSize: "26px"
-    fontWeight: 400
+    fontWeight: 750
+    lineHeight: 1.25
+    letterSpacing: "-.025em"
+  section-title:
+    fontFamily: "Manrope, sans-serif"
+    fontSize: "24px"
+    fontWeight: 750
     lineHeight: 1.3
     letterSpacing: "-.025em"
-  app-subheading:
-    fontFamily: "Manrope, sans-serif"
-    fontSize: "22px"
-    fontWeight: 800
-    lineHeight: 1.3
-    letterSpacing: "-.025em"
-  app-copy:
-    fontFamily: "Manrope, sans-serif"
-    fontSize: "12px"
-    lineHeight: 1.7
-  journal-copy:
-    fontFamily: "Manrope, sans-serif"
-    fontSize: "12px"
-    lineHeight: 1.8
-  title:
+  listing-title:
     fontFamily: "Manrope, sans-serif"
     fontSize: "24px"
     fontWeight: 800
@@ -77,250 +99,224 @@ typography:
     fontSize: "13px"
     fontWeight: 400
     lineHeight: 1.7
-  invitation:
+  journal-copy:
     fontFamily: "Manrope, sans-serif"
-    fontSize: "14px"
+    fontSize: "12px"
+    fontWeight: 400
+    lineHeight: 1.7
+  narrative:
+    fontFamily: "Manrope, sans-serif"
+    fontSize: "15px"
     fontWeight: 400
     lineHeight: 1.8
   action:
     fontFamily: "Manrope, sans-serif"
     fontSize: "13px"
-    fontWeight: 800
-    lineHeight: 1.5
+    fontWeight: 700
   filter:
     fontFamily: "Manrope, sans-serif"
     fontSize: "12px"
     fontWeight: 700
 rounded:
-  control: "6px"
-  action: "7px"
-  preview: "12px"
+  control: "7px"
+  filter: "6px"
   panel: "12px"
-  inset: "8px"
+  dialog: "16px"
+  deck: "14px"
   stage: "48% 48% 0 0"
-  count: "50%"
 spacing:
   inline-small: "12px"
   inline-medium: "20px"
-  section-gap: "30px"
+  section-gap: "24px"
+  column-gap: "36px"
   gutter-desktop: "32px"
-  gutter-mobile: "22px"
-  gutter-small-phone: "18px"
+  gutter-mobile: "18px"
 components:
-  stage-action:
-    backgroundColor: "{colors.festival-yellow}"
-    textColor: "{colors.festival-plum}"
-    typography: "{typography.action}"
-    rounded: "{rounded.action}"
-    padding: "15px 20px"
   button-primary:
-    backgroundColor: "{colors.festival-yellow}"
-    textColor: "{colors.festival-plum}"
+    backgroundColor: "{colors.action}"
+    textColor: "{colors.action-ink}"
     typography: "{typography.action}"
-    rounded: "{rounded.action}"
+    rounded: "{rounded.control}"
     padding: "12px 18px"
+  button-primary-hover:
+    backgroundColor: "{colors.action-hover}"
+    textColor: "{colors.action-ink}"
   button-outline:
-    backgroundColor: "{colors.festival-ground}"
-    textColor: "{colors.festival-ink}"
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.text}"
     rounded: "{rounded.control}"
     padding: "10px 13px"
-  app-filter-selected:
-    backgroundColor: "{colors.festival-plum}"
-    textColor: "{colors.festival-yellow}"
-    rounded: "{rounded.control}"
+  filter:
+    backgroundColor: "transparent"
+    textColor: "{colors.secondary}"
+    typography: "{typography.filter}"
+    rounded: "{rounded.filter}"
+    padding: "10px 16px"
+  filter-selected:
+    backgroundColor: "{colors.selected}"
+    textColor: "{colors.selected-ink}"
   input:
-    backgroundColor: "{colors.festival-ground}"
-    textColor: "{colors.festival-ink}"
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.text}"
     rounded: "{rounded.control}"
     padding: "11px 12px"
   panel:
-    backgroundColor: "{colors.festival-ground}"
-    textColor: "{colors.festival-ink}"
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.text}"
     rounded: "{rounded.panel}"
-  app-navigation:
-    backgroundColor: "{colors.festival-plum}"
-    textColor: "{colors.festival-lilac}"
-    height: "64px"
-  button-primary-hover:
-    backgroundColor: "{colors.festival-action-hover}"
-  button-neighborhood:
-    backgroundColor: "{colors.festival-ink}"
-    textColor: "{colors.festival-mint}"
-    typography: "{typography.action}"
-    rounded: "{rounded.action}"
-    padding: "15px 20px"
-  filter:
+  dialog:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.text}"
+    rounded: "{rounded.dialog}"
+    padding: "32px"
+  event-list-item:
     backgroundColor: "transparent"
-    textColor: "{colors.festival-subtle}"
-    typography: "{typography.filter}"
-    rounded: "{rounded.control}"
-    padding: "10px 16px"
-  filter-selected:
-    backgroundColor: "{colors.festival-ink}"
-    textColor: "{colors.festival-mint}"
-  search:
-    backgroundColor: "transparent"
-    textColor: "{colors.festival-ink}"
-    padding: "14px 0"
-    width: "280px"
-  house-row:
-    textColor: "{colors.festival-ink}"
-    padding: "23px 0"
-  house-row-hover:
-    backgroundColor: "{colors.festival-ground}"
-  navigation:
-    backgroundColor: "{colors.festival-plum}"
-    textColor: "{colors.festival-lilac}"
-    height: "86px"
-  house-picker:
-    backgroundColor: "{colors.festival-plum}"
-    textColor: "{colors.festival-yellow}"
-    rounded: "{rounded.control}"
-    padding: "10px 34px 10px 12px"
-    width: "240px"
+    textColor: "{colors.text}"
+    padding: "20px 32px 20px 0"
+  house-narrative:
+    backgroundColor: "{colors.surface-soft}"
+    textColor: "{colors.text}"
+    rounded: "{rounded.panel}"
+    padding: "28px"
+  world-navigation:
+    backgroundColor: "{colors.page}"
+    textColor: "{colors.secondary}"
+    height: "56px"
 ---
 
 # Design System: Kinarium
 
 ## Overview
 
-**Creative North Star: "Neighborhood festival"**
+**Creative North Star: "Natural-history diorama"**
 
-Kinarium uses the neighborhood festival as its shared visual world: broad plum fields, pale yellow invitations, mint surfaces, and substantial display lettering. It feels sociable and curious, with real house illustrations providing the detail and personality.
+Kinarium frames a living miniature with warm ivory, oat and olive surfaces. Forest actions and pale sage selections relate the working interface to the existing house artwork. The house supplies the detail and personality; controls, navigation and reading surfaces remain calm and legible.
 
-The user-approved expansion carries the landing hero’s identity through world screens, resident details, events, insights, creation and settings dialogs, the field guide, locked states, and administration. `src/client/festival-tokens.css` owns the shared fonts and palette; `theme.css` maps them to semantic interface roles; `app-chrome.css` applies the common navigation, controls, and surface treatments. `landing.css` retains the landing’s particular composition. Existing layouts, task behavior, and simulation artwork remain the foundation.
+This system records the implemented overhaul after the user rejected the previous plum, mint and yellow combination. The natural-history framing is the implementation direction, not a separately user-approved mood board. The user explicitly confirmed retaining the existing artwork and rebuilding the UI around it; the Building SVG remains the product illustration. Dela Gothic One belongs to the wordmark and landing; Manrope carries the working application.
+
+`src/client/design-tokens.css` owns the shared fonts, semantic palette, primary radii and dialog shadow. Component structure lives in the ordered `base`, `components`, `theme`, and `interface` layers. `theme.css` supplies theme mappings and scene treatment; `interface.css` owns the final shared working-surface treatment; `landing.css` owns the landing composition. PRODUCT.md remains the source for durable product behavior.
 
 **Key Characteristics:**
-- Plum landmarks, yellow invitations, and mint tonal surfaces.
-- Dela Gothic One major headings paired with Manrope reading and controls.
-- Flat panels and fine rules, with recognizable house illustrations.
-- The same color relationships in light and dark themes.
+- Warm neutral grounds, olive text, forest actions, and sage selections.
+- Manrope for operational headings and reading; Dela for the brand and landing.
+- Fine rules and open rows, with bounded panels where containment helps.
+- Related olive-charcoal dark surfaces and explicit semantic state colors.
 
 ## Colors
 
-Pale yellow and lilac sit against plum; mint and ink make the neighborhood readable. Frontmatter values are normative and mirror the shared festival palette, semantic border roles, and landing stage accents.
+The palette follows the house’s earth tones. Frontmatter is the normative sampled palette; suffix `-dark` records the alternative value for the matching semantic role under the explicit dark theme, not a second simultaneous palette.
 
 ### Primary
 
-- **Festival yellow** supplies entry actions, the brand, title emphasis, and focus on plum. Its primary-action text stays the light-theme plum even in dark mode.
-- **Festival plum** supplies stage toolbars, navigation, selected app controls, and the landing surround. The dark variant deepens the field.
-
-### Secondary
-
-- **Festival mint** supplies the directory ground, soft panels, tab rails, statistics, and reversed neighborhood action text.
-- **Festival lilac** supplies stage supporting copy and the second headline line; yellow and lilac remain unchanged in dark mode.
+- **Forest action** and **action ink** define primary actions; the dark theme uses pale sage action surfaces with dark olive lettering. **Action hover** changes the surface without lowering text opacity.
+- **Accent** identifies links and active details. **Focus** supplies keyboard outlines and can differ from the action color in dark mode.
+- **Selected sage** and **selected ink** identify pressed filters, chosen modes and highlighted journal details. Page navigation also uses an accent underline.
 
 ### Neutral
 
-- **Festival ink** supplies interface titles, body text, and light-theme focus. It becomes pale in dark mode.
-- **Festival subtle** supplies descriptions, access labels, and metadata; its dark counterpart preserves the same hierarchy.
-- **Festival rule** supplies directory dividers. **Festival ground** supplies page backgrounds, ordinary panels and fields, and directory row hover.
-- **Festival stage rule** and **Festival header rule** supply fine borders on plum.
-- The six `-dark` tokens replace the matching light values under the explicit dark theme. They are alternate theme values, not an additional palette for simultaneous use.
+- **Page ivory / olive charcoal** supplies the page canvas. **Surface** holds fields, scene toolbars, journals and dialogs; **surface soft** groups supporting content; **surface hover** supplies interaction feedback.
+- **Text**, **secondary** and **muted** express the reading hierarchy. **Line** separates content; **control border** gives controls a stronger visible boundary.
+- **Hero**, **hero ink** and **hero muted** are landing-specific material roles. Their darker counterparts retain the same contrast relationships.
+- **Danger** uses clay, **warning** uses ochre, and **good** uses green, each with a soft companion surface. Event and chart category colors retain their own meaningful distinctions. Resident and furniture colors remain part of the simulation, not decorative interface accents.
 
-- **Control border** supplies field and secondary-action outlines, with an alternate dark value. Semantic accent and focus use plum in light mode; dark mode uses lilac for accent and yellow for focus.
-- Event meanings, errors, resident colors, furnishings, and theme-aware scene colors retain their established semantic palettes. They are not recolored to match decorative chrome.
+**The House First Rule.** Let the existing house illustration carry the visual detail; use semantic interface colors to frame it.
 
-**The Shared Identity Rule.** Use the shared festival palette across interface surfaces; preserve semantic state colors and the simulation’s own scene palette.
+**The Action and Selection Rule.** Use action and action-ink for primary actions, selected and selected-ink for chosen filters, and danger, warning or good only for meaning.
 
 ## Typography
 
 **Display Font:** Dela Gothic One, with sans-serif fallback.
+
 **Body Font:** Manrope, with sans-serif fallback.
 
-Dela’s broad forms give major landmarks the character of a festival program. Manrope carries resident names, explanations, detailed headings, metadata, and controls. Both are self-hosted Latin WOFF2 fonts with swap rendering; source and SIL Open Font License files are recorded in public/fonts/README.md. Other scripts use the browser’s sans-serif fallback.
+Both fonts are self-hosted Latin WOFF2 files with swap rendering. Font provenance and SIL Open Font License files live in `public/fonts/README.md`; other scripts use the browser’s sans-serif fallback. Manrope is a variable face, including the operational (750) heading weight.
 
 ### Hierarchy
 
-- **Display:** the two-line landing title; its desktop clamp, weight, tracking, and leading are in frontmatter.
-- **Headline:** the neighborhood heading; featured house headings use the same face with a smaller `clamp(25px, 2.6vw, 37px)`, (1.2) leading and (-.03em) tracking.
-- **Title:** listing house names. The desktop title reduces to (21px), (19px), and (18px) at the successive responsive breakpoints.
-- **Body:** directory descriptions, with a maximum measure of (62ch); invitation copy has its separate, more open role.
-- **App page / world title / app heading:** fixed-size Dela roles for page landmarks, the house title, and event/dialog headings. At (760px), the world title and event/dialog headings become (23px), and the insights heading becomes (28px); the ordinary world title becomes (21px) below (450px).
-- **App subheading:** strong Manrope for sidebar introductions and resident headings. Form and resident-detail section labels use (13px), weight (800). App copy and journal copy retain their separate leading.
-- **Action / filter:** sturdy Manrope controls. App journal filters and sidebar tabs use (11px); resident and event names use (13px). Counts and needs use tabular numerals. Metadata remains subordinate to readable body text.
+- **Display / headline:** fluid landing roles recorded in frontmatter. The featured-house title also uses Dela with `clamp(25px, 2.6vw, 37px)`, (1.2) leading and (-.03em) tracking. These are landing roles, not a universal app scale.
+- **World / insights / dialog titles:** strong Manrope landmarks. The world title reduces to (23px) at the phone breakpoint, insights to (28px), and dialogs to (24px).
+- **Section / listing titles:** Manrope separates tasks and names without a competing display face. Insights sections use (21px), weight (700), while event names use (15px), weight (700).
+- **Body / journal copy:** the directory and working reading roles in frontmatter. Directory descriptions have a maximum measure of (62ch). House narrative prose uses its own more open reading role; it reduces to (14px) on narrow screens.
+- **Action / filter:** sturdy Manrope for primary actions and directory filters. Sidebar tabs use (12px); operational journal filters use (11px). Fields use (14px). These component differences are observed, not a mandate to reduce all controls to the smallest size.
+- **Metrics:** house summary values use (23px), weight (700); insights values use (25px), reducing to (23px) on phones. Time, counts and detailed measurements use tabular numerals where defined by their component.
 
-**The Landmark Type Rule.** Reserve Dela for major landmarks; use Manrope for task controls, resident names, detail sections, and sustained reading.
+**The Working Type Rule.** Reserve Dela for the wordmark and landing; use Manrope for operational headings, controls and sustained reading.
 
-The title uses `clamp(40px,5.4vw,62px)` at the medium breakpoint, `clamp(34px,7.1vw,54px)` and (1.13) leading at mobile, and `clamp(28px,7.8vw,35px)` on small phones. These are source-specific responsive roles, not a universal mathematical type scale.
-
-**The House First Rule.** Use the existing Building SVG for product illustrations; keep names, access conditions, and actions as readable interface text.
+The landing display reduces at its own (1100px), (760px), and (450px) breakpoints. Legacy tiny metadata sizes and tracked eyebrow selectors are not a reusable type scale or a recommended new pattern.
 
 ## Layout
 
-The landing uses full-width color regions with a centered opening and footer capped at (1504px), including desktop gutters. The header and neighborhood use `max(32px, calc((100vw - 1440px) / 2))` horizontal padding. Gutters reduce to (22px) and then (18px).
+The world page is capped at (1504px), with (32px) desktop gutters and (18px) phone gutters. Scene and journal share a grid on wide screens, with a (20px) final gap, and stack at (900px). The compact world header is (56px) on desktop; below (760px) it uses a single row with a (60px) minimum height. The general header retains its separate layout. The world’s view navigation sits directly below its title and description.
 
-The opening title and introduction occupy two unequal columns. The featured house sits in an arched stage, with an adjacent invitation; the decorative note drops away below (1100px). The directory uses open horizontal rows with preview, copy, metadata, and entry affordance in columns of `205px minmax(0,1fr) 185px 115px`, separated by (30px) gaps.
+At (760px), a journal disclosure appears above the stacked panel and an event link appears beside scene actions. The expanded phone journal is capped at (340px) and (55dvh). The phone default can collapse the journal while retaining the saved preference. House metrics become full-width ruled rows. Event list columns reduce from four to three at (1100px), two at (760px), and one at (540px); the alternative event deck retains horizontal scrolling and paging.
 
-Responsive thresholds are (1100px), (760px), and (450px), all max-width queries. At mobile, title and introduction stack, the stage becomes a single column, search fills the available width, and metadata moves below row previews and copy. The entry affordance remains at the right. The featured action sits beside its text above the small-phone threshold and becomes a full available-width action below it. Listing previews reduce from (205px) through (170px), (120px), and (90px).
+Insights use four summary columns, two at (900px), and one at (540px). On phones each metric places its label and value on one row and its explanation beneath. Reading columns stack at (900px); relationship prose wraps without a decorative left stripe. The house narrative becomes a single column at (700px).
 
-The header is (86px) tall on desktop and (74px) at mobile. Mobile hides the active directory link and brand descriptor while preserving the field guide and theme controls. Spacing entries in frontmatter are recurring dimensions extracted from the build, not a mandate to quantize every gap.
+The landing keeps its broad arched house stage and open directory rows, with a (1504px) opening width, (32px) desktop gutters and (22px)/(18px) mobile gutters. Its directory is a preview, copy, metadata and entry grid; mobile moves metadata below preview and copy. The landing brief owns the exact composition and display-size changes.
 
-The app retains its existing content grid and responsive stacking; it does not reuse the hero’s oversized title or arched stage as a page template. The common app header is compact (64px), with the same plum ground, brand, navigation, and theme controls. Dialog padding is (36px), reducing to (28px 24px) at mobile and (26px 20px) on small phones. World-specific layout and reading arrangements are recorded in their surface briefs.
+Spacing tokens record reused dimensions, not a requirement to quantize every existing gap. Dialog content padding is (32px), reducing to (24px 20px) at (760px). Scrolling, wrapping and containment must continue to work when text is enlarged.
 
 ## Elevation & Depth
 
-The shared interface is flat at rest. Color regions, fine borders, and the SVG’s own drawing supply depth. Primary actions, dialogs, and event-deck cards have no box shadow. Dialogs use an opaque semantic surface, a fine control border, and a plum translucent backdrop without blur. Event-card hover changes tone and border without lifting.
+Most working regions are flat: borders, tone and whitespace establish their hierarchy. The live scene, journal and ordinary event list have no shadow. Dialogs deliberately float above an olive translucent backdrop with (3px) blur. Event-deck cards retain subtle elevation and a stronger active treatment on small screens; this is a distinct interaction, not the event list’s appearance. Contextual popovers and the simulation artwork keep their own separation shadows.
 
-Small contextual overlays retain the existing shadow (`0 5px 18px #0004`) to separate tooltips and resident-choice popovers from their anchor. The simulation’s existing illustration shadows remain part of its artwork.
+### Shadow Vocabulary
 
-**The Flat Program Rule.** Separate interface regions through color, space, and fine rules; use tonal change for hover and reserve overlay shadows for contextual information.
+- **Dialog:** `var(--shadow)` from design-tokens.css; light and dark values are recorded in the sidecar.
+- **Context overlay:** `0 5px 18px #0004` for time-mode tooltips and resident-choice popovers.
+- **Deck resting:** `0 1px 2px rgba(60,70,50,.05)` for event-deck cards.
+- **Deck active:** `0 10px 26px rgba(60,70,50,.13)` for the active mobile card and draw animation.
+
+**The Containment Rule.** Use rules and space for ordinary reading and metrics; use bounded surfaces for the scene, journal, disclosures and dialogs.
 
 ## Shapes
 
-Controls have gently rounded corners; primary actions are slightly rounder than filter buttons and the native house selector. House thumbnails use soft rectangular corners, while the featured illustration has a broad arch with square lower corners. Panels, dialogs, world frames, and event cards use the panel radius; template previews use the inset radius. The neighborhood count is circular. Keep these roles distinct rather than rounding every region into a container.
+Controls share the control radius; directory filters and the native featured-house selector use the slightly tighter filter radius. Scene frames, journal panels, house narrative and disclosure containers use the panel radius. Dialogs have the larger dialog radius; event-deck cards use the deck radius. Open event lists and metric rows are square and ruled. The landing artwork keeps its broad arch with square lower corners, while thumbnails remain rounded rectangles. Counts and dedicated icon controls can be circular; these roles do not make every container a pill.
 
 ## Components
 
 ### Buttons
 
-Primary stage actions use yellow with fixed plum text, the action radius, (15px 20px) padding, and a minimum height of (49px). Hover uses the brighter action-hover token. Neighborhood actions invert ink and mint and reduce opacity to (.85) on hover. Both use strong text with a supporting SVG icon. The understated create link is a text button, not a second large stage action.
+Primary buttons use action/action ink, (12px 18px) padding, strong Manrope and a minimum height of (44px). Hover uses action hover. Secondary buttons use surface/text with a control border and (10px 13px) padding; hover changes the surface and accent border. The landing’s stage action uses (15px 20px) padding, weight (800) and a (49px) minimum height. Its secondary creation action uses selected/selected ink.
 
-App primary actions use the same yellow and fixed light-theme plum text, a plum border, (12px 18px) padding, and a minimum height of (44px). Secondary actions use the semantic surface and control border with strong Manrope text and the control radius. Disabled buttons retain their native disabled behavior and reduced opacity.
+The shared focus treatment is a (3px) outline with a (3px) offset. Landing groups use a (5px) offset; component-specific focus treatments remain where defined. Disabled controls keep native behavior and component-specific reduced emphasis.
 
-Keyboard focus on stage actions and the native selector uses a (3px) yellow outline offset by (5px); neighborhood links and buttons use ink at the same dimensions. Header and footer focus use yellow with the inherited (4px) offset.
+### Filters and selection
 
-### Filters
-
-Filters are labeled buttons with `aria-pressed`, a minimum height of (44px), and transparent backgrounds at rest. Selection reverses ink and mint. Hover reveals an ink border. These are functional choices, not decorative badges. App journal/event filters, sidebar tabs, and active world navigation instead select plum with yellow text. Journal filters and sidebar tabs have a minimum height of (40px).
+Directory filters are labeled buttons with `aria-pressed`, a (44px) minimum height, transparent resting surfaces and selected-sage pressed states. Journal and connection filters use the same semantic selection pair. Selected native time modes use the related soft surface with accent text and a control border. Sidebar tabs have (44px) minimum height and an accent rule plus selected tone. Event-deck tone labels remain semantic category information rather than decorative section headings.
 
 ### Inputs / Fields
 
-The search field is transparent with an underline and a leading search SVG. Focus outlines the whole search group with (3px) ink and a (5px) offset; the input’s own outline is suppressed because the group supplies it. Its desktop width is (280px), becoming full width on mobile. The featured-house selector remains a native select with a visible label, plum field, yellow text, and a fine stage-rule border.
+Native fields use surface/text, a control border, control radius, (11px 12px) padding and a (44px) minimum height. Focus changes the border and keeps a visible outline. Labels remain visible; hints use muted text. The directory search is an intentional variant: transparent, underlined, (280px) wide on desktop, full width on mobile, and focused as a group. The featured-house picker remains a labeled native select on the hero surface.
 
-App fields use the semantic surface and text, control border, control radius, and a minimum height of (44px). Form labels are strong Manrope. Selected time modes use a mint surface with an accent border. App focus uses the semantic focus color, while controls on plum toolbars use yellow.
+### Cards / Containers
+
+The live scene and journal use a fine line, panel radius and ordinary surface. The scene toolbar and footer share that surface instead of competing color bands. Insights panels and event list items use open ruled rows. The house narrative uses a soft inset surface without a prose stripe. Event-deck cards retain their semantic top strip, illustrated SVG icon, effects and cooldown states; do not transfer their elevation to ordinary data rows.
+
+### Dialogs and disclosures
+
+Dialogs use the semantic surface, dialog radius and dialog shadow, with a scrollable bounded height and independently locked page scroll. Titles and internal headings use Manrope. Field-guide disclosures remain bordered panel-radius containers with a soft open-state heading and rotating SVG chevron. Their existing (17px) summaries and (13.5px)/(1.75) body copy remain specific reading roles. This is not a flat divider-only list.
 
 ### Navigation
 
-The plum header pairs a yellow Dela wordmark with lilac navigation. The active desktop directory link has a (3px) yellow underline. The theme control retains its circular hit area; visible labels and SVG icons carry meaning. Footer typography echoes the header without repeating the mark. The compact app header uses the same identity with a smaller wordmark; the fullscreen header stays on the ordinary page ground. App view navigation and sidebar tabs use filled selected states rather than the site header’s underline.
+The wordmark keeps Dela; navigation uses Manrope and subdued semantic text on a neutral surface. The active world-view link uses an accent underline. On phones the world header retains the brand, field guide and theme control while hiding secondary desktop navigation; the journal control moves next to its content. Theme controls remain accessible icon buttons. Header dimensions are route-specific, not one global height token.
 
-### House listings
+### Motion
 
-Each listing is a single anchor containing the preserved Building miniature, a Manrope house name, access text beneath the name, a description, population and time-mode metadata, and an arrow. Fine rules and whitespace separate rows; ground color signals hover. Names and descriptions wrap anywhere to accommodate user content. At narrower widths the arrow remains while its redundant “Visit house” label hides.
-
-### Featured house stage
-
-The existing Building SVG is the authoritative illustration, reused without new raster assets. A real listed house gets its name, access condition, population, and visit link attached to the illustration. The template fallback is explicitly labeled. House changes use one (420ms) arrival with `cubic-bezier(.16,1,.3,1)`, moving from (7px) below and (.8) opacity. Reduced motion removes that animation. No continuous decorative animation is part of the landing system.
-
-### Panels, dialogs, and reading surfaces
-
-World frames, sidebars, and insight panels use semantic surfaces with fine rules and soft rectangular corners. Mint groups secondary content such as statistics and tab rails. Dialogs share the same fields and yellow primary actions as the app; their major title uses Dela and their inner sections use Manrope. Close controls use a mint surface and the control radius.
-
-Guide disclosures form a flat ruled list with Manrope summaries; open summaries use the accent color. House narratives use horizontal rules instead of an extra raised card. Event cards retain their meanings and descriptions, with quiet icons, strong Manrope titles, and tonal hover feedback.
+The landing house switch uses a single (420ms) `cubic-bezier(.16,1,.3,1)` arrival. Event-deck cards retain their draw animation and paging feedback. Reduced motion disables the house reveal, deck animation and associated transitions where implemented. Ordinary event-list hover changes tone without lifting.
 
 ## Do's and Don'ts
 
 ### Do:
-
-- Do keep the house name before its access label in featured invitations and listing copy.
-- Do preserve visible keyboard focus, textual control names, and pressed filter states.
-- Do keep long house names and descriptions wrapping inside their available columns.
-- Do use the existing Building SVG and its theme-aware scene colors; font provenance and licenses live in public/fonts/README.md.
-- Do honor reduced motion by disabling the house arrival animation.
+- Do use the semantic light and dark roles from design-tokens.css across new working surfaces.
+- Do preserve visible focus, native field labels, pressed filter states and disabled behavior.
+- Do keep long names and descriptions wrapping inside their available columns.
+- Do use the existing Building SVG and preserve resident, furniture and semantic chart colors.
+- Do honor reduced motion for the house arrival and event-deck animations.
 
 ### Don't:
-
-- Don't copy the landing’s oversized hero composition into everyday app screens.
-- Don't turn the directory rows into a repeated elevated card grid.
-- Don't introduce raster illustrations to replace the product’s existing house renderer.
-- Don't restore the old serif dialog headings, elevated modal treatment, or tracked decorative eyebrows; the shared interface uses Dela landmarks and ordinary Manrope labels.
+- Don't restore the rejected plum, mint and yellow decorative combination.
+- Don't carry the landing’s display typography or arched stage into everyday task screens.
+- Don't turn metric rows and open directory listings into an elevated card grid.
+- Don't add decorative eyebrows, glyph icons or prose border stripes as new system conventions.
+- Don't replace the product’s house renderer with new raster illustrations.

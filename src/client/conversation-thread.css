@@ -1,3 +1,5 @@
+@layer base, components, theme, interface;
+@layer components {
 .conversation-thread { margin-top: 8px; }
 .conversation-thread summary { cursor: pointer; line-height: 1.5; padding: 4px 0; }
 .conversation-thread summary strong { font-size: 13px; }
@@ -26,3 +28,5 @@
 
 .journal-open-conversation{display:flex;align-items:center;gap:4px;margin:7px 0 0 15px;padding:4px 0;background:transparent;border:0;color:var(--secondary,#566f4d);font-size:11px;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .journal-open-conversation:focus-visible{outline:2px solid var(--focus,#566f4d);outline-offset:4px}
+
+}

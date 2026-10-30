@@ -1,3 +1,5 @@
+@layer base, components, theme, interface;
+@layer components {
 /* The scene takes pinches itself so they zoom the house, not the page. */
 .world-stage .building { touch-action: pan-x pan-y; }
 /* Zoomed in, one finger pans the house; the toolbar and footer still scroll the page. */
@@ -13,3 +15,5 @@
 :root[data-theme='dark'] .scene-zoom-controls button:hover:not(:disabled) { background:var(--surface-hover); color:var(--text); }
 /* Phones zoom with a pinch; keep only the way back so the toolbar stays on one line. */
 @media (max-width:450px) { .scene-zoom-controls button:not(.scene-zoom-reset) { display:none; } .scene-zoom-controls:not(:has(.scene-zoom-reset)) { display:none; } }
+
+}

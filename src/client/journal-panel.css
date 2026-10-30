@@ -1,3 +1,5 @@
+@layer base, components, theme, interface;
+@layer components {
 .journal-panel-controls {
   display: flex;
   justify-content: flex-end;
@@ -53,4 +55,6 @@
 .journal-arc-earlier li {
   margin-bottom: 6px;
   line-height: 1.7;
+}
+
 }

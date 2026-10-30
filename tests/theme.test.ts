@@ -27,7 +27,7 @@ describe('theme bootstrap', () => {
     expect(storage.get('kinarium-theme')).toBe(expected);
     expect(root.dataset.theme).toBe(expected);
     expect(root.style.colorScheme).toBe(expected);
-    expect(meta.setAttribute).toHaveBeenCalledWith('content', dark ? '#2a1933' : '#43274f');
+    expect(meta.setAttribute).toHaveBeenCalledWith('content', dark ? '#1d251f' : '#f4f3ec');
     expect(listeners.media).toBeUndefined();
   });
   it.each(['system', 'unexpected'])('migrates legacy/invalid %s values to a persistent binary choice', stored => {
@@ -85,7 +85,7 @@ describe('theme bootstrap', () => {
 
 // WCAG contrast checks for the shared dark palette and the unchanged semantic meter colors.
 const css = readFileSync(new URL('../src/client/theme.css', import.meta.url), 'utf8');
-const tokens = readFileSync(new URL('../src/client/festival-tokens.css', import.meta.url), 'utf8');
+const tokens = readFileSync(new URL('../src/client/design-tokens.css', import.meta.url), 'utf8');
 function palette(theme: 'light' | 'dark') {
   const declarations: Record<string, string> = {};
   for (const source of [tokens, css]) {
