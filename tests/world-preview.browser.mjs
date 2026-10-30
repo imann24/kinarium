@@ -24,7 +24,7 @@ try {
     return [summarize(duo,false),summarize(house('seaside','Seaside',12,'harbor-house'),false),summarize(house('chaos','Chaos',30,'courtyard-house'),false),legacy];
   });
   await page.reload();
-  const card = name => page.locator('.world-card').filter({has:page.getByRole('heading',{name,exact:true})});
+  const card = name => page.locator('.house-listing').filter({has:page.getByRole('heading',{name,exact:true})});
   await card('Duo').waitFor();
   for (const [name,count] of [['Duo',2],['Seaside',12],['Chaos',30]]) {
     assert.equal(await card(name).locator('.resident-sprite').count(),count,name);
@@ -33,7 +33,7 @@ try {
   const duo = card('Duo');
   assert.equal(await duo.locator('.resident-sprite').first().locator('path[fill="#7981a8"]').count(),1);
   assert(await card('Legacy').locator('.resident-sprite').count() > 0);
-  if (shots) await page.locator('.world-grid').screenshot({path:`${shots}/world-previews.png`});
+  if (shots) await page.locator('.house-list').screenshot({path:`${shots}/world-previews.png`});
   assert.deepEqual(errors,[]);
   console.log('world previews ok');
 } finally { await browser.close(); }
