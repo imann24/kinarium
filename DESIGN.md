@@ -101,7 +101,7 @@ typography:
     lineHeight: 1.7
   journal-copy:
     fontFamily: "Manrope, sans-serif"
-    fontSize: "12px"
+    fontSize: "13px"
     fontWeight: 400
     lineHeight: 1.7
   narrative:
@@ -237,7 +237,7 @@ Both fonts are self-hosted Latin WOFF2 files with swap rendering. Font provenanc
 - **World / insights / dialog titles:** strong Manrope landmarks. The world title reduces to (23px) at the phone breakpoint, insights to (28px), and dialogs to (24px).
 - **Section / listing titles:** Manrope separates tasks and names without a competing display face. Insights sections use (21px), weight (700), while event names use (15px), weight (700).
 - **Body / journal copy:** the directory and working reading roles in frontmatter. Directory descriptions have a maximum measure of (62ch). House narrative prose uses its own more open reading role; it reduces to (14px) on narrow screens.
-- **Action / filter:** sturdy Manrope for primary actions and directory filters. Sidebar tabs use (12px); operational journal filters use (11px). Fields use (14px). These component differences are observed, not a mandate to reduce all controls to the smallest size.
+- **Action / filter:** sturdy Manrope for primary actions and directory filters. Sidebar tabs and operational journal filters use (12px). Journal headings use (18px), conversation titles (14px), reading copy (13px), and metadata (10–11px). Fields use (14px). These component differences are observed, not a mandate to reduce all controls to the smallest size.
 - **Metrics:** house summary values use (23px), weight (700); insights values use (25px), reducing to (23px) on phones. Time, counts and detailed measurements use tabular numerals where defined by their component.
 
 **The Working Type Rule.** Reserve Dela for the wordmark and landing; use Manrope for operational headings, controls and sustained reading.
@@ -248,7 +248,7 @@ The landing display reduces at its own (1100px), (760px), and (450px) breakpoint
 
 The world page is capped at (1504px), with (32px) desktop gutters and (18px) phone gutters. Scene and journal share a grid on wide screens, with a (20px) final gap, and stack at (900px). The compact world header is (56px) on desktop; below (760px) it uses a single row with a (60px) minimum height. The general header retains its separate layout. The world’s view navigation sits directly below its title and description.
 
-At (760px), a journal disclosure appears above the stacked panel and an event link appears beside scene actions. The expanded phone journal is capped at (340px) and (55dvh). The phone default can collapse the journal while retaining the saved preference. House metrics become full-width ruled rows. Event list columns reduce from four to three at (1100px), two at (760px), and one at (540px); the alternative event deck retains horizontal scrolling and paging.
+At (760px), a journal disclosure appears above the stacked panel and an event link appears beside scene actions. The expanded journal below (900px) uses (75dvh), bounded between (480px) and (600px), leaving room for reading beneath the fixed header and filters. Above (900px), the sidebar uses a (320–400px) reading column. The phone default can collapse the journal while retaining the saved preference. House metrics become full-width ruled rows. Event list columns reduce from four to three at (1100px), two at (760px), and one at (540px); the alternative event deck retains horizontal scrolling and paging.
 
 Insights use four summary columns, two at (900px), and one at (540px). On phones each metric places its label and value on one row and its explanation beneath. Reading columns stack at (900px); relationship prose wraps without a decorative left stripe. The house narrative becomes a single column at (700px).
 
@@ -283,7 +283,7 @@ The shared focus treatment is a (3px) outline with a (3px) offset. Landing group
 
 ### Filters and selection
 
-Directory filters are labeled buttons with `aria-pressed`, a (44px) minimum height, transparent resting surfaces and selected-sage pressed states. Journal and connection filters use the same semantic selection pair. Selected native time modes use the related soft surface with accent text and a control border. Sidebar tabs have (44px) minimum height and an accent rule plus selected tone. Event-deck tone labels remain semantic category information rather than decorative section headings.
+Directory filters are labeled buttons with `aria-pressed`, a (44px) minimum height, transparent resting surfaces and selected-sage pressed states. Journal and connection filters use the same semantic selection pair. Selected native time modes use the related soft surface with accent text and a control border. Sidebar tabs have (48px) minimum height and an accent rule plus selected tone. Journal filters form a two-column grid with (44px) targets and expose their pressed state. The keyboard-focusable journal scroll region identifies its newest-first order; conversation summaries use explicit read/hide labels, with a separate action to open the full conversation. Event-deck tone labels remain semantic category information rather than decorative section headings.
 
 ### Inputs / Fields
 
