@@ -1,0 +1,389 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-30T10:31:31.490578+00:00",
+  "title": "Design System: Kinarium",
+  "extensions": {
+    "colorMeta": {
+      "festival-plum": {
+        "role": "primary",
+        "displayName": "Festival Plum",
+        "tonalRamp": [
+          "oklch(15.0% 0.0267 315.06)",
+          "oklch(26.4% 0.0496 315.06)",
+          "oklch(37.9% 0.0649 315.06)",
+          "oklch(49.3% 0.0763 315.06)",
+          "oklch(60.7% 0.0763 315.06)",
+          "oklch(72.1% 0.0687 315.06)",
+          "oklch(83.6% 0.0496 315.06)",
+          "oklch(95.0% 0.0191 315.06)"
+        ]
+      },
+      "festival-ink": {
+        "role": "neutral",
+        "displayName": "Festival Ink",
+        "tonalRamp": [
+          "oklch(15.0% 0.0182 315.01)",
+          "oklch(26.4% 0.0337 315.01)",
+          "oklch(37.9% 0.0441 315.01)",
+          "oklch(49.3% 0.0519 315.01)",
+          "oklch(60.7% 0.0519 315.01)",
+          "oklch(72.1% 0.0467 315.01)",
+          "oklch(83.6% 0.0337 315.01)",
+          "oklch(95.0% 0.0130 315.01)"
+        ]
+      },
+      "festival-yellow": {
+        "role": "primary",
+        "displayName": "Festival Yellow",
+        "tonalRamp": [
+          "oklch(15.0% 0.0340 108.75)",
+          "oklch(26.4% 0.0632 108.75)",
+          "oklch(37.9% 0.0827 108.75)",
+          "oklch(49.3% 0.0973 108.75)",
+          "oklch(60.7% 0.0973 108.75)",
+          "oklch(72.1% 0.0875 108.75)",
+          "oklch(83.6% 0.0632 108.75)",
+          "oklch(95.0% 0.0243 108.75)"
+        ]
+      },
+      "festival-mint": {
+        "role": "secondary",
+        "displayName": "Festival Mint",
+        "tonalRamp": [
+          "oklch(15.0% 0.0144 126.94)",
+          "oklch(26.4% 0.0267 126.94)",
+          "oklch(37.9% 0.0349 126.94)",
+          "oklch(49.3% 0.0410 126.94)",
+          "oklch(60.7% 0.0410 126.94)",
+          "oklch(72.1% 0.0369 126.94)",
+          "oklch(83.6% 0.0267 126.94)",
+          "oklch(95.0% 0.0103 126.94)"
+        ]
+      },
+      "festival-ground": {
+        "role": "neutral",
+        "displayName": "Festival Ground",
+        "tonalRamp": [
+          "oklch(15.0% 0.0059 125.29)",
+          "oklch(26.4% 0.0109 125.29)",
+          "oklch(37.9% 0.0142 125.29)",
+          "oklch(49.3% 0.0167 125.29)",
+          "oklch(60.7% 0.0167 125.29)",
+          "oklch(72.1% 0.0151 125.29)",
+          "oklch(83.6% 0.0109 125.29)",
+          "oklch(95.0% 0.0042 125.29)"
+        ]
+      },
+      "festival-subtle": {
+        "role": "neutral",
+        "displayName": "Festival Subtle",
+        "tonalRamp": [
+          "oklch(15.0% 0.0148 130.25)",
+          "oklch(26.4% 0.0274 130.25)",
+          "oklch(37.9% 0.0358 130.25)",
+          "oklch(49.3% 0.0422 130.25)",
+          "oklch(60.7% 0.0422 130.25)",
+          "oklch(72.1% 0.0380 130.25)",
+          "oklch(83.6% 0.0274 130.25)",
+          "oklch(95.0% 0.0105 130.25)"
+        ]
+      },
+      "festival-rule": {
+        "role": "neutral",
+        "displayName": "Festival Rule",
+        "tonalRamp": [
+          "oklch(15.0% 0.0146 130.40)",
+          "oklch(26.4% 0.0272 130.40)",
+          "oklch(37.9% 0.0356 130.40)",
+          "oklch(49.3% 0.0418 130.40)",
+          "oklch(60.7% 0.0418 130.40)",
+          "oklch(72.1% 0.0377 130.40)",
+          "oklch(83.6% 0.0272 130.40)",
+          "oklch(95.0% 0.0105 130.40)"
+        ]
+      },
+      "festival-lilac": {
+        "role": "secondary",
+        "displayName": "Festival Lilac",
+        "tonalRamp": [
+          "oklch(15.0% 0.0128 313.02)",
+          "oklch(26.4% 0.0237 313.02)",
+          "oklch(37.9% 0.0310 313.02)",
+          "oklch(49.3% 0.0365 313.02)",
+          "oklch(60.7% 0.0365 313.02)",
+          "oklch(72.1% 0.0328 313.02)",
+          "oklch(83.6% 0.0237 313.02)",
+          "oklch(95.0% 0.0091 313.02)"
+        ]
+      },
+      "festival-plum-dark": {
+        "role": "primary",
+        "displayName": "Festival Plum Dark",
+        "tonalRamp": [
+          "oklch(15.0% 0.0185 313.13)",
+          "oklch(26.4% 0.0343 313.13)",
+          "oklch(37.9% 0.0448 313.13)",
+          "oklch(49.3% 0.0527 313.13)",
+          "oklch(60.7% 0.0527 313.13)",
+          "oklch(72.1% 0.0475 313.13)",
+          "oklch(83.6% 0.0343 313.13)",
+          "oklch(95.0% 0.0132 313.13)"
+        ]
+      },
+      "festival-ink-dark": {
+        "role": "neutral",
+        "displayName": "Festival Ink Dark",
+        "tonalRamp": [
+          "oklch(15.0% 0.0093 125.62)",
+          "oklch(26.4% 0.0173 125.62)",
+          "oklch(37.9% 0.0226 125.62)",
+          "oklch(49.3% 0.0266 125.62)",
+          "oklch(60.7% 0.0266 125.62)",
+          "oklch(72.1% 0.0240 125.62)",
+          "oklch(83.6% 0.0173 125.62)",
+          "oklch(95.0% 0.0067 125.62)"
+        ]
+      },
+      "festival-mint-dark": {
+        "role": "secondary",
+        "displayName": "Festival Mint Dark",
+        "tonalRamp": [
+          "oklch(15.0% 0.0095 153.06)",
+          "oklch(26.4% 0.0177 153.06)",
+          "oklch(37.9% 0.0232 153.06)",
+          "oklch(49.3% 0.0272 153.06)",
+          "oklch(60.7% 0.0272 153.06)",
+          "oklch(72.1% 0.0245 153.06)",
+          "oklch(83.6% 0.0177 153.06)",
+          "oklch(95.0% 0.0068 153.06)"
+        ]
+      },
+      "festival-ground-dark": {
+        "role": "neutral",
+        "displayName": "Festival Ground Dark",
+        "tonalRamp": [
+          "oklch(15.0% 0.0058 163.49)",
+          "oklch(26.4% 0.0108 163.49)",
+          "oklch(37.9% 0.0141 163.49)",
+          "oklch(49.3% 0.0166 163.49)",
+          "oklch(60.7% 0.0166 163.49)",
+          "oklch(72.1% 0.0149 163.49)",
+          "oklch(83.6% 0.0108 163.49)",
+          "oklch(95.0% 0.0041 163.49)"
+        ]
+      },
+      "festival-subtle-dark": {
+        "role": "neutral",
+        "displayName": "Festival Subtle Dark",
+        "tonalRamp": [
+          "oklch(15.0% 0.0115 130.64)",
+          "oklch(26.4% 0.0213 130.64)",
+          "oklch(37.9% 0.0278 130.64)",
+          "oklch(49.3% 0.0327 130.64)",
+          "oklch(60.7% 0.0327 130.64)",
+          "oklch(72.1% 0.0295 130.64)",
+          "oklch(83.6% 0.0213 130.64)",
+          "oklch(95.0% 0.0082 130.64)"
+        ]
+      },
+      "festival-rule-dark": {
+        "role": "neutral",
+        "displayName": "Festival Rule Dark",
+        "tonalRamp": [
+          "oklch(15.0% 0.0123 145.05)",
+          "oklch(26.4% 0.0229 145.05)",
+          "oklch(37.9% 0.0299 145.05)",
+          "oklch(49.3% 0.0352 145.05)",
+          "oklch(60.7% 0.0352 145.05)",
+          "oklch(72.1% 0.0317 145.05)",
+          "oklch(83.6% 0.0229 145.05)",
+          "oklch(95.0% 0.0088 145.05)"
+        ]
+      },
+      "festival-action-hover": {
+        "role": "neutral",
+        "displayName": "Festival Action Hover",
+        "tonalRamp": [
+          "oklch(15.0% 0.0238 106.69)",
+          "oklch(26.4% 0.0441 106.69)",
+          "oklch(37.9% 0.0577 106.69)",
+          "oklch(49.3% 0.0679 106.69)",
+          "oklch(60.7% 0.0679 106.69)",
+          "oklch(72.1% 0.0611 106.69)",
+          "oklch(83.6% 0.0441 106.69)",
+          "oklch(95.0% 0.0170 106.69)"
+        ]
+      },
+      "festival-stage-rule": {
+        "role": "neutral",
+        "displayName": "Festival Stage Rule",
+        "tonalRamp": [
+          "oklch(15.0% 0.0206 314.40)",
+          "oklch(26.4% 0.0382 314.40)",
+          "oklch(37.9% 0.0500 314.40)",
+          "oklch(49.3% 0.0588 314.40)",
+          "oklch(60.7% 0.0588 314.40)",
+          "oklch(72.1% 0.0529 314.40)",
+          "oklch(83.6% 0.0382 314.40)",
+          "oklch(95.0% 0.0147 314.40)"
+        ]
+      },
+      "festival-header-rule": {
+        "role": "neutral",
+        "displayName": "Festival Header Rule",
+        "tonalRamp": [
+          "oklch(15.0% 0.0244 315.53)",
+          "oklch(26.4% 0.0454 315.53)",
+          "oklch(37.9% 0.0594 315.53)",
+          "oklch(49.3% 0.0698 315.53)",
+          "oklch(60.7% 0.0698 315.53)",
+          "oklch(72.1% 0.0628 315.53)",
+          "oklch(83.6% 0.0454 315.53)",
+          "oklch(95.0% 0.0175 315.53)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Landing title."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Neighborhood heading."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Listing names."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Directory descriptions."
+      },
+      "invitation": {
+        "displayName": "Invitation",
+        "purpose": "Opening explanatory copy."
+      },
+      "action": {
+        "displayName": "Action",
+        "purpose": "Primary actions."
+      },
+      "filter": {
+        "displayName": "Filter",
+        "purpose": "Directory filter controls."
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "house-arrival",
+        "value": "420ms cubic-bezier(.16,1,.3,1)",
+        "purpose": "One featured-house reveal from opacity .8 and translateY(7px); disabled for prefers-reduced-motion: reduce."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "medium",
+        "value": "1100px"
+      },
+      {
+        "name": "mobile",
+        "value": "760px"
+      },
+      {
+        "name": "small-phone",
+        "value": "450px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Stage action",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Yellow invitation on the plum stage.",
+      "html": "<div class=\"ds-stage\"><a class=\"ds-stage-action\" href=\"#house\">Visit this house<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7 7h10v10M7 17 17 7\"/></svg></a></div>",
+      "css": ".ds-stage{background:#43274f;padding:20px}.ds-stage-action{display:inline-flex;align-items:center;justify-content:space-between;gap:22px;border:1px solid transparent;border-radius:7px;padding:15px 20px;min-height:49px;font:800 13px/1.5 Manrope,sans-serif;text-decoration:none;cursor:pointer;background:#f2f3a6;color:#43274f}.ds-stage-action:hover{background:#fffec9}.ds-stage-action:focus-visible{outline:3px solid #f2f3a6;outline-offset:5px}"
+    },
+    {
+      "name": "Neighborhood action",
+      "kind": "button",
+      "refersTo": "button-neighborhood",
+      "description": "Reversed ink and mint action on the directory ground.",
+      "html": "<div class=\"ds-ground\"><button class=\"ds-neighborhood-action\" type=\"button\">Create a world<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7 7h10v10M7 17 17 7\"/></svg></button></div>",
+      "css": ".ds-ground{background:#dce9cc;padding:20px}.ds-neighborhood-action{display:inline-flex;align-items:center;justify-content:space-between;gap:22px;border:1px solid transparent;border-radius:7px;padding:15px 20px;min-height:49px;font:800 13px/1.5 Manrope,sans-serif;text-decoration:none;cursor:pointer;background:#35233d;color:#dce9cc}.ds-neighborhood-action:hover{opacity:.85}.ds-neighborhood-action:focus-visible{outline:3px solid #35233d;outline-offset:5px}"
+    },
+    {
+      "name": "World search",
+      "kind": "input",
+      "refersTo": "search",
+      "description": "Transparent search with group focus.",
+      "html": "<div class=\"ds-search-ground\"><label class=\"ds-search\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"19\" height=\"19\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><circle cx=\"11\" cy=\"11\" r=\"8\"/><path d=\"m21 21-4.3-4.3\"/></svg><input type=\"search\" aria-label=\"Search worlds\" placeholder=\"Find a world…\"></label></div>",
+      "css": ".ds-search-ground{background:#dce9cc;padding:20px}.ds-search{display:flex;align-items:center;gap:12px;border-bottom:1px solid #35233d;padding-left:3px;width:280px;max-width:100%;color:#35233d}.ds-search input{width:100%;min-width:0;background:transparent;border:0;padding:14px 0;color:#35233d;font:13px Manrope,sans-serif}.ds-search input::placeholder{color:#536047}.ds-search:focus-within{outline:3px solid #35233d;outline-offset:5px}.ds-search input:focus-visible{outline:none}"
+    },
+    {
+      "name": "Directory filters",
+      "kind": "chip",
+      "refersTo": "filter",
+      "description": "Labeled filter buttons showing selected and resting states.",
+      "html": "<div class=\"ds-filters\"><button type=\"button\" aria-pressed=\"true\">All worlds</button><button type=\"button\" aria-pressed=\"false\">Open doors</button><button type=\"button\" aria-pressed=\"false\">Always on</button></div>",
+      "css": ".ds-filters{display:flex;gap:6px;flex-wrap:wrap;background:#dce9cc;padding:20px}.ds-filters button{min-height:44px;border:1px solid transparent;border-radius:6px;padding:10px 16px;font:700 12px Manrope,sans-serif;color:#536047;background:transparent;cursor:pointer}.ds-filters button[aria-pressed=true]{background:#35233d;color:#dce9cc}.ds-filters button:hover{border-color:#35233d}.ds-filters button:focus-visible{outline:3px solid #35233d;outline-offset:5px}"
+    },
+    {
+      "name": "Landing navigation",
+      "kind": "nav",
+      "refersTo": "navigation",
+      "description": "Desktop active navigation underline on a plum field.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Main navigation\"><a class=\"ds-current\" href=\"#worlds\" aria-current=\"page\">The worlds</a><button type=\"button\">Field guide</button></nav>",
+      "css": ".ds-nav{display:flex;align-items:center;gap:30px;height:86px;padding:0 24px;background:#43274f;color:#dacbe3;font:600 12px Manrope,sans-serif}.ds-nav a{height:86px;display:flex;align-items:center;position:relative;color:inherit;text-decoration:none}.ds-nav .ds-current:after{content:\"\";position:absolute;bottom:0;left:0;width:100%;height:3px;background:#f2f3a6}.ds-nav button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:pointer}.ds-nav button:hover{color:#81976e}.ds-nav :is(a,button):focus-visible{outline:3px solid #f2f3a6;outline-offset:4px}"
+    },
+    {
+      "name": "Native house picker",
+      "kind": "input",
+      "refersTo": "house-picker",
+      "description": "A native select preserves the visible label and keyboard behavior.",
+      "html": "<label class=\"ds-picker\"><span>Another little world</span><select aria-label=\"Preview a house\"><option>The house on Clover Lane</option><option>The shared roof</option></select></label>",
+      "css": ".ds-picker{display:flex;align-items:center;gap:15px;background:#43274f;color:#dacbe3;padding:20px;font:12px Manrope,sans-serif}.ds-picker select{width:240px;max-width:100%;background:#43274f;color:#f2f3a6;border:1px solid #a38baf;border-radius:6px;padding:10px 34px 10px 12px;font:12px Manrope,sans-serif;text-overflow:ellipsis}.ds-picker select:focus-visible{outline:3px solid #f2f3a6;outline-offset:5px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Neighborhood festival",
+    "overview": "Kinarium’s landing route uses the neighborhood festival as its visual world: broad plum fields, pale yellow invitations, mint listing ground, and substantial display lettering. It feels sociable and curious, with real house illustrations providing the detail and personality.\n\nThis is a scoped landing identity, implemented in src/client/landing.css and the landing header and Directory in src/client/main.tsx. World screens, administration, existing dialogs, and the simulation renderer remain incumbent surfaces. Their DM Sans/Lora typography and semantic green/paper themes in src/client/style.css and src/client/theme.css are separate authority; do not migrate them to these tokens as an incidental extension.",
+    "keyCharacteristics": [
+      "Broad color fields and flat, open house listings.",
+      "Dela Gothic One landmarks paired with Manrope reading and controls.",
+      "An arched stage around the existing Building SVG, with recognizable house detail.",
+      "The same color relationships in light and dark themes."
+    ],
+    "rules": [
+      {
+        "name": "The Scoped Identity Rule",
+        "body": "Apply festival tokens to the landing and its header only; preserve the separate world and dialog systems.",
+        "section": "colors"
+      },
+      {
+        "name": "The House First Rule",
+        "body": "Use the existing Building SVG for product illustrations; keep names, access conditions, and actions as readable interface text.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat Program Rule",
+        "body": "Separate landing regions through color, space, and fine rules; use tonal change for listing hover.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do keep the house name before its access label in featured invitations and listing copy.",
+      "Do preserve visible keyboard focus, textual control names, and pressed filter states.",
+      "Do keep long house names and descriptions wrapping inside their available columns.",
+      "Do use the existing Building SVG and its theme-aware scene colors; font provenance and licenses live in public/fonts/README.md.",
+      "Do honor reduced motion by disabling the house arrival animation."
+    ],
+    "donts": [
+      "Don't apply the landing palette or display typography globally to world screens or existing dialogs.",
+      "Don't turn the directory rows into a repeated elevated card grid.",
+      "Don't introduce raster illustrations to replace the product’s existing house renderer.",
+      "Don't promote existing dialog eyebrows or legacy decorative label styling into festival rules."
+    ]
+  }
+}

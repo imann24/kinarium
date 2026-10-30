@@ -14,7 +14,7 @@ import ResidentState from './ResidentState';
 import HouseDetailsForm from './HouseDetailsForm';
 import React, { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Palette, ArrowLeft, ArrowRight, ArrowUpRight, Asterisk, BookOpen, Check, ChevronDown, CircleHelp, Clock3, DoorOpen, Globe2, Heart, Infinity as InfinityIcon, Leaf, LockKeyhole, Maximize, Maximize2, MessageCircle, Minimize, Moon, Plus, Search, Settings2, Sparkles, Sprout, Users, X, Zap, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
+import { Palette, ArrowDownRight, ArrowLeft, ArrowRight, ArrowUpRight, Asterisk, BookOpen, Check, ChevronDown, CircleHelp, Clock3, DoorOpen, Globe2, Heart, Infinity as InfinityIcon, Leaf, LockKeyhole, Maximize, Maximize2, MessageCircle, Minimize, Moon, Plus, Search, Settings2, Sparkles, Sprout, Users, X, Zap, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
 import { EVENTS, TEMPLATES, TRAITS } from '../simulation/catalog';
 import { EVENT_COOLDOWN_MS, activeCharacters, createWorld, gameTime } from '../simulation/engine';
 import type { Character, Command, LogEntry, Snapshot, TimeMode, WorldState, WorldSummary } from '../simulation/types';
@@ -36,6 +36,7 @@ import { eventBudget, type PlayerEventBudget } from '../simulation/event-budget'
 import { api, ApiError } from './api';
 import './style.css';
 import './theme.css';
+import './landing.css';
 import './introduce-resident.css';
 import ThemeControl from './ThemeControl';
 import { useJournalPanel } from './useJournalPanel';
@@ -61,7 +62,7 @@ function Logo() { return <a href="/" className="brand" aria-label="Kinarium home
 function App() {
   const [guide, setGuide] = useState(false);
   const match = location.pathname.match(/^\/w\/([a-z0-9-]+)(\/insights)?\/?$/);
-  return <><UpdateBanner/><header className={`site-header ${match ? 'world-site-header' : ''}`}><Logo/><nav><a href="/" className={!match ? 'active' : ''}>The worlds</a><button type="button" className="text-button" aria-haspopup="dialog" onClick={() => setGuide(true)}><BookOpen size={13} aria-hidden="true"/> Field guide</button><span className="header-note"><span className="status-dot"/> A little life, unfolding</span><ThemeControl/></nav></header>
+  return <><UpdateBanner/><header className={`site-header ${match ? 'world-site-header' : location.pathname === '/' ? 'landing-header' : ''}`}><Logo/><nav><a href="/" className={!match ? 'active' : ''}>The worlds</a><button type="button" className="text-button" aria-haspopup="dialog" onClick={() => setGuide(true)}><BookOpen size={13} aria-hidden="true"/> Field guide</button><span className="header-note"><span className="status-dot"/> A little life, unfolding</span><ThemeControl/></nav></header>
     {/^\/admin\/?$/.test(location.pathname) ? <Admin/> : match ? <World slug={match[1]} insights={Boolean(match[2])}/> : location.pathname === '/' ? <Directory/> : <main className="empty-page"><h1>A path without a world.</h1><a href="/">Back to the directory</a></main>}
     {guide && <Modal title="A world with no finish line." eyebrow="THE FIELD GUIDE" onClose={() => setGuide(false)}><FieldGuide/></Modal>}
   </>;
@@ -79,17 +80,62 @@ function Modal({ title, eyebrow, className = '', children, onClose }: { title: s
   }} onCancel={e => { e.preventDefault(); onClose(); }} onClick={e => { if (e.target === ref.current) onClose(); }}><div className="modal-content"><button className="icon-button modal-close" onClick={onClose} aria-label="Close dialog"><X size={19}/></button>{eyebrow && <p className="eyebrow">{eyebrow}</p>}<h2 id={titleId}>{title}</h2>{children}</div></dialog>;
 }
 function Directory() {
-  const [worlds, setWorlds] = useState<WorldSummary[]>([]); const [loading, setLoading] = useState(true); const [error, setError] = useState(''); const [create, setCreate] = useState(false); const [query, setQuery] = useState(''); const [filter, setFilter] = useState('all');
-  async function load() { setLoading(true); setError(''); try { setWorlds((await api<{ worlds: WorldSummary[] }>('/worlds')).worlds); } catch (e) { setError(getError(e)); } finally { setLoading(false); } }
+  const [worlds, setWorlds] = useState<WorldSummary[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [create, setCreate] = useState(false);
+  const [query, setQuery] = useState('');
+  const [filter, setFilter] = useState('all');
+  const [featuredSlug, setFeaturedSlug] = useState('');
+  async function load() {
+    setLoading(true); setError('');
+    try { setWorlds((await api<{ worlds: WorldSummary[] }>('/worlds')).worlds); }
+    catch (e) { setError(getError(e)); }
+    finally { setLoading(false); }
+  }
   useEffect(() => { void load(); }, []);
-  const mobile = useMediaQuery('(max-width: 760px)');
-  const filtered = worlds.filter(w => `${w.name} ${w.description}`.toLowerCase().includes(query.toLowerCase()) && (filter === 'all' || (filter === 'open' ? !w.protected : w.mode === 'persistent')));
-  return <main className="directory">
-    <section className="intro"><div className="intro-copy"><p className="eyebrow"><Asterisk className="tiny-star" size={13} strokeWidth={2.4} aria-hidden/> AN OPEN-ENDED COMMUNITY SIMULATION</p><h1>Little worlds.<br/><em>A life of their own.</em></h1><p>A few neighbors. A shared roof. Stories that happen<br className="desktop-break"/> when you leave a little room for life.</p><div className="intro-actions"><button className="primary" onClick={() => setCreate(true)}><Plus size={17}/> Create a world</button><a href="#worlds" className="quiet-link">Find your little corner <ArrowRight size={16}/></a></div><div className="intro-foot"><span><Leaf size={14}/> No goals. Just possibilities.</span><span><Users size={14}/> Better, together.</span></div></div>{!mobile && <div className="intro-art"><Building world={example} miniature/><div className="art-caption"><span className="status-dot"/> A world starts with an open door.</div></div>}</section>
-    <section id="worlds" className="worlds-section"><div className="section-top"><div><p className="eyebrow">SOMEWHERE TO BELONG</p><h2>The neighborhood <span>{worlds.length.toString().padStart(2, '0')}</span></h2></div><label className="search"><Search size={16}/><input aria-label="Search worlds" placeholder="Find a world…" value={query} onChange={e => setQuery(e.target.value)}/></label></div><div className="directory-filters"><div className="pills">{[['all','All worlds'],['open','Open doors'],['persistent','Always on']].map(([id,label]) => <button key={id} className={filter === id ? 'selected' : ''} onClick={() => setFilter(id)}>{label}</button>)}</div><span>Small places. Shared stories.</span></div>
-      {error ? <div className="error-box">{error} <button onClick={load}>Try again</button></div> : loading ? <div className="loading">Opening the neighborhood…</div> : <div className="world-grid">{filtered.map((w, i) => <a className="world-card" href={`/w/${w.slug}`} key={w.slug}><div className={`card-art art-${i%3}`}><WorldPreview summary={w}/><span className="card-badge">{w.protected ? <LockKeyhole size={12}/> : <DoorOpen size={12}/>} {w.protected ? 'Password protected' : 'Everyone welcome'}</span></div><div className="card-body"><div className="card-title"><h3>{w.name}</h3><ArrowUpRight size={20}/></div><p>{w.description}</p><div className="card-meta"><span><Users size={14}/>{w.population} / {w.populationCap} residents</span><span>{w.mode === 'persistent' ? <InfinityIcon size={15}/> : <Clock3 size={13}/>} {w.mode === 'persistent' ? 'Always on' : 'Catch-up'}</span></div></div></a>)}<button className="new-world-card" onClick={() => setCreate(true)}><span className="new-world-icon"><Plus size={26} strokeWidth={1.3}/></span><h3>A world of your own</h3><p>Same small beginning.<br/>An entirely different story.</p><span className="quiet-link">Make room for possibility <ArrowRight size={15}/></span></button></div>}
-      {!loading && !error && filtered.length === 0 && <p className="muted">No worlds match this search. There’s always room for a new one.</p>}
-    </section><footer><Logo/><span>A small experiment in being together.</span><span>Nothing to win. Everything to discover. <Sprout size={15}/></span></footer>
+  const featured = worlds.find(w => w.slug === featuredSlug) ?? worlds.find(w => !w.protected) ?? worlds[0];
+  const filtered = worlds.filter(w => `${w.name} ${w.description}`.toLowerCase().includes(query.trim().toLowerCase()) && (filter === 'all' || (filter === 'open' ? !w.protected : w.mode === 'persistent')));
+  return <main className="directory festival">
+    <section className="festival-opening" aria-labelledby="landing-title">
+      <div className="festival-title-row">
+        <h1 id="landing-title">Little worlds.<br/><span>A life of their own.</span></h1>
+        <div className="festival-invitation">
+          <p>A few neighbors. A shared roof.<br/>An open-ended community simulation where the relationships are the story.</p>
+          <a className="festival-browse" href="#worlds">Find your little corner <ArrowRight size={19} aria-hidden="true"/></a>
+        </div>
+      </div>
+      <div className="house-stage">
+        <div className="house-stage-note"><span>Nothing to win.<br/><strong>So much to discover.</strong></span><span className="stage-note-line" aria-hidden="true"/></div>
+        <div className="featured-scene" key={featured?.slug ?? 'template'}>
+          {featured ? <WorldPreview summary={featured}/> : <Building world={example} miniature/>}
+        </div>
+        <div className="house-stage-invitation" aria-live="polite">
+          <h2>{featured?.name ?? 'A small beginning.'}</h2>
+          <span className="house-access">{featured?.protected ? <LockKeyhole size={15} aria-hidden="true"/> : <DoorOpen size={15} aria-hidden="true"/>}{featured ? featured.protected ? 'Password protected' : 'The door is open' : 'A common-house template'}</span>
+          <p>{featured ? `${featured.population} residents · ${featured.mode === 'persistent' ? 'Life continues while you’re away' : 'Life catches up when you return'}` : 'Neighbors, conversations, and room for a story to unfold.'}</p>
+          {featured ? <a className="festival-action" href={`/w/${featured.slug}`}>{featured.protected ? 'Enter with a password' : 'Visit this house'}<ArrowUpRight size={20} aria-hidden="true"/></a> : <a className="festival-action" href="#worlds">Explore the neighborhood <ArrowDownRight size={20} aria-hidden="true"/></a>}
+        </div>
+        <span className="scene-footnote">{featured ? 'A glimpse of the house · enter to see life unfold' : 'Illustrative preview · your world will write its own story'}</span>
+      </div>
+      <div className="festival-understage">
+        {worlds.length > 1 ? <label className="featured-picker"><span>Another little world</span><select value={featured?.slug ?? ''} onChange={e => setFeaturedSlug(e.target.value)} aria-label="Preview a house">{worlds.map(w => <option key={w.slug} value={w.slug}>{w.name}</option>)}</select></label> : <p>No goals. No finish line. Just possibilities.</p>}
+        <button type="button" onClick={() => setCreate(true)}>Or, create a world of your own <Plus size={18} aria-hidden="true"/></button>
+      </div>
+    </section>
+
+    <section id="worlds" className="neighborhood" aria-labelledby="neighborhood-title">
+      <div className="neighborhood-heading"><div><h2 id="neighborhood-title">The neighborhood<span aria-label={`${worlds.length} worlds`}>{worlds.length}</span></h2><p>Different houses. Shared possibilities. Pick a door and come on in.</p></div><label className="neighborhood-search"><Search size={19} aria-hidden="true"/><input type="search" aria-label="Search worlds" placeholder="Find a world…" value={query} onChange={e => setQuery(e.target.value)}/></label></div>
+      <div className="neighborhood-tools"><div className="neighborhood-filters" aria-label="Filter worlds">{[['all','All worlds'],['open','Open doors'],['persistent','Always on']].map(([id,label]) => <button type="button" key={id} aria-pressed={filter === id} onClick={() => setFilter(id)}>{label}</button>)}</div><span role="status">{loading ? 'Finding houses…' : `${filtered.length} ${filtered.length === 1 ? 'house' : 'houses'} to explore`}</span></div>
+      {error ? <div className="neighborhood-message" role="alert"><h3>We couldn’t open the directory.</h3><p>{error}</p><button type="button" className="festival-action" onClick={() => void load()}>Try again <RotateCcw size={17} aria-hidden="true"/></button></div> : loading ? <div className="neighborhood-message" role="status"><p>Opening the neighborhood…</p></div> : filtered.length > 0 ? <div className="house-list">{filtered.map(w => <a className="house-listing" href={`/w/${w.slug}`} key={w.slug}>
+        <div className="listing-preview"><WorldPreview summary={w}/></div>
+        <div className="listing-copy"><h3>{w.name}</h3><span className="listing-access">{w.protected ? <LockKeyhole size={14} aria-hidden="true"/> : <DoorOpen size={14} aria-hidden="true"/>}{w.protected ? 'Password protected' : 'Everyone welcome'}</span><p>{w.description || 'A shared roof. A story still unfolding.'}</p></div>
+        <div className="listing-details"><span><Users size={16} aria-hidden="true"/>{w.population} / {w.populationCap} residents</span><span>{w.mode === 'persistent' ? <InfinityIcon size={17} aria-hidden="true"/> : <Clock3 size={16} aria-hidden="true"/>}{w.mode === 'persistent' ? 'Always on' : 'Catch-up'}</span></div>
+        <span className="listing-enter"><span>Visit house</span><ArrowUpRight size={23} aria-hidden="true"/></span>
+      </a>)}</div> : <div className="neighborhood-message"><h3>{worlds.length ? 'No doors on this path.' : 'The neighborhood starts with you.'}</h3><p>{worlds.length ? 'Try another name or open up your filters.' : 'Create the first house and give a few neighbors a place to begin.'}</p>{worlds.length > 0 && <button type="button" className="festival-action" onClick={() => { setQuery(''); setFilter('all'); }}>Show all worlds <ArrowRight size={18} aria-hidden="true"/></button>}</div>}
+      <div className="neighborhood-create"><div><h3>Make room for possibility.</h3><p>Same small beginning. An entirely different story.</p></div><button type="button" className="festival-action" onClick={() => setCreate(true)}>Create a world <Plus size={19} aria-hidden="true"/></button></div>
+    </section>
+    <footer className="festival-footer"><Logo/><p>A small experiment in being together.</p><span>Nothing to win. Everything to discover.<Sprout size={18} aria-hidden="true"/></span></footer>
     {create && <CreateWorld onClose={() => setCreate(false)}/>}
   </main>;
 }

@@ -43,6 +43,12 @@ Event allowances are enforced on the server and saved in SQLite, atomically with
 
 On touch screens an event card triggers on a single tap: the hover lift only applies where a fine pointer can hover, so iOS never spends the first tap on hover. The allowance, the shared cooldown and the disabled state while a request is pending are the safeguards against accidental triggers; there is no confirm step. `tests/one-tap-events.browser.mjs` checks this with local snapshots on an emulated phone at 390/320px in light and dark.
 
+## Landing page verification
+
+The landing page uses a discovery-first neighborhood layout with a selectable house preview, search and filters. Its typography is self-hosted; font licenses and sources live in `public/fonts/`.
+
+Run `node tests/landing.browser.mjs` against `pnpm dev:client` with Playwright installed. Set `PLAYWRIGHT_MODULE` and `CHROMIUM_PATH` when using an external installation. The test intercepts directory requests and never writes a server world. It covers light/dark layouts at 1440, 1280, 390, and 320px, entry links, filters/search, preview selection, creation controls, the field guide, theme persistence, and empty/error states. Set `LANDING_SCREENSHOTS=.impeccable/review` to capture the main layouts.
+
 ## Architecture and technology choice
 
 **React + TypeScript + Vite** for the browser. **Cloudflare Workers + SQLite-backed Durable Objects** for the backend and database. Worker static assets serve the SPA from the same origin.
