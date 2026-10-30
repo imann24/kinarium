@@ -1,3 +1,4 @@
+import { ChevronDown } from 'lucide-react';
 import CharacterText from './CharacterText';
 import { gameTime } from '../simulation/engine';
 import type { Character, LogEntry } from '../simulation/types';
@@ -13,6 +14,7 @@ export default function ConversationThread({ entry, characters, onSelect, expand
       <strong className="journal-conversation-title">{thread.title ?? thread.topic}</strong>
       <span className="journal-conversation-description">{entry.text}</span>
       {status}
+      <span className="journal-disclosure"><span className="journal-read-label">Read conversation</span><span className="journal-hide-label">Hide dialogue</span><ChevronDown size={14} aria-hidden="true"/></span>
     </summary> : <summary><strong>{entry.characters.map(name).join(' & ')}</strong><span>{thread.title ?? thread.topic}</span>{status}</summary>}
     {journal && <div className="conversation-participants" role="group" aria-label="Conversation participants">{entry.characters.map(id => onSelect ? <button type="button" className="character-name" key={id} onClick={() => onSelect(id)} aria-label={`View ${name(id)}'s profile`}>{name(id)}</button> : <span key={id}>{name(id)}</span>)}</div>}
     <ol aria-label={`Conversation ${entry.characters.length > 2 ? 'among' : 'between'} ${entry.characters.map(name).join(' and ')}`}>

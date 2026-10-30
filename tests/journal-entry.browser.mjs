@@ -4,10 +4,15 @@ const base = process.env.BASE_URL || 'http://127.0.0.1:5173';
 assert(['localhost', '127.0.0.1'].includes(new URL(base).hostname));
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium', args: ['--no-sandbox'] });
 try {
-  const page = await browser.newPage({hasTouch:true}); const errors = []; let snapshot;
-  page.on('pageerror', e => errors.push(e.message));
-  await page.route('**/api/**', route => route.fulfill({ json: route.request().url().endsWith('/worlds') ? { worlds: [] } : snapshot }));
-  await page.routeWebSocket('**/socket?**', () => {});
+  const errors = []; let snapshot;
+  async function openPage(hasTouch) {
+    const page = await browser.newPage({hasTouch});
+    page.on('pageerror', e => errors.push(e.message));
+    await page.route('**/api/**', route => route.fulfill({ json: route.request().url().endsWith('/worlds') ? { worlds: [] } : snapshot }));
+    await page.routeWebSocket('**/socket?**', () => {});
+    return page;
+  }
+  let page = await openPage(true);
   await page.goto(base);
   snapshot = await page.evaluate(async () => {
     const { createWorld } = await import('/src/simulation/engine.ts');
@@ -21,6 +26,8 @@ try {
   });
   let count=0;
   for(const theme of ['light','dark']) for(const width of [320,1440]) for(const mode of ['normal','native','fallback']) {
+    if(width===320 && mode!=='normal') continue; // Fullscreen is intentionally hidden on phones.
+    await page.close();page=await openPage(width===320);
     await page.setViewportSize({width,height:900});await page.goto(`${base}/w/journal-header`);
     const article=page.locator(`[data-conversation-id="${snapshot.targetId}"]`);await article.waitFor();
     await page.evaluate(theme=>document.documentElement.dataset.theme=theme,theme);
@@ -30,10 +37,19 @@ try {
     assert.equal(await summary.count(),1);assert.equal(await article.locator(':scope > p').count(),0);
     assert.equal(await summary.locator('.entry-meta').count(),1);
     assert.equal(await summary.locator('button,a').count(),0);
+    const filters=page.getByRole('group',{name:'Filter journal'});
+    assert.equal(await filters.getByRole('button',{name:'Everything',exact:true}).getAttribute('aria-pressed'),'true');
+    assert.equal(await page.locator('.journal-scroll').getAttribute('tabindex'),'0');
+    assert((await page.locator('.journal-scroll').boundingBox()).height>=200,'Journal leaves room for reading');
+    for(const button of await filters.getByRole('button').all()) {
+      const bounds=await button.boundingBox();
+      assert(bounds.height>=44 && bounds.width>=44,'Filters have touch-sized targets');
+    }
     assert.equal(await summary.locator('.journal-conversation-title').innerText(),'An attempt to repair');
     assert.match(await summary.innerText(),/Day 1 · 08:00/);assert.match(await summary.innerText(),/conversation/i);
     assert.match(await summary.innerText(),/disagreement is not erased/);
     assert.equal(await thread.evaluate(el=>el.open),false);
+    assert(await summary.getByText('Read conversation',{exact:true}).isVisible());
     const open = article.getByRole('button',{name:'Open conversation: An attempt to repair',exact:true});
     assert.equal(await open.evaluate(el=>el.closest('summary')!==null),false);
     await open.focus();await page.keyboard.press('Enter');
@@ -55,6 +71,7 @@ try {
     assert(await open.evaluate(el=>el===document.activeElement));
     await summary.focus();await page.keyboard.press('Enter');assert.equal(await thread.evaluate(el=>el.open),true);
     assert.equal(await thread.locator('li').count(),2);
+    assert(await summary.getByText('Hide dialogue',{exact:true}).isVisible());
     assert.equal(await thread.getByRole('group',{name:'Conversation participants'}).getByRole('button').count(),2);
     await summary.focus();await page.keyboard.press('Space');assert.equal(await thread.evaluate(el=>el.open),false);
     await summary.locator('.journal-conversation-description').click();assert.equal(await thread.evaluate(el=>el.open),true);
@@ -68,6 +85,27 @@ try {
     assert.equal(await page.locator('.kind-arrival details').count(),0);
     if(mode!=='normal')await page.getByRole('button',{name:'Exit fullscreen',exact:true}).click();
     count++;
+  }
+  await page.goto(`${base}/w/journal-header`);
+  await page.getByRole('button',{name:'Stories',exact:true}).click();
+  await page.getByRole('status').filter({hasText:'No matching entries'}).waitFor();
+  assert.equal(await page.getByRole('button',{name:'Stories',exact:true}).getAttribute('aria-pressed'),'true');
+  await page.getByRole('button',{name:'Show everything',exact:true}).click();
+  assert(await page.locator('.journal-entry').count()>0);
+  await page.locator('.journal-scroll').evaluate(el=>el.scrollTop=150);
+  assert(await page.locator('.journal-scroll').evaluate(el=>el.scrollTop)>0,'Start partway through a scrollable journal');
+  await page.getByRole('button',{name:'Conversations',exact:true}).click();
+  assert(await page.locator('.journal-scroll').evaluate(el=>el.scrollHeight-el.clientHeight)>150,'Destination remains scrollable');
+  assert.equal(await page.locator('.journal-scroll').evaluate(el=>el.scrollTop),0,'Filtering starts at newest entry');
+  await page.close();page=await openPage(true);
+  for(const [width,height] of [[844,390],[932,430]]) {
+    await page.setViewportSize({width,height});await page.goto(`${base}/w/journal-header`);
+    await page.locator('.journal-entry').first().waitFor();
+    assert(await page.evaluate(()=>matchMedia('(hover:none) and (pointer:coarse)').matches));
+    const stage=await page.locator('.world-stage').boundingBox(), sidebar=await page.locator('.world-sidebar').boundingBox();
+    assert(sidebar.y>=stage.y+stage.height,'Landscape phone keeps journal below the house');
+    assert((await page.locator('.journal-scroll').boundingBox()).height>=200,'Landscape journal retains reading room');
+    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
   }
   assert.deepEqual(errors,[]);console.log(`PASS ${count} cohesive journal scenarios: one header, preserved repair context/metadata, mouse/Enter/Space, exact-thread modal, backdrop click/tap and drag guards, focus return, profile navigation, ordinary events, mobile/desktop light/dark native/fallback fullscreen.`);
 } finally {await browser.close();}

@@ -27,6 +27,10 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
 
 The shared source of truth is design-tokens.css. The CSS cascade explicitly orders base, components, theme and interface; this surface owns the final common interface layer. Component structure and behavior stay with their source modules. Do not restore the deleted festival-tokens.css or app-chrome.css.
 
-The world header is (56px) on desktop and a single row with (60px) minimum height on phones. Scene and journal stack at (900px). Below (760px), the journal disclosure sits above its panel, which is bounded to (340px)/(55dvh), and scene actions include an event jump. Saved journal preference remains authoritative. The event list changes from four columns through three and two to one at (1100px), (760px), and (540px); the deck retains its separate horizontal interaction.
+The world header is (56px) on desktop and a single row with (60px) minimum height on phones. Scene and journal stack at (900px). Below (760px), the journal disclosure sits above its panel, which is sized to (75dvh), bounded between (480px) and (600px) below (900px), and scene actions include an event jump. Saved journal preference remains authoritative. The event list changes from four columns through three and two to one at (1100px), (760px), and (540px); the deck retains its separate horizontal interaction.
 
 Dialogs use semantic surfaces, soft elevation and a blurred translucent backdrop; Manrope titles, labeled native inputs and visible focus remain. Ordinary event items, metrics and reading panels use rules and space. No new raster assets or simulation artwork replacements were introduced.
+
+## Journal refinement
+
+The sidebar uses a (320–400px) desktop reading column, two-column filters with pressed states, (13px) body copy, explicit conversation disclosure labels, and a keyboard-focusable newest-first scroll region. Empty filters offer a return to Everything. Preserve the native disclosures, conversation modal, archive paging, and resident navigation. The journal-specific interface rules live in src/client/journal-panel.css.
