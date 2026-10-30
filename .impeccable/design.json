@@ -1,493 +1,939 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-30T10:54:37.457455+00:00",
+  "generatedAt": "2026-10-30T11:27:50.344282Z",
   "title": "Design System: Kinarium",
   "extensions": {
     "colorMeta": {
-      "festival-plum": {
-        "role": "primary",
-        "displayName": "Festival Plum",
-        "tonalRamp": [
-          "oklch(15.0% 0.0267 315.06)",
-          "oklch(26.4% 0.0496 315.06)",
-          "oklch(37.9% 0.0649 315.06)",
-          "oklch(49.3% 0.0763 315.06)",
-          "oklch(60.7% 0.0763 315.06)",
-          "oklch(72.1% 0.0687 315.06)",
-          "oklch(83.6% 0.0496 315.06)",
-          "oklch(95.0% 0.0191 315.06)"
-        ]
-      },
-      "festival-ink": {
+      "page": {
         "role": "neutral",
-        "displayName": "Festival Ink",
+        "displayName": "Page",
         "tonalRamp": [
-          "oklch(15.0% 0.0182 315.01)",
-          "oklch(26.4% 0.0337 315.01)",
-          "oklch(37.9% 0.0441 315.01)",
-          "oklch(49.3% 0.0519 315.01)",
-          "oklch(60.7% 0.0519 315.01)",
-          "oklch(72.1% 0.0467 315.01)",
-          "oklch(83.6% 0.0337 315.01)",
-          "oklch(95.0% 0.0130 315.01)"
+          "oklch(15% 0.0033 100.0)",
+          "oklch(27% 0.0061 100.0)",
+          "oklch(39% 0.0079 100.0)",
+          "oklch(51% 0.0093 100.0)",
+          "oklch(63% 0.0093 100.0)",
+          "oklch(75% 0.0079 100.0)",
+          "oklch(87% 0.0051 100.0)",
+          "oklch(95% 0.0019 100.0)"
         ]
       },
-      "festival-yellow": {
-        "role": "primary",
-        "displayName": "Festival Yellow",
-        "tonalRamp": [
-          "oklch(15.0% 0.0340 108.75)",
-          "oklch(26.4% 0.0632 108.75)",
-          "oklch(37.9% 0.0827 108.75)",
-          "oklch(49.3% 0.0973 108.75)",
-          "oklch(60.7% 0.0973 108.75)",
-          "oklch(72.1% 0.0875 108.75)",
-          "oklch(83.6% 0.0632 108.75)",
-          "oklch(95.0% 0.0243 108.75)"
-        ]
-      },
-      "festival-mint": {
-        "role": "secondary",
-        "displayName": "Festival Mint",
-        "tonalRamp": [
-          "oklch(15.0% 0.0144 126.94)",
-          "oklch(26.4% 0.0267 126.94)",
-          "oklch(37.9% 0.0349 126.94)",
-          "oklch(49.3% 0.0410 126.94)",
-          "oklch(60.7% 0.0410 126.94)",
-          "oklch(72.1% 0.0369 126.94)",
-          "oklch(83.6% 0.0267 126.94)",
-          "oklch(95.0% 0.0103 126.94)"
-        ]
-      },
-      "festival-ground": {
+      "surface": {
         "role": "neutral",
-        "displayName": "Festival Ground",
+        "displayName": "Surface",
         "tonalRamp": [
-          "oklch(15.0% 0.0059 125.29)",
-          "oklch(26.4% 0.0109 125.29)",
-          "oklch(37.9% 0.0142 125.29)",
-          "oklch(49.3% 0.0167 125.29)",
-          "oklch(60.7% 0.0167 125.29)",
-          "oklch(72.1% 0.0151 125.29)",
-          "oklch(83.6% 0.0109 125.29)",
-          "oklch(95.0% 0.0042 125.29)"
+          "oklch(15% 0.0028 98.9)",
+          "oklch(27% 0.0052 98.9)",
+          "oklch(39% 0.0068 98.9)",
+          "oklch(51% 0.0080 98.9)",
+          "oklch(63% 0.0080 98.9)",
+          "oklch(75% 0.0068 98.9)",
+          "oklch(87% 0.0044 98.9)",
+          "oklch(95% 0.0016 98.9)"
         ]
       },
-      "festival-subtle": {
+      "surface-soft": {
         "role": "neutral",
-        "displayName": "Festival Subtle",
+        "displayName": "Surface soft",
         "tonalRamp": [
-          "oklch(15.0% 0.0148 130.25)",
-          "oklch(26.4% 0.0274 130.25)",
-          "oklch(37.9% 0.0358 130.25)",
-          "oklch(49.3% 0.0422 130.25)",
-          "oklch(60.7% 0.0422 130.25)",
-          "oklch(72.1% 0.0380 130.25)",
-          "oklch(83.6% 0.0274 130.25)",
-          "oklch(95.0% 0.0105 130.25)"
+          "oklch(15% 0.0061 117.3)",
+          "oklch(27% 0.0114 117.3)",
+          "oklch(39% 0.0149 117.3)",
+          "oklch(51% 0.0176 117.3)",
+          "oklch(63% 0.0176 117.3)",
+          "oklch(75% 0.0149 117.3)",
+          "oklch(87% 0.0097 117.3)",
+          "oklch(95% 0.0035 117.3)"
         ]
       },
-      "festival-rule": {
+      "surface-hover": {
         "role": "neutral",
-        "displayName": "Festival Rule",
+        "displayName": "Surface hover",
         "tonalRamp": [
-          "oklch(15.0% 0.0146 130.40)",
-          "oklch(26.4% 0.0272 130.40)",
-          "oklch(37.9% 0.0356 130.40)",
-          "oklch(49.3% 0.0418 130.40)",
-          "oklch(60.7% 0.0418 130.40)",
-          "oklch(72.1% 0.0377 130.40)",
-          "oklch(83.6% 0.0272 130.40)",
-          "oklch(95.0% 0.0105 130.40)"
+          "oklch(15% 0.0079 126.2)",
+          "oklch(27% 0.0147 126.2)",
+          "oklch(39% 0.0192 126.2)",
+          "oklch(51% 0.0226 126.2)",
+          "oklch(63% 0.0226 126.2)",
+          "oklch(75% 0.0192 126.2)",
+          "oklch(87% 0.0125 126.2)",
+          "oklch(95% 0.0045 126.2)"
         ]
       },
-      "festival-lilac": {
-        "role": "secondary",
-        "displayName": "Festival Lilac",
-        "tonalRamp": [
-          "oklch(15.0% 0.0128 313.02)",
-          "oklch(26.4% 0.0237 313.02)",
-          "oklch(37.9% 0.0310 313.02)",
-          "oklch(49.3% 0.0365 313.02)",
-          "oklch(60.7% 0.0365 313.02)",
-          "oklch(72.1% 0.0328 313.02)",
-          "oklch(83.6% 0.0237 313.02)",
-          "oklch(95.0% 0.0091 313.02)"
-        ]
-      },
-      "festival-plum-dark": {
-        "role": "primary",
-        "displayName": "Festival Plum Dark",
-        "tonalRamp": [
-          "oklch(15.0% 0.0185 313.13)",
-          "oklch(26.4% 0.0343 313.13)",
-          "oklch(37.9% 0.0448 313.13)",
-          "oklch(49.3% 0.0527 313.13)",
-          "oklch(60.7% 0.0527 313.13)",
-          "oklch(72.1% 0.0475 313.13)",
-          "oklch(83.6% 0.0343 313.13)",
-          "oklch(95.0% 0.0132 313.13)"
-        ]
-      },
-      "festival-ink-dark": {
+      "text": {
         "role": "neutral",
-        "displayName": "Festival Ink Dark",
+        "displayName": "Text",
         "tonalRamp": [
-          "oklch(15.0% 0.0093 125.62)",
-          "oklch(26.4% 0.0173 125.62)",
-          "oklch(37.9% 0.0226 125.62)",
-          "oklch(49.3% 0.0266 125.62)",
-          "oklch(60.7% 0.0266 125.62)",
-          "oklch(72.1% 0.0240 125.62)",
-          "oklch(83.6% 0.0173 125.62)",
-          "oklch(95.0% 0.0067 125.62)"
+          "oklch(15% 0.0093 155.5)",
+          "oklch(27% 0.0172 155.5)",
+          "oklch(39% 0.0226 155.5)",
+          "oklch(51% 0.0265 155.5)",
+          "oklch(63% 0.0265 155.5)",
+          "oklch(75% 0.0226 155.5)",
+          "oklch(87% 0.0146 155.5)",
+          "oklch(95% 0.0053 155.5)"
         ]
       },
-      "festival-mint-dark": {
-        "role": "secondary",
-        "displayName": "Festival Mint Dark",
-        "tonalRamp": [
-          "oklch(15.0% 0.0095 153.06)",
-          "oklch(26.4% 0.0177 153.06)",
-          "oklch(37.9% 0.0232 153.06)",
-          "oklch(49.3% 0.0272 153.06)",
-          "oklch(60.7% 0.0272 153.06)",
-          "oklch(72.1% 0.0245 153.06)",
-          "oklch(83.6% 0.0177 153.06)",
-          "oklch(95.0% 0.0068 153.06)"
-        ]
-      },
-      "festival-ground-dark": {
+      "secondary": {
         "role": "neutral",
-        "displayName": "Festival Ground Dark",
+        "displayName": "Secondary",
         "tonalRamp": [
-          "oklch(15.0% 0.0058 163.49)",
-          "oklch(26.4% 0.0108 163.49)",
-          "oklch(37.9% 0.0141 163.49)",
-          "oklch(49.3% 0.0166 163.49)",
-          "oklch(60.7% 0.0166 163.49)",
-          "oklch(72.1% 0.0149 163.49)",
-          "oklch(83.6% 0.0108 163.49)",
-          "oklch(95.0% 0.0041 163.49)"
+          "oklch(15% 0.0116 138.8)",
+          "oklch(27% 0.0216 138.8)",
+          "oklch(39% 0.0283 138.8)",
+          "oklch(51% 0.0333 138.8)",
+          "oklch(63% 0.0333 138.8)",
+          "oklch(75% 0.0283 138.8)",
+          "oklch(87% 0.0183 138.8)",
+          "oklch(95% 0.0067 138.8)"
         ]
       },
-      "festival-subtle-dark": {
+      "muted": {
         "role": "neutral",
-        "displayName": "Festival Subtle Dark",
+        "displayName": "Muted",
         "tonalRamp": [
-          "oklch(15.0% 0.0115 130.64)",
-          "oklch(26.4% 0.0213 130.64)",
-          "oklch(37.9% 0.0278 130.64)",
-          "oklch(49.3% 0.0327 130.64)",
-          "oklch(60.7% 0.0327 130.64)",
-          "oklch(72.1% 0.0295 130.64)",
-          "oklch(83.6% 0.0213 130.64)",
-          "oklch(95.0% 0.0082 130.64)"
+          "oklch(15% 0.0125 131.9)",
+          "oklch(27% 0.0233 131.9)",
+          "oklch(39% 0.0304 131.9)",
+          "oklch(51% 0.0358 131.9)",
+          "oklch(63% 0.0358 131.9)",
+          "oklch(75% 0.0304 131.9)",
+          "oklch(87% 0.0197 131.9)",
+          "oklch(95% 0.0072 131.9)"
         ]
       },
-      "festival-rule-dark": {
+      "line": {
         "role": "neutral",
-        "displayName": "Festival Rule Dark",
+        "displayName": "Line",
         "tonalRamp": [
-          "oklch(15.0% 0.0123 145.05)",
-          "oklch(26.4% 0.0229 145.05)",
-          "oklch(37.9% 0.0299 145.05)",
-          "oklch(49.3% 0.0352 145.05)",
-          "oklch(60.7% 0.0352 145.05)",
-          "oklch(72.1% 0.0317 145.05)",
-          "oklch(83.6% 0.0229 145.05)",
-          "oklch(95.0% 0.0088 145.05)"
-        ]
-      },
-      "festival-action-hover": {
-        "role": "neutral",
-        "displayName": "Festival Action Hover",
-        "tonalRamp": [
-          "oklch(15.0% 0.0238 106.69)",
-          "oklch(26.4% 0.0441 106.69)",
-          "oklch(37.9% 0.0577 106.69)",
-          "oklch(49.3% 0.0679 106.69)",
-          "oklch(60.7% 0.0679 106.69)",
-          "oklch(72.1% 0.0611 106.69)",
-          "oklch(83.6% 0.0441 106.69)",
-          "oklch(95.0% 0.0170 106.69)"
-        ]
-      },
-      "festival-stage-rule": {
-        "role": "neutral",
-        "displayName": "Festival Stage Rule",
-        "tonalRamp": [
-          "oklch(15.0% 0.0206 314.40)",
-          "oklch(26.4% 0.0382 314.40)",
-          "oklch(37.9% 0.0500 314.40)",
-          "oklch(49.3% 0.0588 314.40)",
-          "oklch(60.7% 0.0588 314.40)",
-          "oklch(72.1% 0.0529 314.40)",
-          "oklch(83.6% 0.0382 314.40)",
-          "oklch(95.0% 0.0147 314.40)"
-        ]
-      },
-      "festival-header-rule": {
-        "role": "neutral",
-        "displayName": "Festival Header Rule",
-        "tonalRamp": [
-          "oklch(15.0% 0.0244 315.53)",
-          "oklch(26.4% 0.0454 315.53)",
-          "oklch(37.9% 0.0594 315.53)",
-          "oklch(49.3% 0.0698 315.53)",
-          "oklch(60.7% 0.0698 315.53)",
-          "oklch(72.1% 0.0628 315.53)",
-          "oklch(83.6% 0.0454 315.53)",
-          "oklch(95.0% 0.0175 315.53)"
+          "oklch(15% 0.0090 124.3)",
+          "oklch(27% 0.0167 124.3)",
+          "oklch(39% 0.0218 124.3)",
+          "oklch(51% 0.0256 124.3)",
+          "oklch(63% 0.0256 124.3)",
+          "oklch(75% 0.0218 124.3)",
+          "oklch(87% 0.0141 124.3)",
+          "oklch(95% 0.0051 124.3)"
         ]
       },
       "control-border": {
         "role": "neutral",
-        "displayName": "Control Border",
+        "displayName": "Control border",
         "tonalRamp": [
-          "oklch(15.0% 0.0141 130.00)",
-          "oklch(26.4% 0.0261 130.00)",
-          "oklch(37.9% 0.0341 130.00)",
-          "oklch(49.3% 0.0402 130.00)",
-          "oklch(60.7% 0.0402 130.00)",
-          "oklch(72.1% 0.0361 130.00)",
-          "oklch(83.6% 0.0261 130.00)",
-          "oklch(95.0% 0.0100 130.00)"
+          "oklch(15% 0.0141 130.0)",
+          "oklch(27% 0.0261 130.0)",
+          "oklch(39% 0.0341 130.0)",
+          "oklch(51% 0.0402 130.0)",
+          "oklch(63% 0.0402 130.0)",
+          "oklch(75% 0.0341 130.0)",
+          "oklch(87% 0.0221 130.0)",
+          "oklch(95% 0.0080 130.0)"
+        ]
+      },
+      "accent": {
+        "role": "primary",
+        "displayName": "Accent",
+        "tonalRamp": [
+          "oklch(15% 0.0183 149.2)",
+          "oklch(27% 0.0339 149.2)",
+          "oklch(39% 0.0444 149.2)",
+          "oklch(51% 0.0522 149.2)",
+          "oklch(63% 0.0522 149.2)",
+          "oklch(75% 0.0444 149.2)",
+          "oklch(87% 0.0287 149.2)",
+          "oklch(95% 0.0104 149.2)"
+        ]
+      },
+      "focus": {
+        "role": "primary",
+        "displayName": "Focus",
+        "tonalRamp": [
+          "oklch(15% 0.0183 149.2)",
+          "oklch(27% 0.0339 149.2)",
+          "oklch(39% 0.0444 149.2)",
+          "oklch(51% 0.0522 149.2)",
+          "oklch(63% 0.0522 149.2)",
+          "oklch(75% 0.0444 149.2)",
+          "oklch(87% 0.0287 149.2)",
+          "oklch(95% 0.0104 149.2)"
+        ]
+      },
+      "action": {
+        "role": "primary",
+        "displayName": "Action",
+        "tonalRamp": [
+          "oklch(15% 0.0183 149.2)",
+          "oklch(27% 0.0339 149.2)",
+          "oklch(39% 0.0444 149.2)",
+          "oklch(51% 0.0522 149.2)",
+          "oklch(63% 0.0522 149.2)",
+          "oklch(75% 0.0444 149.2)",
+          "oklch(87% 0.0287 149.2)",
+          "oklch(95% 0.0104 149.2)"
+        ]
+      },
+      "action-hover": {
+        "role": "primary",
+        "displayName": "Action hover",
+        "tonalRamp": [
+          "oklch(15% 0.0164 150.9)",
+          "oklch(27% 0.0304 150.9)",
+          "oklch(39% 0.0398 150.9)",
+          "oklch(51% 0.0468 150.9)",
+          "oklch(63% 0.0468 150.9)",
+          "oklch(75% 0.0398 150.9)",
+          "oklch(87% 0.0258 150.9)",
+          "oklch(95% 0.0094 150.9)"
+        ]
+      },
+      "action-ink": {
+        "role": "primary",
+        "displayName": "Action ink",
+        "tonalRamp": [
+          "oklch(15% 0.0028 98.9)",
+          "oklch(27% 0.0052 98.9)",
+          "oklch(39% 0.0068 98.9)",
+          "oklch(51% 0.0080 98.9)",
+          "oklch(63% 0.0080 98.9)",
+          "oklch(75% 0.0068 98.9)",
+          "oklch(87% 0.0044 98.9)",
+          "oklch(95% 0.0016 98.9)"
+        ]
+      },
+      "selected": {
+        "role": "primary",
+        "displayName": "Selected",
+        "tonalRamp": [
+          "oklch(15% 0.0099 126.8)",
+          "oklch(27% 0.0184 126.8)",
+          "oklch(39% 0.0241 126.8)",
+          "oklch(51% 0.0283 126.8)",
+          "oklch(63% 0.0283 126.8)",
+          "oklch(75% 0.0241 126.8)",
+          "oklch(87% 0.0156 126.8)",
+          "oklch(95% 0.0057 126.8)"
+        ]
+      },
+      "selected-ink": {
+        "role": "primary",
+        "displayName": "Selected ink",
+        "tonalRamp": [
+          "oklch(15% 0.0182 151.7)",
+          "oklch(27% 0.0339 151.7)",
+          "oklch(39% 0.0443 151.7)",
+          "oklch(51% 0.0521 151.7)",
+          "oklch(63% 0.0521 151.7)",
+          "oklch(75% 0.0443 151.7)",
+          "oklch(87% 0.0287 151.7)",
+          "oklch(95% 0.0104 151.7)"
+        ]
+      },
+      "hero": {
+        "role": "neutral",
+        "displayName": "Hero",
+        "tonalRamp": [
+          "oklch(15% 0.0061 113.8)",
+          "oklch(27% 0.0113 113.8)",
+          "oklch(39% 0.0148 113.8)",
+          "oklch(51% 0.0174 113.8)",
+          "oklch(63% 0.0174 113.8)",
+          "oklch(75% 0.0148 113.8)",
+          "oklch(87% 0.0096 113.8)",
+          "oklch(95% 0.0035 113.8)"
+        ]
+      },
+      "hero-ink": {
+        "role": "neutral",
+        "displayName": "Hero ink",
+        "tonalRamp": [
+          "oklch(15% 0.0093 155.5)",
+          "oklch(27% 0.0172 155.5)",
+          "oklch(39% 0.0226 155.5)",
+          "oklch(51% 0.0265 155.5)",
+          "oklch(63% 0.0265 155.5)",
+          "oklch(75% 0.0226 155.5)",
+          "oklch(87% 0.0146 155.5)",
+          "oklch(95% 0.0053 155.5)"
+        ]
+      },
+      "hero-muted": {
+        "role": "neutral",
+        "displayName": "Hero muted",
+        "tonalRamp": [
+          "oklch(15% 0.0116 138.8)",
+          "oklch(27% 0.0216 138.8)",
+          "oklch(39% 0.0283 138.8)",
+          "oklch(51% 0.0333 138.8)",
+          "oklch(63% 0.0333 138.8)",
+          "oklch(75% 0.0283 138.8)",
+          "oklch(87% 0.0183 138.8)",
+          "oklch(95% 0.0067 138.8)"
+        ]
+      },
+      "danger": {
+        "role": "neutral",
+        "displayName": "Danger",
+        "tonalRamp": [
+          "oklch(15% 0.0418 34.1)",
+          "oklch(27% 0.0776 34.1)",
+          "oklch(39% 0.1014 34.1)",
+          "oklch(51% 0.1193 34.1)",
+          "oklch(63% 0.1193 34.1)",
+          "oklch(75% 0.1014 34.1)",
+          "oklch(87% 0.0656 34.1)",
+          "oklch(95% 0.0239 34.1)"
+        ]
+      },
+      "danger-soft": {
+        "role": "neutral",
+        "displayName": "Danger soft",
+        "tonalRamp": [
+          "oklch(15% 0.0065 57.2)",
+          "oklch(27% 0.0121 57.2)",
+          "oklch(39% 0.0158 57.2)",
+          "oklch(51% 0.0186 57.2)",
+          "oklch(63% 0.0186 57.2)",
+          "oklch(75% 0.0158 57.2)",
+          "oklch(87% 0.0103 57.2)",
+          "oklch(95% 0.0037 57.2)"
+        ]
+      },
+      "warning": {
+        "role": "neutral",
+        "displayName": "Warning",
+        "tonalRamp": [
+          "oklch(15% 0.0302 90.7)",
+          "oklch(27% 0.0562 90.7)",
+          "oklch(39% 0.0734 90.7)",
+          "oklch(51% 0.0864 90.7)",
+          "oklch(63% 0.0864 90.7)",
+          "oklch(75% 0.0734 90.7)",
+          "oklch(87% 0.0475 90.7)",
+          "oklch(95% 0.0173 90.7)"
+        ]
+      },
+      "warning-soft": {
+        "role": "neutral",
+        "displayName": "Warning soft",
+        "tonalRamp": [
+          "oklch(15% 0.0105 92.3)",
+          "oklch(27% 0.0195 92.3)",
+          "oklch(39% 0.0255 92.3)",
+          "oklch(51% 0.0301 92.3)",
+          "oklch(63% 0.0301 92.3)",
+          "oklch(75% 0.0255 92.3)",
+          "oklch(87% 0.0165 92.3)",
+          "oklch(95% 0.0060 92.3)"
+        ]
+      },
+      "good": {
+        "role": "neutral",
+        "displayName": "Good",
+        "tonalRamp": [
+          "oklch(15% 0.0272 146.8)",
+          "oklch(27% 0.0506 146.8)",
+          "oklch(39% 0.0662 146.8)",
+          "oklch(51% 0.0778 146.8)",
+          "oklch(63% 0.0778 146.8)",
+          "oklch(75% 0.0662 146.8)",
+          "oklch(87% 0.0428 146.8)",
+          "oklch(95% 0.0156 146.8)"
+        ]
+      },
+      "good-soft": {
+        "role": "neutral",
+        "displayName": "Good soft",
+        "tonalRamp": [
+          "oklch(15% 0.0086 129.9)",
+          "oklch(27% 0.0159 129.9)",
+          "oklch(39% 0.0209 129.9)",
+          "oklch(51% 0.0245 129.9)",
+          "oklch(63% 0.0245 129.9)",
+          "oklch(75% 0.0209 129.9)",
+          "oklch(87% 0.0135 129.9)",
+          "oklch(95% 0.0049 129.9)"
+        ]
+      },
+      "page-dark": {
+        "role": "neutral",
+        "displayName": "Page dark",
+        "tonalRamp": [
+          "oklch(15% 0.0056 152.8)",
+          "oklch(27% 0.0104 152.8)",
+          "oklch(39% 0.0136 152.8)",
+          "oklch(51% 0.0160 152.8)",
+          "oklch(63% 0.0160 152.8)",
+          "oklch(75% 0.0136 152.8)",
+          "oklch(87% 0.0088 152.8)",
+          "oklch(95% 0.0032 152.8)"
+        ]
+      },
+      "surface-dark": {
+        "role": "neutral",
+        "displayName": "Surface dark",
+        "tonalRamp": [
+          "oklch(15% 0.0070 150.9)",
+          "oklch(27% 0.0129 150.9)",
+          "oklch(39% 0.0169 150.9)",
+          "oklch(51% 0.0199 150.9)",
+          "oklch(63% 0.0199 150.9)",
+          "oklch(75% 0.0169 150.9)",
+          "oklch(87% 0.0109 150.9)",
+          "oklch(95% 0.0040 150.9)"
+        ]
+      },
+      "surface-soft-dark": {
+        "role": "neutral",
+        "displayName": "Surface soft dark",
+        "tonalRamp": [
+          "oklch(15% 0.0092 145.0)",
+          "oklch(27% 0.0170 145.0)",
+          "oklch(39% 0.0223 145.0)",
+          "oklch(51% 0.0262 145.0)",
+          "oklch(63% 0.0262 145.0)",
+          "oklch(75% 0.0223 145.0)",
+          "oklch(87% 0.0144 145.0)",
+          "oklch(95% 0.0052 145.0)"
+        ]
+      },
+      "surface-hover-dark": {
+        "role": "neutral",
+        "displayName": "Surface hover dark",
+        "tonalRamp": [
+          "oklch(15% 0.0111 139.8)",
+          "oklch(27% 0.0205 139.8)",
+          "oklch(39% 0.0268 139.8)",
+          "oklch(51% 0.0316 139.8)",
+          "oklch(63% 0.0316 139.8)",
+          "oklch(75% 0.0268 139.8)",
+          "oklch(87% 0.0174 139.8)",
+          "oklch(95% 0.0063 139.8)"
+        ]
+      },
+      "text-dark": {
+        "role": "neutral",
+        "displayName": "Text dark",
+        "tonalRamp": [
+          "oklch(15% 0.0066 116.6)",
+          "oklch(27% 0.0122 116.6)",
+          "oklch(39% 0.0160 116.6)",
+          "oklch(51% 0.0188 116.6)",
+          "oklch(63% 0.0188 116.6)",
+          "oklch(75% 0.0160 116.6)",
+          "oklch(87% 0.0103 116.6)",
+          "oklch(95% 0.0038 116.6)"
+        ]
+      },
+      "secondary-dark": {
+        "role": "neutral",
+        "displayName": "Secondary dark",
+        "tonalRamp": [
+          "oklch(15% 0.0105 124.1)",
+          "oklch(27% 0.0194 124.1)",
+          "oklch(39% 0.0254 124.1)",
+          "oklch(51% 0.0299 124.1)",
+          "oklch(63% 0.0299 124.1)",
+          "oklch(75% 0.0254 124.1)",
+          "oklch(87% 0.0165 124.1)",
+          "oklch(95% 0.0060 124.1)"
+        ]
+      },
+      "muted-dark": {
+        "role": "neutral",
+        "displayName": "Muted dark",
+        "tonalRamp": [
+          "oklch(15% 0.0129 128.2)",
+          "oklch(27% 0.0240 128.2)",
+          "oklch(39% 0.0313 128.2)",
+          "oklch(51% 0.0369 128.2)",
+          "oklch(63% 0.0369 128.2)",
+          "oklch(75% 0.0313 128.2)",
+          "oklch(87% 0.0203 128.2)",
+          "oklch(95% 0.0074 128.2)"
+        ]
+      },
+      "line-dark": {
+        "role": "neutral",
+        "displayName": "Line dark",
+        "tonalRamp": [
+          "oklch(15% 0.0116 137.0)",
+          "oklch(27% 0.0215 137.0)",
+          "oklch(39% 0.0281 137.0)",
+          "oklch(51% 0.0331 137.0)",
+          "oklch(63% 0.0331 137.0)",
+          "oklch(75% 0.0281 137.0)",
+          "oklch(87% 0.0182 137.0)",
+          "oklch(95% 0.0066 137.0)"
         ]
       },
       "control-border-dark": {
         "role": "neutral",
-        "displayName": "Control Border Dark",
+        "displayName": "Control border dark",
         "tonalRamp": [
-          "oklch(15.0% 0.0166 134.83)",
-          "oklch(26.4% 0.0308 134.83)",
-          "oklch(37.9% 0.0403 134.83)",
-          "oklch(49.3% 0.0474 134.83)",
-          "oklch(60.7% 0.0474 134.83)",
-          "oklch(72.1% 0.0427 134.83)",
-          "oklch(83.6% 0.0308 134.83)",
-          "oklch(95.0% 0.0119 134.83)"
+          "oklch(15% 0.0147 129.9)",
+          "oklch(27% 0.0273 129.9)",
+          "oklch(39% 0.0357 129.9)",
+          "oklch(51% 0.0421 129.9)",
+          "oklch(63% 0.0421 129.9)",
+          "oklch(75% 0.0357 129.9)",
+          "oklch(87% 0.0231 129.9)",
+          "oklch(95% 0.0084 129.9)"
+        ]
+      },
+      "accent-dark": {
+        "role": "primary",
+        "displayName": "Accent dark",
+        "tonalRamp": [
+          "oklch(15% 0.0209 128.8)",
+          "oklch(27% 0.0389 128.8)",
+          "oklch(39% 0.0509 128.8)",
+          "oklch(51% 0.0598 128.8)",
+          "oklch(63% 0.0598 128.8)",
+          "oklch(75% 0.0509 128.8)",
+          "oklch(87% 0.0329 128.8)",
+          "oklch(95% 0.0120 128.8)"
+        ]
+      },
+      "focus-dark": {
+        "role": "primary",
+        "displayName": "Focus dark",
+        "tonalRamp": [
+          "oklch(15% 0.0193 123.2)",
+          "oklch(27% 0.0358 123.2)",
+          "oklch(39% 0.0468 123.2)",
+          "oklch(51% 0.0551 123.2)",
+          "oklch(63% 0.0551 123.2)",
+          "oklch(75% 0.0468 123.2)",
+          "oklch(87% 0.0303 123.2)",
+          "oklch(95% 0.0110 123.2)"
+        ]
+      },
+      "action-dark": {
+        "role": "primary",
+        "displayName": "Action dark",
+        "tonalRamp": [
+          "oklch(15% 0.0190 126.1)",
+          "oklch(27% 0.0353 126.1)",
+          "oklch(39% 0.0461 126.1)",
+          "oklch(51% 0.0542 126.1)",
+          "oklch(63% 0.0542 126.1)",
+          "oklch(75% 0.0461 126.1)",
+          "oklch(87% 0.0298 126.1)",
+          "oklch(95% 0.0108 126.1)"
+        ]
+      },
+      "action-hover-dark": {
+        "role": "primary",
+        "displayName": "Action hover dark",
+        "tonalRamp": [
+          "oklch(15% 0.0141 124.1)",
+          "oklch(27% 0.0262 124.1)",
+          "oklch(39% 0.0343 124.1)",
+          "oklch(51% 0.0404 124.1)",
+          "oklch(63% 0.0404 124.1)",
+          "oklch(75% 0.0343 124.1)",
+          "oklch(87% 0.0222 124.1)",
+          "oklch(95% 0.0081 124.1)"
+        ]
+      },
+      "action-ink-dark": {
+        "role": "primary",
+        "displayName": "Action ink dark",
+        "tonalRamp": [
+          "oklch(15% 0.0127 146.1)",
+          "oklch(27% 0.0235 146.1)",
+          "oklch(39% 0.0308 146.1)",
+          "oklch(51% 0.0362 146.1)",
+          "oklch(63% 0.0362 146.1)",
+          "oklch(75% 0.0308 146.1)",
+          "oklch(87% 0.0199 146.1)",
+          "oklch(95% 0.0072 146.1)"
+        ]
+      },
+      "selected-dark": {
+        "role": "primary",
+        "displayName": "Selected dark",
+        "tonalRamp": [
+          "oklch(15% 0.0136 139.4)",
+          "oklch(27% 0.0253 139.4)",
+          "oklch(39% 0.0331 139.4)",
+          "oklch(51% 0.0389 139.4)",
+          "oklch(63% 0.0389 139.4)",
+          "oklch(75% 0.0331 139.4)",
+          "oklch(87% 0.0214 139.4)",
+          "oklch(95% 0.0078 139.4)"
+        ]
+      },
+      "selected-ink-dark": {
+        "role": "primary",
+        "displayName": "Selected ink dark",
+        "tonalRamp": [
+          "oklch(15% 0.0144 122.2)",
+          "oklch(27% 0.0268 122.2)",
+          "oklch(39% 0.0350 122.2)",
+          "oklch(51% 0.0412 122.2)",
+          "oklch(63% 0.0412 122.2)",
+          "oklch(75% 0.0350 122.2)",
+          "oklch(87% 0.0226 122.2)",
+          "oklch(95% 0.0082 122.2)"
+        ]
+      },
+      "hero-dark": {
+        "role": "neutral",
+        "displayName": "Hero dark",
+        "tonalRamp": [
+          "oklch(15% 0.0096 140.8)",
+          "oklch(27% 0.0178 140.8)",
+          "oklch(39% 0.0232 140.8)",
+          "oklch(51% 0.0273 140.8)",
+          "oklch(63% 0.0273 140.8)",
+          "oklch(75% 0.0232 140.8)",
+          "oklch(87% 0.0150 140.8)",
+          "oklch(95% 0.0055 140.8)"
+        ]
+      },
+      "hero-ink-dark": {
+        "role": "neutral",
+        "displayName": "Hero ink dark",
+        "tonalRamp": [
+          "oklch(15% 0.0066 116.6)",
+          "oklch(27% 0.0122 116.6)",
+          "oklch(39% 0.0160 116.6)",
+          "oklch(51% 0.0188 116.6)",
+          "oklch(63% 0.0188 116.6)",
+          "oklch(75% 0.0160 116.6)",
+          "oklch(87% 0.0103 116.6)",
+          "oklch(95% 0.0038 116.6)"
+        ]
+      },
+      "hero-muted-dark": {
+        "role": "neutral",
+        "displayName": "Hero muted dark",
+        "tonalRamp": [
+          "oklch(15% 0.0105 124.1)",
+          "oklch(27% 0.0194 124.1)",
+          "oklch(39% 0.0254 124.1)",
+          "oklch(51% 0.0299 124.1)",
+          "oklch(63% 0.0299 124.1)",
+          "oklch(75% 0.0254 124.1)",
+          "oklch(87% 0.0165 124.1)",
+          "oklch(95% 0.0060 124.1)"
+        ]
+      },
+      "danger-dark": {
+        "role": "neutral",
+        "displayName": "Danger dark",
+        "tonalRamp": [
+          "oklch(15% 0.0272 46.9)",
+          "oklch(27% 0.0506 46.9)",
+          "oklch(39% 0.0661 46.9)",
+          "oklch(51% 0.0778 46.9)",
+          "oklch(63% 0.0778 46.9)",
+          "oklch(75% 0.0661 46.9)",
+          "oklch(87% 0.0428 46.9)",
+          "oklch(95% 0.0156 46.9)"
+        ]
+      },
+      "danger-soft-dark": {
+        "role": "neutral",
+        "displayName": "Danger soft dark",
+        "tonalRamp": [
+          "oklch(15% 0.0106 47.8)",
+          "oklch(27% 0.0197 47.8)",
+          "oklch(39% 0.0257 47.8)",
+          "oklch(51% 0.0303 47.8)",
+          "oklch(63% 0.0303 47.8)",
+          "oklch(75% 0.0257 47.8)",
+          "oklch(87% 0.0166 47.8)",
+          "oklch(95% 0.0061 47.8)"
+        ]
+      },
+      "warning-dark": {
+        "role": "neutral",
+        "displayName": "Warning dark",
+        "tonalRamp": [
+          "oklch(15% 0.0296 95.0)",
+          "oklch(27% 0.0550 95.0)",
+          "oklch(39% 0.0719 95.0)",
+          "oklch(51% 0.0845 95.0)",
+          "oklch(63% 0.0845 95.0)",
+          "oklch(75% 0.0719 95.0)",
+          "oklch(87% 0.0465 95.0)",
+          "oklch(95% 0.0169 95.0)"
+        ]
+      },
+      "warning-soft-dark": {
+        "role": "neutral",
+        "displayName": "Warning soft dark",
+        "tonalRamp": [
+          "oklch(15% 0.0099 99.3)",
+          "oklch(27% 0.0184 99.3)",
+          "oklch(39% 0.0240 99.3)",
+          "oklch(51% 0.0283 99.3)",
+          "oklch(63% 0.0283 99.3)",
+          "oklch(75% 0.0240 99.3)",
+          "oklch(87% 0.0156 99.3)",
+          "oklch(95% 0.0057 99.3)"
+        ]
+      },
+      "good-dark": {
+        "role": "neutral",
+        "displayName": "Good dark",
+        "tonalRamp": [
+          "oklch(15% 0.0275 131.9)",
+          "oklch(27% 0.0510 131.9)",
+          "oklch(39% 0.0667 131.9)",
+          "oklch(51% 0.0785 131.9)",
+          "oklch(63% 0.0785 131.9)",
+          "oklch(75% 0.0667 131.9)",
+          "oklch(87% 0.0432 131.9)",
+          "oklch(95% 0.0157 131.9)"
+        ]
+      },
+      "good-soft-dark": {
+        "role": "neutral",
+        "displayName": "Good soft dark",
+        "tonalRamp": [
+          "oklch(15% 0.0134 140.6)",
+          "oklch(27% 0.0249 140.6)",
+          "oklch(39% 0.0326 140.6)",
+          "oklch(51% 0.0383 140.6)",
+          "oklch(63% 0.0383 140.6)",
+          "oklch(75% 0.0326 140.6)",
+          "oklch(87% 0.0211 140.6)",
+          "oklch(95% 0.0077 140.6)"
         ]
       }
     },
     "typographyMeta": {
       "display": {
         "displayName": "Display",
-        "purpose": "Landing title."
+        "purpose": "Landing only."
       },
       "headline": {
         "displayName": "Headline",
-        "purpose": "Neighborhood heading."
+        "purpose": "Landing only."
       },
-      "title": {
-        "displayName": "Title",
-        "purpose": "Listing names."
+      "world-title": {
+        "displayName": "World title",
+        "purpose": "Working interface role; see DESIGN.md for component and responsive use."
+      },
+      "insights-title": {
+        "displayName": "Insights title",
+        "purpose": "Working interface role; see DESIGN.md for component and responsive use."
+      },
+      "dialog-title": {
+        "displayName": "Dialog title",
+        "purpose": "Working interface role; see DESIGN.md for component and responsive use."
+      },
+      "section-title": {
+        "displayName": "Section title",
+        "purpose": "Working interface role; see DESIGN.md for component and responsive use."
+      },
+      "listing-title": {
+        "displayName": "Listing title",
+        "purpose": "Working interface role; see DESIGN.md for component and responsive use."
       },
       "body": {
         "displayName": "Body",
-        "purpose": "Directory descriptions."
+        "purpose": "Working interface role; see DESIGN.md for component and responsive use."
       },
-      "invitation": {
-        "displayName": "Invitation",
-        "purpose": "Opening explanatory copy."
+      "journal-copy": {
+        "displayName": "Journal copy",
+        "purpose": "Working interface role; see DESIGN.md for component and responsive use."
+      },
+      "narrative": {
+        "displayName": "Narrative",
+        "purpose": "Working interface role; see DESIGN.md for component and responsive use."
       },
       "action": {
         "displayName": "Action",
-        "purpose": "Primary actions."
+        "purpose": "Working interface role; see DESIGN.md for component and responsive use."
       },
       "filter": {
         "displayName": "Filter",
-        "purpose": "Directory filter controls."
-      },
-      "app-page": {
-        "displayName": "App Page",
-        "purpose": "Locked, empty, administration, and insights page landmarks."
-      },
-      "world-title": {
-        "displayName": "World Title",
-        "purpose": "House title; responsive sizes remain in the source."
-      },
-      "app-heading": {
-        "displayName": "App Heading",
-        "purpose": "Event section and dialog titles."
-      },
-      "app-subheading": {
-        "displayName": "App Subheading",
-        "purpose": "Sidebar introductions and resident headings."
-      },
-      "app-copy": {
-        "displayName": "App Copy",
-        "purpose": "Sidebar explanations and event descriptions."
-      },
-      "journal-copy": {
-        "displayName": "Journal Copy",
-        "purpose": "Journal entries with more open leading."
+        "purpose": "Working interface role; see DESIGN.md for component and responsive use."
       }
     },
     "shadows": [
       {
-        "name": "contextual-overlay",
+        "name": "dialog-light",
+        "value": "0 16px 48px #26332626",
+        "purpose": "Dialog separation in light mode."
+      },
+      {
+        "name": "dialog-dark",
+        "value": "0 16px 48px #0005",
+        "purpose": "Dialog separation in dark mode."
+      },
+      {
+        "name": "context-overlay",
         "value": "0 5px 18px #0004",
-        "purpose": "Existing time-mode tooltips and resident-choice popovers; ordinary panels and dialogs are flat."
+        "purpose": "Time-mode tooltips and resident-choice popovers."
+      },
+      {
+        "name": "deck-resting",
+        "value": "0 1px 2px rgba(60,70,50,.05)",
+        "purpose": "Resting event-deck cards."
+      },
+      {
+        "name": "deck-active",
+        "value": "0 10px 26px rgba(60,70,50,.13)",
+        "purpose": "Active mobile event-deck card and draw feedback."
       }
     ],
     "motion": [
       {
         "name": "house-arrival",
         "value": "420ms cubic-bezier(.16,1,.3,1)",
-        "purpose": "One featured-house reveal from opacity .8 and translateY(7px); disabled for prefers-reduced-motion: reduce."
+        "purpose": "Single house arrival; disabled for reduced motion."
       },
       {
-        "name": "event-hover",
-        "value": "background .15s, border-color .15s",
-        "purpose": "Fine-pointer hover changes tone and border without movement; reduced motion disables transitions."
+        "name": "action-hover",
+        "value": "background .2s",
+        "purpose": "Primary-button hover feedback."
+      },
+      {
+        "name": "deck-drawn",
+        "value": "1.4s ease-out",
+        "purpose": "Draw feedback; disabled for reduced motion."
       }
     ],
     "breakpoints": [
       {
-        "name": "medium",
+        "name": "directory-medium-events-three",
         "value": "1100px"
       },
       {
-        "name": "world-stack",
+        "name": "world-stack-insights-two",
         "value": "900px"
       },
       {
-        "name": "mobile",
+        "name": "phone-controls-events-two",
         "value": "760px"
       },
       {
-        "name": "small-phone",
+        "name": "narrative-stack",
+        "value": "700px"
+      },
+      {
+        "name": "insights-rows-events-one",
+        "value": "540px"
+      },
+      {
+        "name": "landing-small-phone",
         "value": "450px"
       }
     ]
   },
   "components": [
     {
-      "name": "Stage action",
-      "kind": "button",
-      "refersTo": "stage-action",
-      "description": "Yellow invitation on the plum stage.",
-      "html": "<div class=\"ds-stage\"><a class=\"ds-stage-action\" href=\"#house\">Visit this house<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7 7h10v10M7 17 17 7\"/></svg></a></div>",
-      "css": ".ds-stage{background:var(--festival-plum,#43274f);padding:20px}.ds-stage-action{display:inline-flex;align-items:center;justify-content:space-between;gap:22px;border:1px solid transparent;border-radius:7px;padding:15px 20px;min-height:49px;font:800 13px/1.5 Manrope,sans-serif;text-decoration:none;cursor:pointer;background:var(--festival-yellow,#f2f3a6);color:var(--festival-action-ink,#43274f)}.ds-stage-action:hover{background:var(--festival-action-hover,#fffec9)}.ds-stage-action:focus-visible{outline:3px solid var(--festival-yellow,#f2f3a6);outline-offset:5px}"
-    },
-    {
-      "name": "Neighborhood action",
-      "kind": "button",
-      "refersTo": "button-neighborhood",
-      "description": "Reversed ink and mint action on the directory ground.",
-      "html": "<div class=\"ds-ground\"><button class=\"ds-neighborhood-action\" type=\"button\">Create a world<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7 7h10v10M7 17 17 7\"/></svg></button></div>",
-      "css": ".ds-ground{background:var(--festival-mint,#dce9cc);padding:20px}.ds-neighborhood-action{display:inline-flex;align-items:center;justify-content:space-between;gap:22px;border:1px solid transparent;border-radius:7px;padding:15px 20px;min-height:49px;font:800 13px/1.5 Manrope,sans-serif;text-decoration:none;cursor:pointer;background:var(--festival-ink,#35233d);color:var(--festival-mint,#dce9cc)}.ds-neighborhood-action:hover{opacity:.85}.ds-neighborhood-action:focus-visible{outline:3px solid var(--festival-ink,#35233d);outline-offset:5px}"
-    },
-    {
-      "name": "World search",
-      "kind": "input",
-      "refersTo": "search",
-      "description": "Transparent search with group focus.",
-      "html": "<div class=\"ds-search-ground\"><label class=\"ds-search\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"19\" height=\"19\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><circle cx=\"11\" cy=\"11\" r=\"8\"/><path d=\"m21 21-4.3-4.3\"/></svg><input type=\"search\" aria-label=\"Search worlds\" placeholder=\"Find a world…\"></label></div>",
-      "css": ".ds-search-ground{background:var(--festival-mint,#dce9cc);padding:20px}.ds-search{display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--festival-ink,#35233d);padding-left:3px;width:280px;max-width:100%;color:var(--festival-ink,#35233d)}.ds-search input{width:100%;min-width:0;background:transparent;border:0;padding:14px 0;color:var(--festival-ink,#35233d);font:13px Manrope,sans-serif}.ds-search input::placeholder{color:var(--festival-subtle,#536047)}.ds-search:focus-within{outline:3px solid var(--festival-ink,#35233d);outline-offset:5px}.ds-search input:focus-visible{outline:none}"
-    },
-    {
-      "name": "Directory filters",
-      "kind": "chip",
-      "refersTo": "filter",
-      "description": "Labeled filter buttons showing selected and resting states.",
-      "html": "<div class=\"ds-filters\"><button type=\"button\" aria-pressed=\"true\">All worlds</button><button type=\"button\" aria-pressed=\"false\">Open doors</button><button type=\"button\" aria-pressed=\"false\">Always on</button></div>",
-      "css": ".ds-filters{display:flex;gap:6px;flex-wrap:wrap;background:var(--festival-mint,#dce9cc);padding:20px}.ds-filters button{min-height:44px;border:1px solid transparent;border-radius:6px;padding:10px 16px;font:700 12px Manrope,sans-serif;color:var(--festival-subtle,#536047);background:transparent;cursor:pointer}.ds-filters button[aria-pressed=true]{background:var(--festival-ink,#35233d);color:var(--festival-mint,#dce9cc)}.ds-filters button:hover{border-color:var(--festival-ink,#35233d)}.ds-filters button:focus-visible{outline:3px solid var(--festival-ink,#35233d);outline-offset:5px}"
-    },
-    {
-      "name": "Shared app navigation",
-      "kind": "nav",
-      "refersTo": "app-navigation",
-      "description": "Compact plum app navigation; the landing uses the taller header variant.",
-      "html": "<nav class=\"ds-nav\" aria-label=\"Main navigation\"><a class=\"ds-current\" href=\"#worlds\" aria-current=\"page\">The worlds</a><button type=\"button\">Field guide</button></nav>",
-      "css": ".ds-nav{display:flex;align-items:center;gap:30px;height:64px;padding:0 24px;background:var(--festival-plum,#43274f);color:var(--festival-lilac,#dacbe3);font:600 12px Manrope,sans-serif}.ds-nav a{height:64px;display:flex;align-items:center;position:relative;color:inherit;text-decoration:none}.ds-nav .ds-current:after{content:\"\";position:absolute;bottom:0;left:0;width:100%;height:3px;background:var(--festival-yellow,#f2f3a6)}.ds-nav button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:pointer}.ds-nav button:hover{color:var(--festival-yellow,#f2f3a6)}.ds-nav :is(a,button):focus-visible{outline:3px solid var(--festival-yellow,#f2f3a6);outline-offset:4px}"
-    },
-    {
-      "name": "App primary action",
+      "name": "Primary action",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "Yellow primary action with fixed plum text in both themes.",
+      "description": "Forest action in light mode; pale sage in dark mode.",
       "html": "<button class=\"ds-primary\" type=\"button\">Save house details</button>",
-      "css": ".ds-primary{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:44px;padding:12px 18px;background:var(--festival-yellow,#f2f3a6);color:var(--festival-action-ink,#43274f);border:1px solid var(--festival-action-ink,#43274f);border-radius:7px;font:800 13px Manrope,sans-serif;box-shadow:none;cursor:pointer;transition:background .2s}.ds-primary:hover:not(:disabled){background:var(--festival-action-hover,#fffec9)}.ds-primary:focus-visible{outline:3px solid var(--focus,#43274f);outline-offset:4px}.ds-primary:disabled{opacity:.48;cursor:not-allowed}"
+      "css": ".ds-primary{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:12px 18px;background:var(--action,#3e5b43);color:var(--action-ink,#fffef8);border:1px solid transparent;border-radius:var(--radius-control,7px);font:700 13px Manrope,sans-serif;cursor:pointer;transition:background .2s}.ds-primary:hover:not(:disabled){background:var(--action-hover,#2d4733)}.ds-primary:focus-visible{outline:3px solid var(--focus,#3e5b43);outline-offset:3px}.ds-primary:disabled{opacity:.48;cursor:not-allowed}"
     },
     {
       "name": "Secondary action",
       "kind": "button",
       "refersTo": "button-outline",
-      "description": "Quiet outlined action on the ordinary surface.",
+      "description": "Outlined action on an ordinary surface.",
       "html": "<button class=\"ds-outline\" type=\"button\">Cancel</button>",
-      "css": ".ds-outline{min-height:44px;padding:10px 13px;background:var(--surface,#eef3e7);color:var(--text,#35233d);border:1px solid var(--control-border,#748168);border-radius:6px;font:700 11px Manrope,sans-serif;cursor:pointer}.ds-outline:hover:not(:disabled){background:var(--surface-hover,#dce9cc)}.ds-outline:focus-visible{outline:3px solid var(--focus,#43274f);outline-offset:4px}.ds-outline:disabled{opacity:.48;cursor:not-allowed}"
+      "css": ".ds-outline{min-height:44px;padding:10px 13px;background:var(--surface,#fffef8);color:var(--text,#29382e);border:1px solid var(--control-border,#748168);border-radius:var(--radius-control,7px);font:650 12px Manrope,sans-serif;cursor:pointer}.ds-outline:hover:not(:disabled){background:var(--surface-hover,#dfe6d6);border-color:var(--accent,#3e5b43)}.ds-outline:focus-visible{outline:3px solid var(--focus,#3e5b43);outline-offset:3px}.ds-outline:disabled{opacity:.48;cursor:not-allowed}"
     },
     {
       "name": "House name field",
       "kind": "input",
       "refersTo": "input",
-      "description": "Labeled native text input with semantic surface and outline.",
+      "description": "Visible label and native field on the semantic surface.",
       "html": "<label class=\"ds-field\">House name<input value=\"The common house\" required><small>Required · up to 60 characters</small></label>",
-      "css": ".ds-field{display:flex;flex-direction:column;gap:8px;color:var(--secondary,#536047);font:700 12px Manrope,sans-serif}.ds-field input{min-height:44px;min-width:0;padding:11px 12px;border:1px solid var(--control-border,#748168);border-radius:6px;background:var(--surface,#eef3e7);color:var(--text,#35233d);font:14px Manrope,sans-serif;caret-color:var(--accent,#43274f)}.ds-field input:focus-visible{outline:3px solid var(--focus,#43274f);outline-offset:4px}.ds-field small{font-size:11px;font-weight:400;line-height:1.6}"
+      "css": ".ds-field{display:flex;flex-direction:column;gap:8px;color:var(--text,#29382e);font:13px/1.6 Manrope,sans-serif}.ds-field input{min-height:44px;min-width:0;padding:11px 12px;border:1px solid var(--control-border,#748168);border-radius:var(--radius-control,7px);background:var(--surface,#fffef8);color:var(--text,#29382e);font:14px Manrope,sans-serif}.ds-field input:focus{border-color:var(--focus,#3e5b43)}.ds-field input:focus-visible{outline:3px solid var(--focus,#3e5b43);outline-offset:3px}.ds-field small{color:var(--muted,#596550);font-size:12px;line-height:1.65}"
     },
     {
-      "name": "App selected tabs",
+      "name": "Directory filters",
+      "kind": "chip",
+      "refersTo": "filter",
+      "description": "Sage selected state shared with working-surface choices.",
+      "html": "<div class=\"ds-filters\"><button type=\"button\" aria-pressed=\"true\">All worlds</button><button type=\"button\" aria-pressed=\"false\">Open doors</button></div>",
+      "css": ".ds-filters{display:flex;flex-wrap:wrap;gap:6px;padding:12px;background:var(--surface-soft,#e9ecdf)}.ds-filters button{min-height:44px;padding:10px 16px;border:1px solid transparent;border-radius:6px;background:transparent;color:var(--secondary,#52604e);font:700 12px Manrope,sans-serif;cursor:pointer}.ds-filters button[aria-pressed=true]{background:var(--selected,#dfe8d4);color:var(--selected-ink,#2c4a34)}.ds-filters button:hover{border-color:var(--text,#29382e)}.ds-filters button:focus-visible{outline:3px solid var(--text,#29382e);outline-offset:5px}"
+    },
+    {
+      "name": "World view navigation",
       "kind": "nav",
-      "refersTo": "app-filter-selected",
-      "description": "Plum and yellow selection on a mint tab rail.",
-      "html": "<nav class=\"ds-tabs\" aria-label=\"House details\"><button type=\"button\" aria-current=\"page\">Journal</button><button type=\"button\">Residents</button><button type=\"button\">Bonds</button></nav>",
-      "css": ".ds-tabs{display:flex;gap:4px;padding:6px;background:var(--surface-soft,#dce9cc);color:var(--secondary,#536047)}.ds-tabs button{flex:1;min-height:40px;padding:0 5px;border:0;border-radius:6px;background:transparent;color:inherit;font:11px Manrope,sans-serif;cursor:pointer}.ds-tabs button[aria-current=page]{background:var(--festival-plum,#43274f);color:var(--festival-yellow,#f2f3a6);font-weight:700}.ds-tabs button:hover{background:var(--surface-hover,#dce9cc)}.ds-tabs button[aria-current=page]:hover{background:var(--festival-plum,#43274f)}.ds-tabs button:focus-visible{outline:3px solid var(--focus,#43274f);outline-offset:4px}"
+      "description": "Quiet links with a persistent accent underline for the current view.",
+      "html": "<nav class=\"ds-views\" aria-label=\"World views\"><a href=\"#world\" aria-current=\"page\">The world</a><a href=\"#insights\">Community insights</a></nav>",
+      "css": ".ds-views{display:flex;flex-wrap:wrap;gap:8px;background:var(--page,#f4f3ec);font:600 13px Manrope,sans-serif}.ds-views a{display:flex;align-items:center;min-height:44px;padding:10px 12px;border-bottom:2px solid transparent;color:var(--secondary,#52604e);text-decoration:none}.ds-views a[aria-current=page]{color:var(--text,#29382e);border-color:var(--accent,#3e5b43)}.ds-views a:hover{background:var(--surface-soft,#e9ecdf)}.ds-views a:focus-visible{outline:3px solid var(--focus,#3e5b43);outline-offset:3px}"
     },
     {
-      "name": "Event card",
+      "name": "House narrative",
       "kind": "card",
-      "refersTo": "panel",
-      "description": "Flat event invitation with strong text, quiet icon, and tonal hover.",
-      "html": "<button class=\"ds-event\" type=\"button\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" aria-hidden=\"true\"><path d=\"M4 10h16a8 8 0 0 1-16 0ZM8 3v3m4-3v3m4-3v3M6 21h12\"/></svg><b>A shared meal</b><small>Make room at the table. Shared meals have a way of starting connections.</small></button>",
-      "css": ".ds-event{display:flex;flex-direction:column;align-items:flex-start;gap:10px;max-width:250px;padding:16px 14px;text-align:left;background:var(--surface,#eef3e7);color:var(--accent,#43274f);border:1px solid var(--line,#b7c6aa);border-radius:12px;box-shadow:none;cursor:pointer;transition:background .15s,border-color .15s}.ds-event b{color:var(--text,#35233d);font:800 13px/1.5 Manrope,sans-serif}.ds-event small{color:var(--muted,#536047);font:12px/1.7 Manrope,sans-serif}@media(hover:hover) and (pointer:fine){.ds-event:hover:not(:disabled){background:var(--surface-soft,#dce9cc);border-color:var(--control-border,#748168)}}.ds-event:focus-visible{outline:3px solid var(--focus,#43274f);outline-offset:4px}.ds-event:disabled{opacity:.48;cursor:not-allowed}@media(prefers-reduced-motion:reduce){.ds-event{transition:none}}"
+      "refersTo": "house-narrative",
+      "description": "Soft reading inset without a decorative prose stripe.",
+      "html": "<article class=\"ds-narrative\"><h3>A little life together</h3><p>Conversations, shared routines and familiar faces shape life in the house.</p></article>",
+      "css": ".ds-narrative{display:grid;grid-template-columns:1fr 2fr;gap:28px;padding:28px;background:var(--surface-soft,#e9ecdf);color:var(--text,#29382e);border:0;border-radius:var(--radius-panel,12px);font-family:Manrope,sans-serif}.ds-narrative h3{font-size:23px;font-weight:700;line-height:1.3;letter-spacing:-.025em;margin:10px 0 0}.ds-narrative p{margin:0 0 10px;font-size:15px;line-height:1.8;overflow-wrap:anywhere}@media(max-width:700px){.ds-narrative{grid-template-columns:1fr;gap:16px;padding:20px}.ds-narrative p{font-size:14px}}"
+    },
+    {
+      "name": "Open event list item",
+      "kind": "custom",
+      "refersTo": "event-list-item",
+      "description": "Ruled event item with tonal hover; distinct from the elevated event deck.",
+      "html": "<button class=\"ds-event\" type=\"button\"><b>A shared meal</b><small>Make room at the table. Shared meals have a way of starting connections.</small></button>",
+      "css": ".ds-event{display:flex;flex-direction:column;align-items:flex-start;gap:9px;max-width:300px;min-height:142px;padding:20px 32px 20px 0;text-align:left;background:transparent;color:var(--text,#29382e);border:0;border-top:1px solid var(--line,#c9d0be);border-radius:0;box-shadow:none;cursor:pointer}.ds-event b{font:700 15px Manrope,sans-serif}.ds-event small{color:var(--secondary,#52604e);font:12px/1.65 Manrope,sans-serif}.ds-event:hover:not(:disabled){background:var(--surface-soft,#e9ecdf);border-color:var(--control-border,#748168)}.ds-event:active:not(:disabled){background:var(--surface-hover,#dfe6d6)}.ds-event:focus-visible{outline:3px solid var(--focus,#3e5b43);outline-offset:3px}.ds-event:disabled{opacity:.48;cursor:not-allowed}"
+    },
+    {
+      "name": "Field guide disclosure",
+      "kind": "custom",
+      "description": "Bordered reading container with native details behavior and a soft open heading.",
+      "html": "<details class=\"ds-guide\"><summary>What can I do here?<svg class=\"ds-chevron\" width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m6 9 6 6 6-6\"/></svg></summary><p>Watch residents, explore their stories and bring an event into the house.</p></details>",
+      "css": ".ds-guide{border:1px solid var(--line,#c9d0be);border-radius:12px;background:var(--surface,#fffef8);color:var(--text,#29382e);font-family:Manrope,sans-serif;transition:border-color .15s ease,background .15s ease}.ds-guide[open]{border-color:var(--control-border,#748168)}.ds-guide summary{display:flex;align-items:center;justify-content:space-between;gap:16px;list-style:none;padding:16px 20px;cursor:pointer;font-size:17px;line-height:1.35;border-radius:11px}.ds-guide summary::-webkit-details-marker{display:none}.ds-guide summary:hover,.ds-guide[open] summary{background:var(--surface-soft,#e9ecdf)}.ds-guide[open] summary{border-bottom:1px solid var(--line,#c9d0be);border-radius:11px 11px 0 0}.ds-guide summary:focus-visible{outline:3px solid var(--focus,#3e5b43);outline-offset:3px}.ds-guide p{padding:16px 20px 18px;margin:0;color:var(--secondary,#52604e);font-size:13.5px;line-height:1.75}.ds-chevron{color:var(--muted,#596550);transition:transform .2s ease}.ds-guide[open] .ds-chevron{transform:rotate(180deg);color:var(--accent,#3e5b43)}"
     }
   ],
   "narrative": {
-    "northStar": "Neighborhood festival",
-    "overview": "Kinarium uses the neighborhood festival as its shared visual world: broad plum fields, pale yellow invitations, mint surfaces, and substantial display lettering. It feels sociable and curious, with real house illustrations providing the detail and personality.\n\nThe user-approved expansion carries the landing hero’s identity through world screens, resident details, events, insights, creation and settings dialogs, the field guide, locked states, and administration. `src/client/festival-tokens.css` owns the shared fonts and palette; `theme.css` maps them to semantic interface roles; `app-chrome.css` applies the common navigation, controls, and surface treatments. `landing.css` retains the landing’s particular composition. Existing layouts, task behavior, and simulation artwork remain the foundation.",
+    "northStar": "Natural-history diorama",
+    "overview": "Kinarium frames a living miniature with warm ivory, oat and olive surfaces. Forest actions and pale sage selections relate the working interface to the existing house artwork. The house supplies the detail and personality; controls, navigation and reading surfaces remain calm and legible.\n\nThis system records the implemented overhaul after the user rejected the previous plum, mint and yellow combination. The natural-history framing is the implementation direction, not a separately user-approved mood board. The user explicitly confirmed retaining the existing artwork and rebuilding the UI around it; the Building SVG remains the product illustration. Dela Gothic One belongs to the wordmark and landing; Manrope carries the working application.",
     "keyCharacteristics": [
-      "Plum landmarks, yellow invitations, and mint tonal surfaces.",
-      "Dela Gothic One major headings paired with Manrope reading and controls.",
-      "Flat panels and fine rules, with recognizable house illustrations.",
-      "The same color relationships in light and dark themes."
+      "Warm neutral grounds, olive text, forest actions, and sage selections.",
+      "Manrope for operational headings and reading; Dela for the brand and landing.",
+      "Fine rules and open rows, with bounded panels where containment helps.",
+      "Related olive-charcoal dark surfaces and explicit semantic state colors."
     ],
     "rules": [
       {
-        "name": "The Shared Identity Rule",
-        "body": "Use the shared festival palette across interface surfaces; preserve semantic state colors and the simulation’s own scene palette.",
+        "name": "The House First Rule",
+        "body": "Let the existing house illustration carry the visual detail; use semantic interface colors to frame it.",
         "section": "colors"
       },
       {
-        "name": "The Landmark Type Rule",
-        "body": "Reserve Dela for major landmarks; use Manrope for task controls, resident names, detail sections, and sustained reading.",
+        "name": "The Action and Selection Rule",
+        "body": "Use action and action-ink for primary actions, selected and selected-ink for chosen filters, and danger, warning or good only for meaning.",
+        "section": "colors"
+      },
+      {
+        "name": "The Working Type Rule",
+        "body": "Reserve Dela for the wordmark and landing; use Manrope for operational headings, controls and sustained reading.",
         "section": "typography"
       },
       {
-        "name": "The House First Rule",
-        "body": "Use the existing Building SVG for product illustrations; keep names, access conditions, and actions as readable interface text.",
-        "section": "typography"
-      },
-      {
-        "name": "The Flat Program Rule",
-        "body": "Separate interface regions through color, space, and fine rules; use tonal change for hover and reserve overlay shadows for contextual information.",
+        "name": "The Containment Rule",
+        "body": "Use rules and space for ordinary reading and metrics; use bounded surfaces for the scene, journal, disclosures and dialogs.",
         "section": "elevation"
       }
     ],
     "dos": [
-      "Do keep the house name before its access label in featured invitations and listing copy.",
-      "Do preserve visible keyboard focus, textual control names, and pressed filter states.",
-      "Do keep long house names and descriptions wrapping inside their available columns.",
-      "Do use the existing Building SVG and its theme-aware scene colors; font provenance and licenses live in public/fonts/README.md.",
-      "Do honor reduced motion by disabling the house arrival animation."
+      "Do use the semantic light and dark roles from design-tokens.css across new working surfaces.",
+      "Do preserve visible focus, native field labels, pressed filter states and disabled behavior.",
+      "Do keep long names and descriptions wrapping inside their available columns.",
+      "Do use the existing Building SVG and preserve resident, furniture and semantic chart colors.",
+      "Do honor reduced motion for the house arrival and event-deck animations."
     ],
     "donts": [
-      "Don't copy the landing’s oversized hero composition into everyday app screens.",
-      "Don't turn the directory rows into a repeated elevated card grid.",
-      "Don't introduce raster illustrations to replace the product’s existing house renderer.",
-      "Don't restore the old serif dialog headings, elevated modal treatment, or tracked decorative eyebrows; the shared interface uses Dela landmarks and ordinary Manrope labels."
+      "Don't restore the rejected plum, mint and yellow decorative combination.",
+      "Don't carry the landing’s display typography or arched stage into everyday task screens.",
+      "Don't turn metric rows and open directory listings into an elevated card grid.",
+      "Don't add decorative eyebrows, glyph icons or prose border stripes as new system conventions.",
+      "Don't replace the product’s house renderer with new raster illustrations."
     ]
   }
 }

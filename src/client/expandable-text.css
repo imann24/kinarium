@@ -1,3 +1,5 @@
+@layer base, components, theme, interface;
+@layer components {
 .expandable-text{display:block;max-width:100%;min-width:0;margin:0;text-align:left;white-space:pre-wrap;overflow-wrap:anywhere;color:inherit}
 button.expandable-text{cursor:pointer}
 button.expandable-text[aria-expanded=true]{cursor:text}
@@ -40,3 +42,5 @@ button.expandable-text[aria-expanded=true]{cursor:text}
 .speech-sheet .speech-lifetime{margin-top:12px}
 @keyframes speech-sheet-in{from{opacity:0;transform:translateY(12px)}}
 @media (prefers-reduced-motion:reduce){.speech-sheet{animation:none}}
+
+}

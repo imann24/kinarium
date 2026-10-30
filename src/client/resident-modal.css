@@ -1,3 +1,5 @@
+@layer base, components, theme, interface;
+@layer components {
 .detail-toolbar{display:flex;align-items:center;justify-content:space-between;min-height:28px}
 .detail-toolbar .expand-resident{margin:-6px -6px 0 auto}
 .modal.resident-modal{width:min(1040px,calc(100vw - 48px));max-height:calc(100dvh - 48px);overflow:auto}
@@ -16,3 +18,5 @@
 .resident-modal .model-selection select{min-height:36px;margin-top:6px;padding:6px 10px;font-size:12px}
 .resident-modal .model-selection p{font-size:10px;line-height:1.6;margin-top:6px}
 .resident-modal .resident-state{margin-bottom:0}
+
+}

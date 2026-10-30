@@ -1,16 +1,18 @@
-.event-picker{--tone-kind:#6f8a5c;--tone-kind-soft:#eef3e5;--tone-mixed:#8c8a4f;--tone-mixed-soft:#f3f1df;--tone-disruptive:#a5704a;--tone-disruptive-soft:#f6ece0}
+@layer base, components, theme, interface;
+@layer components {
+.event-picker{--tone-kind:var(--good);--tone-kind-soft:#eef3e5;--tone-mixed:var(--warning);--tone-mixed-soft:#f3f1df;--tone-disruptive:var(--danger);--tone-disruptive-soft:#f6ece0}
 :root[data-theme='dark'] .event-picker{--tone-kind:#b9cfa2;--tone-kind-soft:#2e3b2f;--tone-mixed:#d3d0a2;--tone-mixed-soft:#393c29;--tone-disruptive:#e1c398;--tone-disruptive-soft:#40382b}
 
 .event-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
 .event-filters{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px}
 .event-filters::-webkit-scrollbar{display:none}
-.event-filters button,.event-view-toggle button{min-height:34px;border:1px solid var(--line);background:var(--surface);color:var(--secondary);border-radius:999px;touch-action:manipulation}
+.event-filters button,.event-view-toggle button{min-height:44px;border:1px solid var(--line);background:var(--surface);color:var(--secondary);border-radius:7px;touch-action:manipulation}
 .event-filters button{display:inline-flex;align-items:center;gap:7px;padding:0 13px;font-size:11px;white-space:nowrap}
-.event-filters button span{font-size:9px;color:var(--muted);background:var(--surface-soft);border-radius:999px;padding:2px 6px}
-.event-filters button[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.event-filters button span{font-size:9px;color:var(--muted);background:var(--surface-soft);border-radius:7px;padding:2px 6px}
+.event-filters button[aria-pressed=true]{background:var(--selected);border-color:var(--control-border);color:var(--selected-ink)}
 .event-filters button[aria-pressed=true] span{background:transparent;color:inherit}
-.event-view-toggle{display:flex;flex:none;border:1px solid var(--line);border-radius:999px;padding:2px;background:var(--surface)}
-.event-view-toggle button{display:grid;place-items:center;width:34px;min-height:30px;border:0;background:transparent;color:var(--muted)}
+.event-view-toggle{display:flex;flex:none;border:1px solid var(--line);border-radius:7px;padding:2px;background:var(--surface)}
+.event-view-toggle button{display:grid;place-items:center;width:44px;min-height:44px;border:0;background:transparent;color:var(--muted)}
 .event-view-toggle button[aria-pressed=true]{background:var(--surface-soft);color:var(--accent)}
 @media(hover:hover) and (pointer:fine){.event-filters button:hover:not([aria-pressed=true]),.event-view-toggle button:hover:not([aria-pressed=true]){background:var(--surface-hover)}}
 
@@ -21,7 +23,7 @@
 .deck-card.mixed{--tone:var(--tone-mixed);--tone-soft:var(--tone-mixed-soft)}
 .deck-card.disruptive{--tone:var(--tone-disruptive);--tone-soft:var(--tone-disruptive-soft)}
 .deck-card.active{border-color:var(--tone);box-shadow:0 10px 26px rgba(60,70,50,.13)}
-.deck-card:not(.active){opacity:.82}
+.deck-card:not(.active){opacity:1}
 .deck-card:active:not(:disabled){background:var(--tone-soft)}
 .deck-card:disabled{cursor:default}
 .deck-card.drawn{animation:deck-drawn 1.4s ease-out}
@@ -29,14 +31,14 @@
 @media(prefers-reduced-motion:reduce){.deck-card{transition:none}.deck-card.drawn{animation:none}}
 .deck-card-top{align-self:stretch;display:flex;align-items:center;justify-content:space-between;padding:16px 15px 14px;background:var(--tone-soft);margin-bottom:4px}
 .deck-icon{display:grid;place-items:center;width:46px;height:46px;border-radius:12px;background:var(--surface);color:var(--tone)}
-.deck-tone{font-size:9px;letter-spacing:1.3px;text-transform:uppercase;color:var(--tone);font-weight:600}
+.deck-tone{font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--tone);font-weight:600}
 .deck-card b{font-family:var(--serif);font-size:18px;font-weight:500;color:var(--text);padding:0 15px;line-height:1.25}
-.deck-card small{font-size:11px;line-height:1.6;color:var(--secondary);padding:0 15px}
+.deck-card small{font-size:13px;line-height:1.6;color:var(--secondary);padding:0 15px}
 .deck-effects{display:flex;flex-wrap:wrap;gap:5px;padding:2px 15px 0;margin-top:auto}
-.deck-effect{display:inline-flex;align-items:center;gap:3px;font-size:9.5px;padding:3px 7px;border-radius:999px;background:var(--surface-soft);white-space:nowrap}
+.deck-effect{display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:3px 7px;border-radius:7px;background:var(--surface-soft);white-space:nowrap}
 .deck-effect.good{color:var(--change-good)}
 .deck-effect.bad{color:var(--change-bad)}
-.deck-cta{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;color:var(--tone);padding:4px 15px 0}
+.deck-cta{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:var(--tone);padding:4px 15px 0}
 .deck-card:disabled .deck-cta{color:var(--muted)}
 /* Resting cards: the face fades and greys, and the countdown takes over from the call to action. */
 .deck-card.waiting,.deck-card.waiting:not(.active){opacity:1;border-style:dashed}
@@ -47,16 +49,16 @@
 .deck-card.waiting .deck-wait{align-self:stretch;margin:2px 12px 0;padding:7px 10px;border-radius:8px;gap:6px;background:var(--surface-soft);color:var(--secondary);font-variant-numeric:tabular-nums}
 .event-card.waiting{opacity:1;border-style:dashed}
 .event-card.waiting>:not(.event-wait){filter:grayscale(.75);opacity:.6}
-.event-wait{position:absolute;right:10px;top:14px;display:inline-flex;align-items:center;gap:4px;font-size:10px;font-variant-numeric:tabular-nums;padding:3px 7px;border-radius:999px;background:var(--surface-soft);color:var(--secondary)}
+.event-wait{position:absolute;right:10px;top:14px;display:inline-flex;align-items:center;gap:4px;font-size:10px;font-variant-numeric:tabular-nums;padding:3px 7px;border-radius:7px;background:var(--surface-soft);color:var(--secondary)}
 @media(prefers-reduced-motion:reduce){.deck-wait-bar i{transition:none}}
 
 .deck-controls{display:flex;align-items:center;gap:10px;padding:0 var(--page-gutter, 18px)}
-.deck-step{display:grid;place-items:center;width:36px;height:36px;flex:none;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--secondary);touch-action:manipulation}
+.deck-step{display:grid;place-items:center;width:44px;height:44px;flex:none;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--secondary);touch-action:manipulation}
 .deck-step:disabled{opacity:.4}
 .deck-position{flex:1;display:flex;flex-direction:column;gap:5px;font-size:10px;color:var(--muted);min-width:0}
 .deck-progress{height:3px;border-radius:2px;background:var(--surface-soft);overflow:hidden}
 .deck-progress i{display:block;height:100%;background:var(--accent);border-radius:2px;transition:width .25s,margin-left .25s}
-.deck-draw{display:inline-flex;align-items:center;gap:6px;flex:none;min-height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--accent);font-size:11px;touch-action:manipulation}
+.deck-draw{display:inline-flex;align-items:center;gap:6px;flex:none;min-height:44px;padding:0 14px;border-radius:7px;border:1px solid var(--line);background:var(--surface);color:var(--accent);font-size:11px;touch-action:manipulation}
 @media(hover:hover) and (pointer:fine){.deck-card:hover:not(:disabled){border-color:var(--tone);opacity:1}.deck-step:hover:not(:disabled),.deck-draw:hover:not(:disabled){background:var(--surface-hover)}}
 
 /* On larger screens the deck sits inside the page, shows several cards at once, and can be paged with side arrows or dragged with a mouse. */
@@ -71,3 +73,5 @@
   .deck-track.dragging .deck-card{pointer-events:none}}
 @media(min-width:761px) and (hover:hover) and (pointer:fine){.deck-track{cursor:grab}.deck-side:hover:not(:disabled){background:var(--surface-hover)}}
 @media(max-width:380px){.deck-draw{padding:0 11px}.deck-card b{font-size:17px}}
+
+}

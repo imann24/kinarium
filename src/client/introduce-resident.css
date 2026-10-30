@@ -1,3 +1,5 @@
+@layer base, components, theme, interface;
+@layer components {
 .introduce-control { position:relative; display:inline-flex; flex-shrink:0; border-radius:7px; }
 .introduce-control:focus-visible { outline:2px solid var(--focus); outline-offset:4px; }
 .introduce-control button:disabled { pointer-events:none; }
@@ -8,3 +10,5 @@
 .population-tooltip::after { content:""; position:absolute; left:0; right:0; bottom:-11px; height:11px; }
 :root[data-theme='dark'] .population-tooltip { box-shadow:0 5px 18px #0004; }
 @media(max-width:550px) { .stage-footer .introduce-control { width:100%; } }
+
+}

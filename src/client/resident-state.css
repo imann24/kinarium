@@ -1,3 +1,5 @@
+@layer base, components, theme, interface;
+@layer components {
 .resident-state { margin: 18px 0 24px; color: var(--secondary); font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
 .resident-state h4 { color: var(--text); margin-bottom: 10px; }
 .resident-state dl { margin: 0; }
@@ -28,3 +30,5 @@
 .delta-chip[data-tone=good] { border-color: var(--change-good); }
 .delta-chip[data-tone=bad] { border-color: var(--change-bad); }
 .resident-state-events .delta-chips { display: flex; }
+
+}

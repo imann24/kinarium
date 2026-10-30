@@ -6,7 +6,7 @@ const origin = process.env.TEST_ORIGIN || 'http://127.0.0.1:5173';
 assert(['localhost', '127.0.0.1'].includes(new URL(origin).hostname));
 const page = await browser.newPage();
 const errors = []; page.on('pageerror', e => errors.push(e.message));
-await page.route('**/stack-fixture', route => route.fulfill({ contentType: 'text/html', body: '<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="/src/client/style.css"><link rel="stylesheet" href="/src/client/theme.css"></head><body><div id="fixture" style="width:100%"></div></body></html>' }));
+await page.route('**/stack-fixture', route => route.fulfill({ contentType: 'text/html', body: '<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="/src/client/design-tokens.css"><link rel="stylesheet" href="/src/client/style.css"><link rel="stylesheet" href="/src/client/theme.css"></head><body><div id="fixture" style="width:100%"></div></body></html>' }));
 await page.route('**/api/**', route => route.abort());
 try {
   await page.goto(`${origin}/stack-fixture`);

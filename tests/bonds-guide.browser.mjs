@@ -43,7 +43,7 @@ try {
       await audit('.world-sidebar');
       const opener = page.getByRole('button', { name: 'Field guide' });
       await opener.focus(); await page.keyboard.press('Enter');
-      const dialog = page.getByRole('dialog', { name: 'A world with no finish line.' });
+      const dialog = page.getByRole('dialog', { name: 'Field guide' });
       await dialog.waitFor();
       assert.match(await dialog.innerText(), /Meet the residents/);
       const details = dialog.locator('summary').last();

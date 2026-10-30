@@ -93,6 +93,20 @@ try {
   await page.getByRole('button', { name: 'Try again', exact: true }).click();
   await page.locator('.house-listing').last().waitFor();
   assert.equal(await page.locator('.house-listing').count(), 3);
+  for (const theme of ['light', 'dark']) {
+    await page.evaluate(theme => window.kinariumTheme.setPreference(theme), theme);
+    await page.setViewportSize({ width: 390, height: 1000 });
+    await page.reload();
+    await page.locator('.house-listing').last().waitFor();
+    await page.evaluate(() => document.fonts.ready);
+    await page.evaluate(() => {
+      const elements = [...document.querySelectorAll('body *')].filter(el => el instanceof HTMLElement);
+      const sizes = elements.map(el => parseFloat(getComputedStyle(el).fontSize));
+      elements.forEach((el, i) => { el.style.fontSize = `${sizes[i] * 2}px`; });
+    });
+    await noOverflow();
+    if (capture) await page.screenshot({ path: `${capture}/populated-text200-${theme}.png`, fullPage: true });
+  }
   assert.deepEqual(errors, []);
   console.log('PASS: directory links, protected featured house, search/filters/reset, creation controls, guide, keyboard, theme persistence, empty/error/retry, long content, light/dark at 1440/1280/390/320px; no page errors.');
 } finally {

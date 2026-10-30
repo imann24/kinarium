@@ -1,3 +1,5 @@
+@layer base, components, theme, interface;
+@layer components {
 /* World pages reserve more of the first screen for the scene, not header spacing. */
 .site-header.world-site-header {
   height: 56px;
@@ -67,4 +69,6 @@
 .world-page:not(.world-fullscreen) .world-heading-actions { flex-shrink: 0; }
 @media(max-width:760px) {
   .world-page .world-heading-actions .outline { min-width: 44px; }
+}
+
 }

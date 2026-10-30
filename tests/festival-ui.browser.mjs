@@ -43,7 +43,9 @@ async function contrast(selector, minimum = 4.5) {
     };
     return elements.filter(el => el.getClientRects().length).map(el => {
       const style = getComputedStyle(el);
-      const fg = luminance(style.color), bg = luminance(style.backgroundColor);
+      let parent = el, background = style.backgroundColor;
+      while (background === 'rgba(0, 0, 0, 0)' && parent.parentElement) { parent = parent.parentElement; background = getComputedStyle(parent).backgroundColor; }
+      const fg = luminance(style.color), bg = luminance(background);
       return (Math.max(fg, bg) + .05) / (Math.min(fg, bg) + .05);
     });
   });
@@ -69,12 +71,20 @@ try {
       await contrast('.world-view-nav a[aria-current=page]');
       await contrast('.sidebar-tabs .active');
       await contrast('.stage-toolbar');
-      assert.match(await page.locator('.world-heading h1').evaluate(el => getComputedStyle(el).fontFamily), /Dela Gothic One/);
+      assert.match(await page.locator('.world-heading h1').evaluate(el => getComputedStyle(el).fontFamily), /Manrope/);
       assert.match(await page.locator('.stage-footer .primary').evaluate(el => getComputedStyle(el).fontFamily), /Manrope/);
+      await page.getByRole('button', { name: 'World settings', exact: true }).hover();
+      await contrast('.world-heading-actions .outline');
       await page.getByRole('button', { name: 'World settings', exact: true }).click();
       await page.getByRole('dialog').waitFor();
       await capture('settings', theme, width);
       await contrast('dialog .primary');
+      const scrollBefore = await page.evaluate(() => scrollY);
+      await page.getByRole('dialog').evaluate(el => { el.scrollTop = el.scrollHeight; });
+      await page.getByRole('dialog').hover();
+      await page.mouse.wheel(0, 1000);
+      await settled();
+      assert.equal(await page.evaluate(() => scrollY), scrollBefore, 'dialog must contain background scrolling');
       await page.keyboard.press('Escape');
       await page.getByRole('button', { name: 'Residents', exact: true }).click();
       await page.locator('.resident-row').first().click();
@@ -85,9 +95,22 @@ try {
       assert(await page.locator('.world-sidebar').isHidden());
       await page.getByRole('button', { name: 'Show journal' }).click();
       assert(await page.locator('.world-sidebar').isVisible());
+      await page.getByRole('button', { name: 'Card deck', exact: true }).click();
+      await contrast('.deck-tone, .deck-cta');
+      assert(await page.locator('.deck-card').evaluateAll(els => els.every(el => getComputedStyle(el).opacity === '1')), 'enabled cards retain readable opacity');
+      if (width < 500) {
+        await page.getByRole('link', { name: 'House events', exact: true }).click();
+        assert.equal(await page.evaluate(() => location.hash), '#house-events');
+      }
       await page.goto(`${origin}/w/festival-fixture/insights`);
       await page.locator('.insights-summary').waitFor();
       await capture('insights', theme, width);
+      if (width < 500) {
+        assert.equal(await page.locator('.insights-columns').evaluate(el => getComputedStyle(el).gridTemplateColumns.split(' ').length), 1, 'phone insight lists stack vertically');
+        assert.equal(await page.locator('.insights-summary').evaluate(el => getComputedStyle(el).gridTemplateColumns.split(' ').length), 1, 'phone summary uses readable rows');
+      }
+      await page.getByText('How connection labels work', { exact: true }).click();
+      assert(await page.locator('.insights-explainer').evaluate(el => el.open));
       await page.getByRole('button', { name: 'Field guide', exact: true }).click();
       await page.locator('.guide-item[open] .guide-item-body').waitFor({ state: 'visible' });
       await capture('guide', theme, width);
@@ -105,11 +128,23 @@ try {
       await capture('locked', theme, width);
     }
   }
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto(`${origin}/w/festival-fixture`);
+  await page.locator('.world-stage').waitFor();
+  await page.getByRole('button', { name: 'Enter fullscreen', exact: true }).click();
+  await page.waitForFunction(() => document.fullscreenElement);
+  await page.getByRole('button', { name: 'World settings', exact: true }).click();
+  await page.evaluate(() => document.exitFullscreen());
+  await page.waitForFunction(() => !document.querySelector('.world-fullscreen'));
+  assert.equal(await page.evaluate(() => getComputedStyle(document.body).overflow), 'hidden', 'open dialog remains scroll locked after fullscreen exit');
+  await page.keyboard.press('Escape');
+  assert.notEqual(await page.evaluate(() => getComputedStyle(document.body).overflow), 'hidden', 'closing the last dialog restores page scrolling');
+  await page.setViewportSize({ width: 320, height: 844 });
   snapshot.world.name = 'A very long house name that needs room to wrap without overlap';
   snapshot.world.description = 'AnUnbrokenHouseDescription'.repeat(8);
   await page.goto(`${origin}/w/festival-fixture`);
   await page.locator('.world-stage').waitFor();
   await fits();
   assert.deepEqual(errors, []);
-  console.log('Festival UI passed: house, insights, dialogs, guide, admin, locked house; 320/390/900/1440px, both themes, action contrast, journal toggling, long content.');
+  console.log('Interface UI passed: house, insights, dialogs, guide, admin, locked house; 320/390/900/1440px, both themes, action contrast, journal toggling, long content.');
 } finally { await browser.close(); }

@@ -1,3 +1,5 @@
+@layer base, components, theme, interface;
+@layer components {
 .resident-name-editor{margin:0 0 16px;min-width:0}
 .resident-name-editor>[hidden]{display:none}
 .resident-name-editor>button{min-height:32px}
@@ -9,3 +11,5 @@
 .resident-name-actions button{min-height:36px}
 .character-heading>div{min-width:0}
 .character-heading h2{overflow-wrap:anywhere}
+
+}

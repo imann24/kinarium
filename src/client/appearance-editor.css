@@ -1,3 +1,5 @@
+@layer base, components, theme, interface;
+@layer components {
 .appearance-editor{gap:0}
 .appearance-preview{width:96px;height:104px;margin:0 auto 18px;border-radius:14px;padding:9px 8px 0;overflow:hidden}
 .appearance-preview svg{width:100%;height:100%;display:block}
@@ -18,3 +20,5 @@
 .resident-edit-actions{display:flex;flex-wrap:wrap;gap:4px 18px}
 .resident-edit-actions>[hidden]{display:none}
 .resident-edit-actions>button{min-height:32px}
+
+}

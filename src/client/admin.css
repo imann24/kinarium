@@ -1,3 +1,5 @@
+@layer base, components, theme, interface;
+@layer components {
 .admin-page { max-width: var(--page-max); margin: 48px auto 80px; padding: 0 var(--page-gutter); }
 .admin-page > p { max-width: 720px; line-height: 1.7; }
 .admin-page h1 { margin-bottom: 20px; }
@@ -18,3 +20,5 @@
 @media (max-width: 560px) { .admin-houses li { align-items: flex-start; flex-direction: column; } .admin-confirm, .admin-login { padding: 18px; } }
 .admin-deleted { opacity: .75; }
 .admin-page section { margin-top: 36px; }
+
+}
