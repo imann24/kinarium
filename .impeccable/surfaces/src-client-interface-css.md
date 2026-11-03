@@ -2,7 +2,7 @@
 version: 1
 slug: "src-client-interface-css"
 primary_target: "src/client/interface.css"
-related_targets: ["src/client/design-tokens.css","src/client/main.tsx","src/client/SceneEvents.tsx","src/client/theme.css","src/client/style.css","src/client/event-picker.css","src/client/Building.tsx"]
+related_targets: ["src/client/design-tokens.css","src/client/main.tsx","src/client/SceneEvents.tsx","src/client/theme.css","src/client/style.css","src/client/event-picker.css","src/client/Building.tsx","src/client/world-widgets.css"]
 ---
 
 # House and task interfaces / Ensemble playhouse
@@ -19,13 +19,13 @@ STORY: Enter a house, see its cast, follow recorded moments, inspect a resident 
 
 FIRST VIEWPORT: Wide screens use cast/stage/journal columns, with a navy quick-event tray directly beneath the central stage. Cast changes to a horizontal strip at 1100px. At 760px the stage, event tray and journal stack; explicit journal disclosure, observer identity, settings, zoom and fullscreen remain available. The story desk uses short previews with full content reachable by explicit disclosure and conversation actions.
 
-FORM: Ensemble theatre playbill and stage-management desk, first grounded candidate; seed:b12428c0 retained from the direction record. The user selected Cast beside the stage and approved `.impeccable/mocks/decision/model-pick.webp`. This session chose comp-first; the saved default remains code-first. Original seed-roll output is unavailable; the saved user choice is the authoritative decision. The comp's sample dialogue and altered portraits are not production content. The live SVG and byte-identical Person renderer remain the resident source; authorized architectural recoloring relates the house to the stage.
+FORM: Ensemble theatre playbill and stage-management desk, first grounded candidate; seed:b12428c0 retained from the direction record. The user selected Cast beside the stage and approved `.impeccable/mocks/decision/model-pick.webp`. The original full redesign chose comp-first; the saved default remains code-first. The subsequent dialog/widget refinement uses that code-first default and introduces no new comp. Original seed-roll output is unavailable; the saved user choice is the authoritative decision. The comp's sample dialogue and altered portraits are not production content. The live SVG and byte-identical Person renderer remain the resident source; authorized architectural recoloring relates the house to the stage.
 
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
 
 ## Implemented layout and controls
 
-The final interface layer follows `base`, `components`, and `theme`. Shared semantic tokens live in design-tokens.css; component modules retain their behavior. Do not restore superseded token files.
+The final interface layer follows `base`, `components`, and `theme`. Shared semantic tokens live in design-tokens.css; component modules retain their behavior. world-widgets.css is imported after interface.css in this same layer and owns the subsequent dialog/widget sizing and spacing refinements. Do not restore superseded token files.
 
 The world is capped at 1800px. Above 1250px, its normal view uses 10px gutters, a 20px heading inset and `minmax(168px,15fr) minmax(0,59.6fr) minmax(300px,25.2fr)`, with 14px column gaps and 16px row gaps. The world title is 50px, rail headings 40px, and actual simulation time appears beside the heading. Viewport fitting reserves the quick-event tray and 25px bottom clearance, with a minimum 240px canvas height. Cast and journal span stage plus tray; journal collapse reallocates its column. At 1250px gutters return to 16px and the columns become 150px/flexible/300px with 12px gaps. At 1100px the cast becomes a horizontal scrolling strip and the stage shares a row with a 310px journal bounded to 720px. At 760px the layout becomes a single column with 14px gutters and a 560px internally scrolling journal.
 
@@ -44,3 +44,8 @@ Dialogs use Anton titles, semantic surfaces, 16px corners, soft shadow and a blu
 The shared system is now recorded in DESIGN.md and `.impeccable/design.json`. Source includes post-review fixes for story truncation, observer controls, phone zoom/fullscreen and stronger desktop hierarchy, including the user-requested additional fidelity round above 1250px. Review captures and the current verdict belong in `.impeccable/review/`; older captures may precede these corrections and do not overrule current source.
 
 The automated composition gate remains below its 72% threshold. Live content, unchanged resident art and authorized environmental recoloring explain some differences; remaining geometry differences still exist. This is not a passed pixel gate or a numerical override. Original seed output remains unavailable. These are disclosed delivery limitations, not reusable visual rules. No shipping raster scene replaces the live SVG.
+
+
+## Subsequent dialog and widget refinement
+
+The user's later request for deeper, more spacious task layouts is documented in `src-client-world-widgets-css.md`. It preserves this world composition while giving dialogs an 8px label / 24px field / 32px section rhythm, 40px desktop insets, task-specific widths and one outer scroll surface with a sticky close control. Settings and resident reading columns stack at 900px; 600px phone rules use 24px insets, 32px top padding and dynamic-viewport bounds. The independent widget review passed; this does not resolve or supersede the full-revamp pixel gate.

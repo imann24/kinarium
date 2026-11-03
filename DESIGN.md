@@ -144,6 +144,20 @@ typography:
     fontFamily: "Manrope, sans-serif"
     fontSize: "13px"
     fontWeight: 700
+  dialog-action:
+    fontFamily: "Manrope, sans-serif"
+    fontSize: "14px"
+    fontWeight: 700
+  resident-name:
+    fontFamily: "Manrope, sans-serif"
+    fontSize: "28px"
+    fontWeight: 750
+    lineHeight: 1.25
+  conversation-reading:
+    fontFamily: "Manrope, sans-serif"
+    fontSize: "16px"
+    fontWeight: 400
+    lineHeight: 1.8
   filter:
     fontFamily: "Manrope, sans-serif"
     fontSize: "12px"
@@ -159,7 +173,11 @@ spacing:
   gap: "16px"
   reading: "20px"
   section: "24px"
-  dialog: "32px"
+  dialog: "40px"
+  dialog-phone: "24px"
+  label-gap: "8px"
+  field-gap: "24px"
+  section-gap: "32px"
   column: "36px"
   landing-section: "48px"
   world-gutter: "16px"
@@ -219,7 +237,35 @@ components:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.text}"
     rounded: "{rounded.dialog}"
-    padding: "32px"
+    padding: "{spacing.dialog}"
+    width: "min(620px,calc(100vw - 48px))"
+  dialog-settings:
+    width: "min(1040px,calc(100vw - 48px))"
+  dialog-resident:
+    width: "min(1120px,calc(100vw - 48px))"
+  dialog-appearance:
+    width: "min(800px,calc(100vw - 48px))"
+  dialog-conversation:
+    width: "min(800px,calc(100vw - 48px))"
+  dialog-relationship:
+    width: "min(960px,calc(100vw - 48px))"
+  dialog-guide:
+    width: "min(800px,calc(100vw - 48px))"
+  input-dialog:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.text}"
+    rounded: "{rounded.control}"
+    padding: "11px 12px"
+  button-dialog-primary:
+    backgroundColor: "{colors.action}"
+    textColor: "{colors.action-ink}"
+    typography: "{typography.dialog-action}"
+    rounded: "{rounded.control}"
+    padding: "12px 18px"
+  metric-popover:
+    width: "min(460px,calc(100vw - 24px))"
+    rounded: "{rounded.panel}"
+    padding: "28px"
   navigation:
     backgroundColor: "{colors.stage}"
     textColor: "{colors.stage-ink}"
@@ -236,7 +282,7 @@ Kinarium puts the resident ensemble beside a live house stage. Navy frames the s
 
 The user selected this world for the full interface redesign and approved the cast-beside-stage composition. House structure, furnishings and environmental colors may adapt to the interface; resident artwork and resident colors remain protected. The live SVG, actual residents, recorded stories and authoritative availability remain the content source.
 
-`src/client/design-tokens.css` owns semantic colors, fonts, shared radii and dialog shadows. The cascade order is `base`, `components`, `theme`, then `interface`; `interface.css` supplies final working-surface rules and `landing.css` supplies discovery composition. Frontmatter is normative for the roles recorded here. Component styles and responsive overrides remain the implementation source for local exceptions. PRODUCT.md owns product behavior; surface briefs own composition and provenance.
+`src/client/design-tokens.css` owns semantic colors, fonts, shared radii and dialog shadows. The cascade order is `base`, `components`, `theme`, then `interface`; `interface.css` supplies working-surface rules and `landing.css` supplies discovery composition. `world-widgets.css` is imported after interface.css in the same final `interface` layer; it owns the later dialog and widget refinements and their spacing properties. Frontmatter is normative for the roles recorded here. Component styles and responsive overrides remain the implementation source for local exceptions. PRODUCT.md owns product behavior; surface briefs own composition and provenance.
 
 **Key Characteristics:**
 - Navy stage and navigation, cool white reading surfaces, and saffron actions.
@@ -276,12 +322,12 @@ The live stage sets its sky roles to stage navy. Light room fills mix each autho
 ### Hierarchy
 
 - **Display / world title:** uppercase Anton with zero tracking; the landing is fluid and the world title follows its frontmatter role above (1250px). Below that threshold, the base world role is `clamp(32px,3.2vw,48px)` before the (1100px), (760px) and (420px) overrides.
-- **Program / event / dialog / listing titles:** uppercase Anton creates repeated landmarks. Wide cast and story headings use the program role; the base role below (1251px) is (36px) before narrower overrides. Catalog sections use the event role; the wide quick-event tray uses (36px). Modal titles use the dialog role. Directory house names use the listing role.
+- **Program / event / dialog / listing titles:** uppercase Anton creates repeated landmarks. Wide cast and story headings use the program role; the base role below (1251px) is (36px) before narrower overrides. Catalog sections use the event role; the wide quick-event tray uses (36px). Modal titles use the dialog role, with a (28px) direct-title override below (600px). Resident identity uses its separate Manrope name role. Directory house names use the listing role.
 - **Brand:** Manrope at (800), not Anton. The wide world masthead uses (34px); the shared base is recorded in frontmatter. It reduces to (22px) on phones; the footer identity has its own (24px) treatment.
 - **Insights title:** Manrope at (750), with a (28px) phone override. Insights panel headings are (21px)/(700); narrative headings are (23px)/(700).
 - **Body / journal / narrative:** preserve their distinct frontmatter roles. Directory descriptions are bounded to (58ch); world descriptions use (16px) and (62ch), with (1.5) leading above (1250px) and (1.65) below, reducing to (12px) on phones. Narrative prose becomes (14px) below (700px).
 - **Names and story titles:** wide cast names are (20px) bold; wide conversation titles and previews use the dedicated frontmatter roles. At widths up to (1250px), the base cast names and conversation titles are (18px), before the smaller layout overrides. Responsive cast names become compact labels inside the scrolling strip.
-- **Actions and fields:** primary actions use the action role, fields (14px), and labels (13px)/(1.6). Introduction on the live stage is a stronger (20px)/(750) action above (1250px), with a (16px) base below that threshold. Desktop navigation is (16px)/(650), reducing to (13px) below (1250px).
+- **Actions and fields:** primary actions use the action role, fields (14px), and ordinary labels (13px)/(1.6); dialog labels and actions use (14px). Introduction on the live stage is a stronger (20px)/(750) action above (1250px), with a (16px) base below that threshold. Desktop navigation is (16px)/(650), reducing to (13px) below (1250px).
 
 **The Program Type Rule.** Use Anton for program landmarks and Manrope for names, controls and sustained reading.
 
@@ -300,6 +346,10 @@ Event catalog cards use four columns, three at (1100px), two at (760px), and one
 Insights use four summary columns, two below (900px), and one below (760px); phone metrics put label and value together with explanation below. Reading columns stack at (900px), narrative columns at (700px), and the activity chart at (540px). Tables retain horizontal overflow containers.
 
 Discovery has a (1480px) maximum opening and directory width, (32px) desktop gutters, and (18px) phone gutters. The title and introduction are adjacent, followed by a navy house stage and invitation. Below (760px), those regions stack. Directory rows arrange preview, copy, details and entry control; phones move details beneath preview and copy. At (360px), previews shrink again. Surface briefs carry further composition detail.
+
+Dialog content follows an (8px) label gap, (24px) field gap and (32px) section gap. Desktop insets use the dialog spacing token; at (600px) and below the inset becomes (24px), with (32px) top padding. Dialog widths vary by task as recorded in frontmatter. They are capped to the viewport minus (48px), and height is capped to `calc(100dvh - 48px)`; phones use (24px) total viewport clearance in both dimensions. The dialog itself owns scrolling with a stable scrollbar gutter and (24px) scroll padding. The close control stays sticky inside that scroll surface rather than scrolling out of reach.
+
+Settings use two equal columns with a (40px) gap and a ruled second column, each form retaining its own heading and save action. At (900px), they stack with a top rule and the dialog caps at (680px). The resident dialog places identity above a (1fr / 1.15fr) narrative/history grid with a (48px) gap, then a separate settings section; these grids stack at (900px). Appearance uses a (160px) sticky portrait column beside choices; at (600px), the portrait becomes a centered (120px) preview above the choices. These layouts create reading and task separation within the established world, without a new visual identity.
 
 ## Elevation & Depth
 
@@ -321,13 +371,13 @@ Controls use the shared control radius; cast, stage, journal, featured landing h
 
 ### Buttons
 
-Primary buttons use action/action ink, the frontmatter padding, a (44px) minimum height and a background hover change. Secondary buttons use surface/text, a control border and their frontmatter padding. Introduction on the stage uses (22px) inline padding; above (1250px) it is at least (50px) tall and (268px) wide, with a (48px) minimum height below that threshold. The landing action uses (14px 18px) padding and a (48px) minimum height. Icon buttons normally occupy (44px) squares; compact header and stage variants retain their authored sizes.
+Primary buttons use action/action ink, the frontmatter padding, a (44px) minimum height and a background hover change. Secondary buttons use surface/text, a control border and their frontmatter padding. Introduction on the stage uses (22px) inline padding; above (1250px) it is at least (50px) tall and (268px) wide, with a (48px) minimum height below that threshold. The landing action uses (14px 18px) padding and a (48px) minimum height. Icon buttons normally occupy (44px) squares; compact header and stage variants retain their authored sizes. Inside dialogs, primary and outline actions have (48px) minimum height, (14px) type and (12px 18px) padding. Close buttons, appearance swatches, hair choices and resident edit actions retain at least (44px) targets.
 
 Shared keyboard focus is a (3px) outline offset by (3px). Stage, tray and masthead focus use saffron. Component-specific focus rules remain, including the search group's outline. Disabled actions keep their native state and never imply available event capacity when the server disallows it.
 
 ### Inputs / Fields
 
-Native inputs, text areas and selects use surface/text, a control border, control radius, (11px 12px) padding and a (44px) minimum height. Focus changes the border and retains a visible outline. Labels remain visible. Directory search is an underlined transparent variant, (290px) wide on desktop and full-width on phones. The featured-house select is native, (250px) on desktop and (60%) of its phone row.
+Native inputs, text areas and selects use surface/text, a control border, control radius, (11px 12px) padding and a (44px) minimum height. Dialog text inputs and selects use (48px) minimum height; dialog text areas use (112px) minimum height, (12px) padding and (1.65) leading. Dialog form labels have an (8px) gap and fields are separated by (24px). Focus changes the border and retains a visible outline. Labels remain visible. Directory search is an underlined transparent variant, (290px) wide on desktop and full-width on phones. The featured-house select is native, (250px) on desktop and (60%) of its phone row.
 
 ### Navigation and selection
 
@@ -335,7 +385,7 @@ The navy masthead uses Manrope links and a saffron active rule. World view links
 
 ### Cast and resident detail
 
-The desktop cast panel contains full-body resident SVGs, names and actual activities; names wrap. Above (1250px), the rows have (91px) minimum height, square corners and a top rule, with (20px) names and (11px) activity labels. Hover and selection use the selected surface. Choosing a resident opens the existing resident detail experience while the house remains in context. The strip scrolls horizontally on narrower layouts. Full resident management and time-away navigation remain reachable even where the desktop rail footer is hidden.
+The desktop cast panel contains full-body resident SVGs, names and actual activities; names wrap. Above (1250px), the rows have (91px) minimum height, square corners and a top rule, with (20px) names and (11px) activity labels. Hover and selection use the selected surface. Choosing a resident opens the resident detail experience while the house remains in context. Identity and edit actions sit above background, wellbeing, influences, connections and retained history; model choice and time-away controls sit in a separate Resident settings section after the story. Resident names use the Manrope name role, narrative/history copy uses (14px)/(1.8), and section headings use (16px)/(750). The strip scrolls horizontally on narrower layouts. Full resident management and time-away navigation remain reachable even where the desktop rail footer is hidden.
 
 ### Journal
 
@@ -351,7 +401,11 @@ The navy tray offers the first three server-permitted catalog entries with actua
 
 ### Insights, dialogs and disclosures
 
-Insights pair ruled summaries and open analysis rows with a soft narrative container. Relationship prose has no decorative stripe. Native explanatory disclosures and factual caveats remain. Dialogs use the semantic surface, dialog radius, bounded scrolling, locked page scroll and Anton titles; internal reading headings stay Manrope. Field-guide disclosures retain their bordered containers, soft open headings and SVG chevrons.
+Insights pair ruled summaries and open analysis rows with a soft narrative container. Relationship prose has no decorative stripe. Native explanatory disclosures and factual caveats remain. Dialogs use the semantic surface, dialog radius, locked page scroll and Anton titles; internal reading headings stay Manrope. The larger, task-specific widths and spacing in Layout are final overrides from world-widgets.css. The dialog has one outer scroll surface; conversation lists have no nested maximum height or scrolling, and resident detail content remains overflow-visible within the dialog. Close buttons are sticky, (44px) square, with (16px) desktop and (12px) phone top offsets.
+
+Conversations use the conversation-reading role, ruled turns with (24px) vertical padding, (14px) speakers and (12px) timestamps; the redundant conversation eyebrow is removed. Relationship reading keeps distinct portraits, meters, perspectives, moments and source disclosures, with (24–32px) grouping space and wrapping labels. Observer identity separates the form from a ruled presence list. Field-guide disclosures retain their bordered containers, soft open headings and SVG chevrons inside the wider guide dialog.
+
+Metric popovers use the frontmatter width and inset, reducing to (24px) padding on phones. Titles use (20px)/(750), body uses (14px)/(1.75), and disclosure/close targets remain (44px). The sidebar resident and bond lists use (20px) insets, wrapped resident labels and more space between rows. These compact widgets retain the scene context rather than adopting dialog-scale widths.
 
 ### Motion
 

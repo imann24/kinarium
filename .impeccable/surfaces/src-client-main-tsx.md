@@ -2,7 +2,7 @@
 version: 1
 slug: "src-client-main-tsx"
 primary_target: "src/client/main.tsx"
-related_targets: ["src/client/landing.css","src/client/interface.css","src/client/design-tokens.css","src/client/Building.tsx","src/client/theme.css","src/client/CommunityInsights.tsx"]
+related_targets: ["src/client/landing.css","src/client/interface.css","src/client/design-tokens.css","src/client/Building.tsx","src/client/theme.css","src/client/CommunityInsights.tsx","src/client/world-widgets.css"]
 ---
 
 # Kinarium / Ensemble playhouse
@@ -34,4 +34,11 @@ The stage toolbar wraps with automatic height and a 58px minimum. Time-mode, zoo
 
 The wide journal uses underlined filters, a saffron active-tab rule, 14px timestamps, 20px conversation titles and 16px/two-line conversation previews. Status and disclosure share a row above the saffron conversation action. Non-conversation record previews remain 14px/three-line disclosures at wide widths. The 761–1100px compact journal retains 12px/two-line previews, while other responsive layouts retain their earlier behavior. The newest-first label remains accessible when visually hidden on wide screens.
 
-The quick-event tray retains authoritative availability and its three live catalog choices, with 18px labels and a substantial outlined All events link. The landing composition and layouts at 1250px and below retain their established rules. This session uses comp-first; the saved workflow default remains code-first. Current gate results and the finish verdict live in the review artifacts; below-threshold comparisons remain open and are not numerical overrides.
+The quick-event tray retains authoritative availability and its three live catalog choices, with 18px labels and a substantial outlined All events link. The landing composition and layouts at 1250px and below retain their established rules. The full redesign used comp-first; the saved workflow default remains code-first. Current gate results and the finish verdict live in the review artifacts; below-threshold comparisons remain open and are not numerical overrides.
+
+
+## Subsequent code-first task-surface refinement
+
+The user's later request gives world dialogs and widgets more room within the same visual world. world-widgets.css loads after interface.css in its existing layer. Settings separate House details and Life in the house forms; resident details separate identity, narrative/history and settings; appearance uses a portrait-and-choices layout; full conversations use one outer scroll surface. Task-specific widths, the 8/24/32 spacing rhythm, 40px desktop insets, phone reflow and sticky close controls are recorded in `src-client-world-widgets-css.md` and DESIGN.md. Current screenshots and review are in `.impeccable/review/widgets/`.
+
+This refinement is code-first with no new comp or seed. The previous full-revamp 71.33% comparison remains below its 72% threshold; the passing widget review does not claim that historical pixel gate passed. Resident artwork and colors remain unchanged.

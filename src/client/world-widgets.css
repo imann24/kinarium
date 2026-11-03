@@ -1,0 +1,201 @@
+@layer base, components, theme, interface;
+@layer interface {
+/* Quiet task surfaces: 8px within labels, 24px between fields, 32px between sections. */
+:root {
+  --dialog-inset: 40px;
+  --field-gap: 24px;
+  --section-gap: 32px;
+  --label-gap: 8px;
+}
+
+.modal {
+  width:min(620px,calc(100vw - 48px));
+  max-height:calc(100dvh - 48px);
+  overflow:auto;
+  overscroll-behavior:contain;
+  scrollbar-gutter:stable;
+  scroll-padding-block:24px;
+}
+.modal .modal-content { display:flow-root; min-width:0; padding:var(--dialog-inset); }
+.modal .modal-close {
+  position:sticky; float:right; top:16px; z-index:3;
+  margin:-16px -16px 0 16px; background:var(--surface);
+  width:44px; height:44px;
+}
+.modal .modal-content>h2 { margin:0 0 var(--section-gap); padding-right:32px; line-height:1.25; overflow-wrap:anywhere; }
+.modal form { gap:var(--field-gap); min-width:0; }
+.modal form label { gap:var(--label-gap); font-size:14px; }
+.modal input:not([type=range]):not([type=checkbox]),.modal select { min-height:48px; }
+.modal textarea { min-height:112px; padding:12px; line-height:1.65; }
+.modal .muted,.modal .form-foot { font-size:13px; line-height:1.7; }
+.modal form>.muted { margin:0; }
+.modal .primary,.modal .outline { min-height:48px; font-size:14px; padding:12px 18px; }
+.modal .form-foot { margin:12px 0 0; }
+.modal .error-box { overflow-wrap:anywhere; }
+.modal.guide-modal { width:min(800px,calc(100vw - 48px)); }
+
+/* Each form has its own heading, content and save action. */
+.modal.settings-modal { width:min(1040px,calc(100vw - 48px)); }
+.settings-sections { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:40px; align-items:start; }
+.settings-sections>.house-details { border:0; padding:0; margin:0; }
+.settings-sections>.world-settings-form { padding-left:40px; border-left:1px solid var(--line); }
+.settings-sections legend,.settings-sections h3 { font:750 18px/1.4 var(--font-body); color:var(--text); margin:0 0 8px; letter-spacing:0; }
+.settings-sections .house-details label { margin:24px 0 8px; }
+.settings-sections .house-details small { font-size:12px; line-height:1.65; margin-top:8px; }
+.settings-sections .house-details .muted { margin:20px 0 24px; }
+.settings-sections .house-details-status:empty { display:none; }
+.settings-field { display:grid; gap:12px; }
+.settings-field .muted { margin:0; }
+.settings-save { margin-top:8px; }
+.settings-modal .mode-options { gap:12px; }
+.settings-modal .mode { padding:16px; }
+.settings-modal .template-note { padding:16px; gap:12px; }
+
+/* Identity and management are distinct from a resident's life and story. */
+.modal.resident-modal { width:min(1120px,calc(100vw - 48px)); }
+.resident-modal .character-detail { padding:0; overflow:visible; }
+.character-detail { padding:24px; font-size:14px; line-height:1.7; }
+.resident-identity { padding-bottom:24px; margin-bottom:var(--section-gap); border-bottom:1px solid var(--line); }
+.character-detail .character-heading { margin:0 0 16px; gap:20px; align-items:center; }
+.character-detail .character-heading>div { min-width:0; }
+.character-detail .character-heading h2 { margin:0; padding:0; font:750 28px/1.25 var(--font-body); text-transform:none; overflow-wrap:anywhere; }
+.character-detail .character-heading .trait { margin-top:8px; font-size:12px; }
+.character-detail .detail-toolbar { margin-bottom:16px; }
+.character-detail .resident-edit-actions { gap:8px 20px; }
+.character-detail .resident-edit-actions>button { min-height:44px; }
+.character-detail .detail-columns { display:grid; gap:var(--section-gap); }
+.resident-overview { display:grid; gap:var(--section-gap); align-content:start; min-width:0; }
+.resident-section { min-width:0; }
+.resident-modal .detail-columns { grid-template-columns:minmax(0,1fr) minmax(0,1.15fr); gap:48px; }
+.character-detail h4,.resident-controls h3 { margin:0 0 16px; color:var(--text); font:750 16px/1.4 var(--font-body); letter-spacing:0; }
+.character-detail .background-label { margin:0 0 8px; font-size:11px; }
+.character-detail .backstory { margin:0; font-size:14px; line-height:1.8; }
+.character-detail .current-activity { margin:20px 0; font-size:12px; }
+.character-detail .character-needs { margin:24px 0 0; gap:16px; }
+.character-detail .character-needs span,.character-detail .character-needs b { font-size:12px; }
+.character-detail .resident-state { margin:0; font-size:14px; line-height:1.75; }
+.resident-state dl>div { margin:20px 0; }
+.resident-state dd { margin-top:6px; }
+.resident-state details { padding:12px 0; }
+.resident-state summary { min-height:44px; }
+.character-detail .small-bond { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:baseline; gap:8px 16px; padding:14px 0; font-size:14px; }
+.character-detail .small-bond span { overflow-wrap:anywhere; }
+.character-detail .small-bond small { font-size:12px; text-align:right; }
+.character-detail .personal-history { margin:0; }
+.character-detail .personal-history h4:not(:first-child) { margin-top:var(--section-gap); }
+.character-detail .history-story,.character-detail .history-highlights p,.character-detail .history-list p { font-size:14px; line-height:1.8; }
+.character-detail .history-note { font-size:12px; line-height:1.75; margin-bottom:16px; }
+.character-detail .history-highlights>li { margin-bottom:24px; }
+.character-detail .personal-history summary { padding:12px 0; min-height:44px; font-size:12px; }
+.character-detail .history-meta { font-size:11px; gap:8px 12px; margin-bottom:8px; }
+.character-detail .history-list li { padding-bottom:24px; }
+.resident-controls { margin-top:var(--section-gap); padding-top:var(--section-gap); border-top:1px solid var(--line); }
+.resident-controls-grid { display:grid; gap:16px; }
+.resident-controls .model-selection { margin:0; }
+.resident-controls .model-selection label { font-size:13px; }
+.resident-controls .model-selection select { margin-top:8px; min-height:48px; font-size:14px; }
+.resident-controls .model-selection p { margin:8px 0 0; font-size:12px; line-height:1.7; }
+.resident-controls .form-foot { margin:0; font-size:12px; }
+.resident-modal .resident-controls-grid { grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:12px 48px; align-items:start; }
+.resident-modal .resident-controls .model-selection { grid-row:1/3; }
+.resident-modal .resident-controls .form-foot { grid-column:2; }
+
+/* The existing portrait is a preview, with a separate, consistently aligned choice column. */
+.modal.appearance-modal { width:min(800px,calc(100vw - 48px)); }
+.appearance-modal .appearance-editor { display:grid; grid-template-columns:160px minmax(0,1fr); gap:24px 32px; align-items:start; }
+.appearance-modal .appearance-preview { width:160px; height:176px; padding:16px 12px 0; margin:0; grid-column:1; grid-row:1/4; position:sticky; top:24px; }
+.appearance-choices { display:grid; gap:24px; min-width:0; }
+.appearance-modal .appearance-row { display:grid; gap:12px; padding:0; justify-content:stretch; }
+.appearance-row>span { white-space:normal; font-size:14px; font-weight:650; color:var(--text); }
+.appearance-options { justify-content:flex-start; gap:12px; }
+.appearance-swatch,.appearance-style { width:44px; height:44px; flex-shrink:0; }
+.appearance-modal .appearance-editor>.muted,.appearance-modal .appearance-editor>.error-box,.appearance-modal .appearance-actions { grid-column:2; margin:0; }
+.appearance-actions { gap:12px; border-top:1px solid var(--line); padding-top:24px; }
+.appearance-actions button { min-width:112px; }
+
+/* Conversation and bond dialogs are reading surfaces, with a single scrolling page. */
+.modal.conversation-modal { width:min(800px,calc(100vw - 48px)); }
+.modal.relationship-modal { width:min(960px,calc(100vw - 48px)); }
+.conversation-modal .conversation-thread { margin:0 0 32px; }
+.conversation-modal .conversation-thread>summary { padding:0 0 24px; line-height:1.7; }
+.conversation-modal .conversation-thread>summary strong { font-size:16px; }
+.conversation-modal .conversation-thread>summary span { font-size:14px; margin-top:4px; }
+.conversation-modal .conversation-thread>summary small { font-size:12px; margin-top:8px; opacity:1; color:var(--muted); }
+.conversation-modal .conversation-thread ol { border:0; padding:0; margin:0; max-height:none; overflow:visible; }
+.conversation-modal .conversation-thread li { padding:24px 0; border-top:1px solid var(--line); }
+.conversation-modal .conversation-speaker { font-size:14px; gap:8px 20px; align-items:baseline; }
+.conversation-modal .conversation-speaker time { font-size:12px; opacity:1; color:var(--muted); }
+.conversation-modal .conversation-thread li p { font-size:16px; line-height:1.8; margin:12px 0 0; }
+.conversation-modal .conversation-progress { display:block; margin-top:16px; font-size:13px; }
+.relationship-modal .bond-hero { padding-right:24px; gap:24px; margin-bottom:32px; }
+.relationship-modal .bond-portrait { max-width:160px; gap:8px; }
+.relationship-modal .bond-portrait b { font-size:16px; }
+.relationship-modal .bond-meters { padding:24px; gap:20px 24px; margin:0; }
+.relationship-modal .bond-meter-row { font-size:13px; gap:10px; }
+.relationship-modal .relationship-story h5 { font-size:16px; margin:32px 0 16px; }
+.relationship-modal .relationship-columns,.relationship-modal .relationship-views { gap:24px 32px; }
+.relationship-modal .relationship-points ul { gap:20px; }
+.relationship-modal .relationship-points li { font-size:14px; line-height:1.6; gap:8px 12px; }
+.relationship-modal .thread-label>span { white-space:normal; overflow-wrap:anywhere; }
+.relationship-modal .relationship-views article { padding:20px 0; font-size:14px; line-height:1.7; }
+.relationship-modal .bond-moments li { padding-bottom:24px; font-size:14px; line-height:1.75; }
+.relationship-modal .bond-full-story { margin-top:32px; padding-top:20px; }
+.relationship-modal .bond-full-story summary { min-height:44px; font-size:14px; }
+.relationship-modal .relationship-prose p { font-size:14px; line-height:1.8; margin-bottom:16px; }
+.identity-modal .presence-heading { margin:32px 0 12px; padding-top:32px; border-top:1px solid var(--line); font-size:18px; }
+.identity-modal .presence-row { display:grid; grid-template-columns:32px minmax(0,1fr) auto; gap:12px; padding:16px 0; font-size:14px; overflow-wrap:anywhere; }
+.identity-modal .presence-row small { font-size:12px; }
+
+/* Small widgets use the same reading rhythm without taking over the world. */
+.metric-details { width:min(460px,calc(100vw - 24px)); padding:28px; border-radius:12px; font-size:14px; line-height:1.75; overflow-wrap:anywhere; }
+.metric-details-heading { gap:16px; }
+.metric-details h3 { font:750 20px/1.4 var(--font-body); }
+.metric-details h4 { font-size:14px; margin:24px 0 12px; }
+.metric-details p { margin:16px 0; }
+.metric-details .metric-note { font-size:12px; }
+.metric-changes li { grid-template-columns:minmax(0,1fr) auto; gap:8px 20px; padding:16px 0; margin:0; }
+.metric-more { padding-top:12px; margin-top:16px; }
+.metric-more>summary { min-height:44px; font-size:13px; line-height:1.6; }
+.metric-details .icon-button { flex-shrink:0; width:44px; height:44px; margin:-8px -8px 0 0; }
+.world-sidebar .resident-list,.world-sidebar .bonds-list { padding:20px; }
+.world-sidebar .resident-row { padding:16px 0; gap:16px; }
+.world-sidebar .resident-row b { font-size:14px; overflow-wrap:anywhere; }
+.world-sidebar .resident-row small { font-size:12px; line-height:1.6; white-space:normal; }
+.world-sidebar .bond-card { padding:20px 0; }
+.world-sidebar .bond-card p { font-size:13px; line-height:1.7; }
+.away-confirmation .away-consequences { gap:20px; font-size:15px; line-height:1.8; }
+.away-confirmation .away-actions { gap:12px; margin-top:32px; }
+
+@media(max-width:900px) {
+  .settings-sections { grid-template-columns:1fr; gap:32px; }
+  .settings-sections>.world-settings-form { border-left:0; border-top:1px solid var(--line); padding:32px 0 0; }
+  .modal.settings-modal { width:min(680px,calc(100vw - 48px)); }
+  .resident-modal .detail-columns { grid-template-columns:1fr; gap:32px; }
+  .resident-modal .resident-history { padding-top:32px; border-top:1px solid var(--line); }
+  .resident-modal .resident-controls-grid { grid-template-columns:1fr; gap:16px; }
+  .resident-modal .resident-controls .model-selection { grid-row:auto; }
+  .resident-modal .resident-controls .form-foot { grid-column:auto; }
+}
+@media(max-width:600px) {
+  :root { --dialog-inset:24px; }
+  .modal,.modal.resident-modal,.modal.conversation-modal,.modal.relationship-modal,.modal.settings-modal,.modal.appearance-modal,.modal.guide-modal { width:calc(100vw - 24px); max-height:calc(100dvh - 24px); }
+  .modal .modal-content { padding-top:32px; }
+  .modal .modal-close { margin:-16px -12px 0 8px; top:12px; }
+  .modal .modal-content>h2 { font-size:28px; padding-right:20px; }
+  .appearance-modal .appearance-editor { grid-template-columns:1fr; gap:24px; }
+  .appearance-modal .appearance-preview { position:static; grid-column:1; grid-row:auto; width:120px; height:132px; margin-inline:auto; }
+  .appearance-modal .appearance-editor>.muted,.appearance-modal .appearance-editor>.error-box,.appearance-modal .appearance-actions { grid-column:1; }
+  .appearance-options { gap:12px; }
+  .appearance-actions button { flex:1; }
+  .character-detail { padding:20px; }
+  .resident-modal .character-detail { padding:0; }
+  .character-detail .small-bond { grid-template-columns:minmax(0,1fr); gap:4px; }
+  .character-detail .small-bond small { text-align:left; }
+  .relationship-modal .bond-hero { padding-right:0; gap:8px; }
+  .relationship-modal .bond-portrait b { font-size:14px; }
+  .relationship-modal .bond-meters { padding:20px; }
+  .identity-modal .presence-row { grid-template-columns:32px minmax(0,1fr); }
+  .identity-modal .presence-row small { grid-column:2; margin:0; }
+  .metric-details { padding:24px; }
+}
+}

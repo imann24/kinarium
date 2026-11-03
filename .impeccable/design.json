@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-03T12:49:58.357077+00:00",
+  "generatedAt": "2026-11-03T13:05:36.147836+00:00",
   "title": "Design System: Kinarium",
   "extensions": {
     "colorMeta": {
@@ -934,7 +934,7 @@
       },
       "dialog-title": {
         "displayName": "Dialog Title",
-        "purpose": "Modal titles."
+        "purpose": "Anton dialog headings, with 28px direct-title override on phones; resident identity headings use Manrope."
       },
       "listing-title": {
         "displayName": "Listing Title",
@@ -975,6 +975,18 @@
       "story-title-wide": {
         "displayName": "Wide story title",
         "purpose": "Conversation titles above 1250px."
+      },
+      "dialog-action": {
+        "displayName": "Dialog action",
+        "purpose": "Primary and secondary actions inside dialogs."
+      },
+      "resident-name": {
+        "displayName": "Resident name",
+        "purpose": "Resident identity heading, preserving name casing."
+      },
+      "conversation-reading": {
+        "displayName": "Conversation reading",
+        "purpose": "Full conversation turns inside the single-scroll dialog."
       }
     },
     "shadows": [
@@ -1056,6 +1068,10 @@
       {
         "name": "narrow-directory",
         "value": "360px"
+      },
+      {
+        "name": "widget-phone",
+        "value": "600px"
       }
     ]
   },
@@ -1123,6 +1139,22 @@
       "description": "Journal program sheet with its wide heading variant.",
       "html": "<section class=\"ds-panel\"><h2>Life in the house</h2><p>Recorded moments appear here as the house story unfolds.</p></section>",
       "css": ".ds-panel { background:var(--surface,#fff); color:var(--text,#17284d); border:1px solid var(--line,#cbd4e2); border-radius:var(--radius-panel,12px); overflow:hidden; max-width:400px; } .ds-panel h2 { margin:0; padding:22px 20px 12px; font:400 36px/1.2 var(--font-display,Anton,sans-serif); text-transform:uppercase; letter-spacing:0; } .ds-panel p { margin:0; padding:0 20px 20px; font:400 14px/1.75 var(--font-body,Manrope,sans-serif); } @media(min-width:1251px) { .ds-panel h2 { padding:14px 18px 8px; font-size:40px; } }"
+    },
+    {
+      "name": "Task dialog shell",
+      "kind": "custom",
+      "refersTo": "dialog",
+      "description": "Shared single-scroll shell with a sticky close control, spacious inset and dialog-scale action. Task-specific widths are recorded in DESIGN.md.",
+      "html": "<section class=\"ds-dialog\" role=\"dialog\" aria-labelledby=\"ds-dialog-title\"><div class=\"ds-dialog-content\"><button class=\"ds-dialog-close\" aria-label=\"Close\"><svg width=\"19\" height=\"19\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m6 6 12 12M18 6 6 18\"/></svg></button><h2 id=\"ds-dialog-title\">World settings</h2><p>These settings change the world for everyone.</p><button class=\"ds-dialog-primary\">Save world settings</button></div></section>",
+      "css": ".ds-dialog { width:min(620px,calc(100vw - 48px)); max-height:calc(100dvh - 48px); overflow:auto; overscroll-behavior:contain; scrollbar-gutter:stable; scroll-padding-block:24px; background:var(--surface,#fff); color:var(--text,#17284d); border:1px solid var(--line,#cbd4e2); border-radius:16px; box-shadow:var(--shadow,0 16px 48px #14284b26); } .ds-dialog-content { display:flow-root; min-width:0; padding:var(--dialog-inset,40px); } .ds-dialog-close { position:sticky; float:right; top:16px; z-index:3; margin:-16px -16px 0 16px; background:var(--surface,#fff); color:var(--secondary,#41516e); width:44px; height:44px; display:inline-grid; place-items:center; border:0; border-radius:var(--radius-control,6px); cursor:pointer; } .ds-dialog-close:hover { background:var(--surface-hover,#dce5f2); color:var(--text,#17284d); } .ds-dialog-close:focus-visible { outline:3px solid var(--focus,#284e80); outline-offset:3px; } .ds-dialog h2 { margin:0 0 var(--section-gap,32px); padding-right:32px; font:400 32px/1.25 var(--font-display,Anton,sans-serif); letter-spacing:0; text-transform:uppercase; overflow-wrap:anywhere; } .ds-dialog p { font:400 13px/1.7 var(--font-body,Manrope,sans-serif); color:var(--muted,#4b5c78); } .ds-dialog-primary { min-height:48px; padding:12px 18px; background:var(--action,#f4c455); color:var(--action-ink,#17284d); border:1px solid transparent; border-radius:var(--radius-control,6px); font:700 14px var(--font-body,Manrope,sans-serif); cursor:pointer; } .ds-dialog-primary:hover:not(:disabled) { background:var(--action-hover,#e5ab33); } .ds-dialog-primary:focus-visible { outline:3px solid var(--focus,#284e80); outline-offset:3px; } .ds-dialog-primary:disabled { opacity:.45; cursor:default; } @media(max-width:600px) { .ds-dialog { width:calc(100vw - 24px); max-height:calc(100dvh - 24px); } .ds-dialog-content { padding:32px 24px 24px; } .ds-dialog-close { top:12px; margin:-16px -12px 0 8px; } .ds-dialog h2 { font-size:28px; padding-right:20px; } }"
+    },
+    {
+      "name": "Dialog field",
+      "kind": "input",
+      "refersTo": "input-dialog",
+      "description": "Dialog field variant with a 48px minimum control and the shared label/field rhythm.",
+      "html": "<div class=\"ds-dialog-fields\"><label class=\"ds-dialog-label\">House name<input class=\"ds-dialog-input\" value=\"The Common House\"></label><label class=\"ds-dialog-label\">Description<textarea class=\"ds-dialog-textarea\" rows=\"3\">An open door, a pot of tea, and a few lives slowly intertwining.</textarea></label></div>",
+      "css": ".ds-dialog-fields { display:grid; gap:var(--field-gap,24px); } .ds-dialog-label { display:grid; gap:var(--label-gap,8px); color:var(--text,#17284d); font:400 14px/1.6 var(--font-body,Manrope,sans-serif); } .ds-dialog-input,.ds-dialog-textarea { min-width:0; background:var(--surface,#fff); color:var(--text,#17284d); border:1px solid var(--control-border,#6b7b96); border-radius:var(--radius-control,6px); padding:11px 12px; font:400 14px var(--font-body,Manrope,sans-serif); } .ds-dialog-input { min-height:48px; } .ds-dialog-textarea { min-height:112px; padding:12px; line-height:1.65; resize:vertical; } .ds-dialog-input:focus,.ds-dialog-textarea:focus { border-color:var(--focus,#284e80); } .ds-dialog-input:focus-visible { outline:3px solid var(--focus,#284e80); outline-offset:3px; } .ds-dialog-textarea:focus-visible { outline:3px solid var(--focus,#284e80); outline-offset:3px; }"
     }
   ],
   "narrative": {
