@@ -1,2 +1,6 @@
+@layer base, components, theme, interface;
+@layer components {
 .house-details{border-bottom:1px solid var(--control-border,#dce3d4);margin-bottom:22px;padding-bottom:8px}.house-details fieldset{border:0;margin:0;padding:0;min-width:0}.house-details legend{font-weight:600;margin-bottom:12px}.house-details small{display:block;line-height:1.5}.house-details-actions{display:flex;flex-wrap:wrap;gap:10px}.house-details-status{min-height:1.5em;font-size:13px}.house-details input,.house-details textarea{width:100%;box-sizing:border-box}.world-heading h1,.world-heading p,.card-title h3,.card-body>p{overflow-wrap:anywhere}
 .house-details label{display:block;margin:16px 0 8px;font-size:12px}.house-details small{margin-top:6px;color:var(--muted)}.house-details .muted{line-height:1.6;margin:14px 0}.house-details fieldset:disabled{opacity:.75}
+
+}

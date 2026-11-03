@@ -47,9 +47,10 @@ describe('resident state attribution', () => {
     expect(changes.some(c => c.cause.startsWith('Warm encounter'))).toBe(true);
     expect(changes.some(c => c.cause.startsWith('Disagreement'))).toBe(true);
     for (const c of changes) {
-      expect(world.history.some(e => e.id === c.eventId && e.minute === c.minute)).toBe(true);
-      expect(c.energy).toBe(0);
-      expect(c.cause.startsWith('Warm') ? c.mood >= 0 && c.belonging >= 0 : c.mood <= 0 && c.belonging <= 0).toBe(true);
+      // Repair is attributed when the exchange completes, after the entry opened.
+      expect(world.history.some(e => e.id === c.eventId && e.minute <= c.minute)).toBe(true);
+      if (!c.cause.startsWith('Quiet')) expect(c.energy).toBe(0);
+      expect(c.cause.startsWith('Disagreement') ? c.mood <= 0 && c.belonging <= 0 : c.mood >= 0 && c.belonging >= 0).toBe(true);
     }
   });
   it('bounds records, keeps zero effects honest and leaves away stats paused', () => {

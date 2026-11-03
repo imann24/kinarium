@@ -1,5 +1,5 @@
 import { EVENT_REPLIES } from './event-voices';
-import { EVENTS, TEMPLATES } from './catalog';
+import { EVENTS, TEMPLATES, eventDefinition } from './catalog';
 import { dialogueMemory, memoryExcerpt, statefulProgression } from './dialogue-context';
 import type { Character, Trait, WorldState } from './types';
 
@@ -23,6 +23,18 @@ export function chooseConversationScene(world: WorldState, a: Character, b: Char
   const scenes: Scene[] = [];
   const add = (id: string, topic: string, lines: string[], relevance = 10) => scenes.push({ id, topic, lines, relevance });
   if (positive) {
+    add('taste', 'A small, fiercely held opinion', [
+      'I think tea should taste a little bitter. What harmless opinion would you defend much too fiercely?',
+      voice(b, { practical: 'A cup needs a handle you can actually hold. Beautiful but useless mugs annoy me.', curious: 'A strange flavor deserves a second sip. How else do you know whether you dislike it?', reserved: 'Quiet breakfasts. I’m prepared to be surprisingly stubborn about them.', spirited: 'Cinnamon improves nearly everything. I realize that is a dangerous position.', kind: 'The best cup is the one someone chose for you. Even if it is slightly hideous.' }),
+      'I disagree with at least part of that, and now I want to hear your defense.',
+      'Good. A little disagreement is more interesting than politely liking everything.',
+    ], 11);
+    if ((relationship?.trust ?? 0) > 50 && !relationship?.unresolvedConflict) add('bid', 'An awkward invitation', [
+      'I’d like to get to know you beyond being polite in the hallway. Tea sometime? That sounded smoother in my head.',
+      voice(b, { reserved: 'I’d like that. I might be quiet, but I do have opinions worth coaxing out.', practical: 'Yes. I’d rather have an awkward invitation than spend weeks guessing.', spirited: 'Yes, and please keep a little of the awkwardness. It makes this interesting.', curious: 'Yes. What would you ask if you weren’t worried about being polite?', kind: 'I’d like that too. I was waiting for an opening, which is a ridiculous way for two people to meet.' }),
+      'What do you wish people asked you about instead of what you do all day?',
+      'What I’m trying to get braver about. Though I might need a whole cup of tea to answer that.',
+    ], 16);
     add('company', 'Company without pressure', [
       a.trait === 'reserved' ? 'I want company, but I’m not always ready to talk. Does that make sense?' : 'Would you rather be invited into the conversation or have room to listen?',
       voice(b, { reserved: 'I’d rather listen at first. Being quiet doesn’t mean I want to be left out.', practical: 'I find it easier to talk over a meal. Having something ordinary to do takes the pressure off.', spirited: 'Invite me in. I like a lively exchange, as long as nobody has to perform.', curious: 'An invitation helps. I like finding out what a quiet person is thinking, without prying.', kind: 'I like being invited, with enough room to say no without hurting anyone.' }),
@@ -117,15 +129,33 @@ export function chooseConversationScene(world: WorldState, a: Character, b: Char
     ], previous?.conversation?.tone === 'tense' || recalled ? 24 : 12);
   }
   const event = [...world.history].reverse().find(e => e.kind === 'event' && world.minute - e.minute >= 0 && world.minute - e.minute < 120);
-  const definition = EVENTS.find(e => e.text === event?.text);
+  const definition = eventDefinition(event);
   if (event && definition) {
     const questions: Record<string, string> = {
       'shared-meal': 'After the shared meal, I wonder what makes eating together comfortable for you.',
       'care-package': 'That unexpected gift makes me wonder: is it easy for you to accept kindness?',
       'story-night': 'Story night leaves me wondering which parts of ourselves we choose to tell.',
+      'community-gathering': 'After that gathering, what kind of conversation would you like more of around here?',
+      'vulnerable-share': 'That share out makes me wonder: what would you like to be a little more honest about, if you chose to share?',
+      'group-meditation': 'After that quiet pause, what do you make of trying to slow down together?',
+      'quiet-day': 'After a whole quiet day, I’m curious: does doing nothing come easily to you?',
       'new-project': 'The garden plan has brought out different opinions. Is that possibility or trouble to you?',
+      'chore-partners': 'Being paired up for chores was unexpected. What was it like working with someone new?',
+      'clearing-air': 'After clearing the air, how do you feel about saying hard things in front of everyone?',
       'power-outage': 'After the lights went out, I keep thinking about how uncertainty affects us. What is hardest for you?',
       rumor: 'That rumor is bothering me. How do we talk about uncertainty without spreading it?',
+      'burst-pipe': 'With all of us squeezed into one room after the pipe burst, how do you cope when there’s no space of your own?',
+      'missing-thing': 'Since that thing went missing, I keep noticing how suspicion changes a room. How do you live with not knowing?',
+      'shouting-match': 'That shouting match is still ringing in my ears. What do you do when voices start to rise?',
+      'lean-week': 'With the cupboards this bare, what does sharing fairly mean to you?',
+      'sleepless-night': 'After that sleepless night, I’m curious: what are you like when you’re running on nothing?',
+      'broken-confidence': 'After that confidence was passed around, I wonder: what makes you trust someone with something private?',
+      'left-out': 'Someone was left off that list. Have you ever been on the outside of something like that?',
+      'plans-fall-through': 'Our plans fell through. How do you handle a disappointment that nobody really caused?',
+      'house-vote': 'That vote split the house. Does losing a vote feel different to you from losing an argument?',
+      'unexpected-bill': 'That bill caught us all off guard. Does worrying together make it lighter or heavier for you?',
+      'someone-ill': 'With someone unwell, I keep thinking about care. Is it easier for you to look after people or to be looked after?',
+      'birthday-surprise': 'That birthday surprise was lovely. Do you like being made a fuss of, or would you rather not be?',
     };
     const opening = questions[definition.id];
     const reply = voice(b, EVENT_REPLIES[definition.id]);

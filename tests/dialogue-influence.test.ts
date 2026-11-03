@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { EVENTS, TRAITS } from '../src/simulation/catalog';
 import { createWorld } from '../src/simulation/engine';
 import { chooseConversationScene } from '../src/simulation/conversation-scenes';
-import { dialogueMemory } from '../src/simulation/dialogue-context';
+import { dialogueMemory, statefulProgression } from '../src/simulation/dialogue-context';
 import { beginConversation, advanceConversations, TURN_INTERVAL } from '../src/simulation/conversations';
 import { enrichConversation, enrichDialogue } from '../src/server/llm';
 import type { Character, Memory, WorldState } from '../src/simulation/types';
@@ -57,14 +57,17 @@ describe('controlled dialogue influence (same seed and all other inputs fixed)',
     const restedScene=scene(world), tiredScene=scene(tired);
     expect(tiredScene.topic).toBe(restedScene.topic);
     expect(tiredScene.lines.slice(0,2)).toEqual(restedScene.lines.slice(0,2));
-    expect(tiredScene.lines.join(' ')).toMatch(index===0 ? /running out of energy/ : /I’m tired/);
-    expect(tiredScene.lines.at(-1)).toMatch(/worn out|quick answer/);
+    expect(tiredScene.lines).toHaveLength(4);
+    expect(tiredScene.lines[index === 0 ? 2 : 3]).toContain(restedScene.lines[index === 0 ? 2 : 3]);
+    expect(tiredScene.lines.join(' ')).not.toMatch(/leave the rest|rather pause|too tired/);
     expect(baseline.lines.join(' ')).not.toMatch(/running out of energy|I’m tired/);
   });
   it.each([0,1])('lets resident %i mood change disclosure and the partner’s response', index => {
-    const { world }=fixture(); const normal=scene(world); world.characters[index].mood=10; const low=scene(world);
-    expect(low.lines.join(' ')).toMatch(index===0 ? /hard time finding the words/ : /feeling low/);
-    expect(low.lines.at(-1)).toMatch(/cheerful|upbeat/);
+    const { world }=fixture();
+    world.history.push({ id: world.nextLog++, minute: world.minute, kind: 'event', characters: [], text: EVENTS[0].text });
+    const normal=scene(world); world.characters[index].mood=10; const low=scene(world);
+    expect(low.lines.join(' ')).toMatch(index===0 ? /rough day/ : /feeling low/);
+    expect(low.lines[index === 0 ? 2 : 3]).toContain(normal.lines[index === 0 ? 2 : 3]);
     expect(low.lines).not.toEqual(normal.lines);
   });
   it.each([0,1])('lets resident %i belonging affect topic and their own perspective', index => {
@@ -92,6 +95,18 @@ describe('controlled dialogue influence (same seed and all other inputs fixed)',
     expect(scene(changed).lines[1-index]).toBe(recalled.lines[1-index]);
     const tense=copy(world);tense.characters[index].memories[0].tone='tense';
     expect(scene(tense).lines.join(' ')).toContain('still feels unsettled');
+  });
+  it('keeps specific content for moderately tired residents across traits and preserves severe-exhaustion boundaries', () => {
+    const { a, b } = fixture();
+    const lines = ['Sweet tea or bitter?', 'Bitter. I want to taste the leaves.', 'I vote sweet. Is that scandalous?', 'Only if you insist I drink it too.', 'Then we need two cups.'];
+    for (const trait of TRAITS) for (const energy of [10, 15, 25]) {
+      a.trait = trait; a.energy = energy;
+      const engaged = statefulProgression(lines, a, b, true);
+      expect(engaged).toHaveLength(4); expect(engaged[2]).toContain('I vote sweet');
+      expect(engaged.join(' ')).not.toMatch(/need space|too tired|leave the rest|rather pause/);
+    }
+    a.energy = 5;
+    expect(statefulProgression(lines, a, b, false).join(' ')).toContain('leave the rest');
   });
   it('does not attribute future, legacy, unrelated, active or contradictory memories', () => {
     const {world,a,b}=fixture();
@@ -139,6 +154,11 @@ describe('AI causal instructions and enforced pacing', () => {
     const friction=copy(world);Object.values(friction.relationships)[0].affinity=-40;
     expect((await prompt(friction,legacy)).context.characters[0].delivery.join(' ')).toContain('Friction');
     expect(baseline.system).toMatch(/owner|speaker/);
+    expect(baseline.system).toMatch(/specific opinion/);
+    expect(baseline.system).toMatch(/vulnerable admission/);
+    const tired = copy(world); tired.characters[0].energy = 15;
+    const tiredPrompt = await prompt(tired, legacy);
+    expect(tiredPrompt.context.characters[0].delivery.join(' ')).toContain('tiredness alone is not a reason to withdraw');
   });
   it('transmits a grounded memory only under its owner, excluding current/future records', async () => {
     const {world,b}=fixture();memoryFor(world,b,'I valued being asked rather than assumed to agree.');
@@ -148,7 +168,7 @@ describe('AI causal instructions and enforced pacing', () => {
     expect(context.characters[1].memories.map((m:Memory)=>m.text)).toEqual(['I valued being asked rather than assumed to agree.']);
   });
   it('rejects an overlong exhausted plan in one call and keeps the procedural pause', async () => {
-    const {world,a,b}=fixture();a.energy=10;const entry=beginConversation(world,a,b,true);
+    const {world,a,b}=fixture();a.energy=5;const entry=beginConversation(world,a,b,true);
     const run=vi.fn().mockResolvedValue({response:JSON.stringify({turns:[...response.turns,{speakerId:'c1',text:'Let us start another long debate about all of this.'}]})});
     expect(await enrichConversation({AI:{run}},world,entry)).toBeNull();expect(run).toHaveBeenCalledTimes(1);
     for(let i=0;i<8;i++){world.minute+=TURN_INTERVAL;advanceConversations(world);}

@@ -81,6 +81,8 @@ describe('procedural conversational variety', () => {
   it.each(EVENTS)('uses a distinct grounded response to $id and does not keep replaying it', event => {
     const world = worldFor(); const [a, b] = world.characters;
     applyCommand(world, { type: 'trigger-event', eventId: event.id }, 0);
+    // Some events send residents to another floor; talk once the pair has settled there together.
+    for (const c of [a, b]) Object.assign(c, { floor: a.destination, destination: a.destination, x: 10 });
     const first = beginConversation(world, a, b, false); finish(world);
     expect(first.conversation!.topic).toBe(event.name);
     expect(first.text).toContain(event.text);

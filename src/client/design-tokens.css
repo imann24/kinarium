@@ -1,0 +1,83 @@
+@font-face {
+  font-family: 'Dela Gothic One';
+  src: url('/fonts/DelaGothicOne-Latin.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: Manrope;
+  src: url('/fonts/Manrope-Latin.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+}
+/* The house artwork is the visual anchor. Interface colors share its earth tones. */
+:root {
+  --font-body: Manrope, sans-serif;
+  --font-display: 'Dela Gothic One', sans-serif;
+  --page: #f4f3ec;
+  --surface: #fffef8;
+  --surface-soft: #e9ecdf;
+  --surface-hover: #dfe6d6;
+  --text: #29382e;
+  --secondary: #52604e;
+  --muted: #596550;
+  --line: #c9d0be;
+  --control-border: #748168;
+  --accent: #3e5b43;
+  --focus: #3e5b43;
+  --action: #3e5b43;
+  --action-hover: #2d4733;
+  --action-ink: #fffef8;
+  --selected: #dfe8d4;
+  --selected-ink: #2c4a34;
+  --hero: #e7e9dc;
+  --hero-ink: #29382e;
+  --hero-muted: #52604e;
+  --footer: #29382e;
+  --footer-ink: #f0f2e5;
+  --warm: #e1c17b;
+  --danger: #943f2c;
+  --danger-soft: #f5e8df;
+  --warning: #75601f;
+  --warning-soft: #f1ead4;
+  --good: #38633d;
+  --good-soft: #e4eddc;
+  --overlay: #20291fb3;
+  --shadow: 0 16px 48px #26332626;
+  --radius-control: 7px;
+  --radius-panel: 12px;
+}
+:root[data-theme='dark'] {
+  --page: #1d251f;
+  --surface: #252f27;
+  --surface-soft: #2e3a2e;
+  --surface-hover: #394636;
+  --text: #edf0e2;
+  --secondary: #c5cdb8;
+  --muted: #b7c3aa;
+  --line: #4b5846;
+  --control-border: #8b997e;
+  --accent: #b9cda4;
+  --focus: #d9e7bf;
+  --action: #c2d2ac;
+  --action-hover: #dbe6c9;
+  --action-ink: #233424;
+  --selected: #394935;
+  --selected-ink: #e1ebcd;
+  --hero: #283326;
+  --hero-ink: #edf0e2;
+  --hero-muted: #c5cdb8;
+  --footer: #182119;
+  --footer-ink: #e0e8d3;
+  --warm: #d1b676;
+  --danger: #f0b69a;
+  --danger-soft: #46342b;
+  --warning: #decd8d;
+  --warning-soft: #3c3928;
+  --good: #b6d49f;
+  --good-soft: #30402d;
+  --overlay: #0c130ccc;
+  --shadow: 0 16px 48px #0005;
+}

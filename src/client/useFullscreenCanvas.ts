@@ -30,7 +30,7 @@ export function useFullscreenCanvas(pageRef: RefObject<HTMLElement | null>, acti
     }
     fit();
     const observer = new ResizeObserver(fit);
-    [page, stage, toolbar, footer, ...page.querySelectorAll('.world-heading, .journal-panel-controls, .world-view-controls, .error-box')].forEach(el => observer.observe(el));
+    [page, stage, toolbar, footer, ...page.querySelectorAll('.fullscreen-site-header, .world-heading, .journal-panel-controls, .world-view-controls, .error-box')].forEach(el => observer.observe(el));
     window.addEventListener('resize', fit);
     window.visualViewport?.addEventListener('resize', fit);
     return () => {

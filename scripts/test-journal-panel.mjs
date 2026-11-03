@@ -6,8 +6,8 @@ const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || 'playwright')
  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH,headless:true,args:['--no-sandbox']});
  const page=await browser.newPage(); const errors=[];page.on('pageerror',e=>errors.push(e.message));
  const base='http://127.0.0.1:5173';
- await page.goto(base);await page.locator('.world-card').first().waitFor();
- const href=await page.locator('.world-card').first().getAttribute('href');await page.goto(base+href);
+ await page.goto(base);await page.locator('.house-listing').first().waitFor();
+ const href=await page.locator('.house-listing').first().getAttribute('href');await page.goto(base+href);
  const toggle=page.locator('.journal-panel-toggle'),panel=page.locator('#world-journal-panel');await toggle.waitFor();
  for(const width of [320,375,768,900,980,1280,1440]){
   await page.setViewportSize({width,height:900});

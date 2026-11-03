@@ -11,6 +11,6 @@
 # LLM_DAILY_CALL_LIMIT=240
 
 # Server-side policy; omitted list preserves LLM_MODEL for legacy installations.
-# LLM_ALLOWED_MODELS=@cf/meta/llama-3.1-8b-instruct-fp8,@cf/meta/llama-3.2-3b-instruct,@cf/mistralai/mistral-small-3.1-24b-instruct
+# LLM_ALLOWED_MODELS=@cf/meta/llama-3.1-8b-instruct-fp8,@cf/meta/llama-3.2-3b-instruct,@cf/google/gemma-4-26b-a4b-it,@cf/mistralai/mistral-small-3.1-24b-instruct,@cf/meta/llama-3.3-70b-instruct-fp8-fast,@cf/meta/llama-4-scout-17b-16e-instruct
 # LLM_DEFAULT_MODEL=@cf/meta/llama-3.1-8b-instruct-fp8
 # For compatible providers, use that provider's IDs in both variables.

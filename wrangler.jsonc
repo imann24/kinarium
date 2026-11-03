@@ -8,7 +8,9 @@
     "binding": "ASSETS",
     "not_found_handling": "single-page-application",
     "run_worker_first": [
-      "/api/*"
+      "/api/*",
+      "/admin",
+      "/admin/*"
     ]
   },
   "durable_objects": {
@@ -33,9 +35,9 @@
     }
   ],
   "vars": {
-    "LLM_ALLOWED_MODELS": "cf/meta/llama-3.1-8b-instruct-fp8,cf/meta/llama-3.2-3b-instruct,cf/mistralai/mistral-small-3.1-24b-instruct",
+    "LLM_ALLOWED_MODELS": "@cf/meta/llama-3.1-8b-instruct-fp8,@cf/meta/llama-3.2-3b-instruct,@cf/google/gemma-4-26b-a4b-it,@cf/mistralai/mistral-small-3.1-24b-instruct,@cf/meta/llama-3.3-70b-instruct-fp8-fast,@cf/meta/llama-4-scout-17b-16e-instruct",
     "LLM_DAILY_CALL_LIMIT": "240",
-    "LLM_DEFAULT_MODEL": "cf/meta/llama-3.1-8b-instruct-fp8",
+    "LLM_DEFAULT_MODEL": "@cf/meta/llama-3.1-8b-instruct-fp8",
     "LLM_PROVIDER": "cloudflare"
   },
   "observability": {

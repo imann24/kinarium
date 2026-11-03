@@ -121,6 +121,7 @@ describe('the community engine', () => {
   });
   it('grows a ritual in a cohesive house and records its absence in a strained one', () => {
     const a = world(); a.minute = 1078; step(a); expect(a.history.at(-1)?.kind).toBe('ritual');
-    const b = world(); b.minute = 1078; b.cohesion = 5; step(b); expect(b.history.at(-1)?.text).toContain('stays quiet');
+    const b = world(); b.minute = 1078; b.cohesion = 5; for (const c of b.characters) c.mood = 10; step(b); expect(b.history.at(-1)?.text).toContain('stays quiet');
+    expect(b.tension).toBeGreaterThan(18);
   });
 });

@@ -1,3 +1,5 @@
+@layer base, components, theme, interface;
+@layer components {
 /* Explicit SVG height changes the rendered scene scale, not only its container. */
 .world-fullscreen .world-layout {
   height: auto;
@@ -15,4 +17,6 @@
 .world-fullscreen .world-sidebar {
   height: var(--fullscreen-stage-height);
   max-height: none;
+}
+
 }

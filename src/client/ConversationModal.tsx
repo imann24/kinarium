@@ -6,14 +6,22 @@ import ConversationThread from './ConversationThread';
 import './conversation-modal.css';
 
 /** The ID, never the dialogue text, identifies both live and archived threads. */
-export default function ConversationModal({ world, conversationId, onClose, onJournal, onSelect }: {
-  world: WorldState; conversationId: number; onClose: () => void;
+export default function ConversationModal({ world, conversationId, initialEntry, onClose, onJournal, onSelect }: {
+  world: WorldState; conversationId: number; initialEntry?: LogEntry; onClose: () => void;
   onJournal: (entry: LogEntry) => void; onSelect: (id: string) => void;
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const titleId = useId();
+  const backdropPointer = useRef<number | undefined>(undefined);
+  const backdropClick = useRef(false);
+  function onBackdrop(target: EventTarget | null, x: number, y: number) {
+    const dialog = dialogRef.current;
+    if (!dialog || target !== dialog) return false;
+    const box = dialog.getBoundingClientRect();
+    return x < box.left || x > box.right || y < box.top || y > box.bottom;
+  }
   const live = world.history.find(e => e.id === conversationId && e.conversation);
-  const lastReceived = useRef<LogEntry | undefined>(live);
+  const lastReceived = useRef<LogEntry | undefined>(live ?? (initialEntry?.id === conversationId && initialEntry.conversation ? initialEntry : undefined));
   const [archived, setArchived] = useState<LogEntry>();
   const [status, setStatus] = useState('');
   const [retry, setRetry] = useState(0);
@@ -53,6 +61,22 @@ export default function ConversationModal({ world, conversationId, onClose, onJo
 
   return <dialog ref={dialogRef} className="modal conversation-modal" aria-labelledby={titleId}
     onCancel={e => { e.preventDefault(); onClose(); }}
+    onPointerDown={e => {
+      backdropClick.current = false;
+      backdropPointer.current = e.button === 0 && onBackdrop(e.target, e.clientX, e.clientY) ? e.pointerId : undefined;
+    }}
+    onPointerUp={e => {
+      backdropClick.current = e.pointerId === backdropPointer.current && onBackdrop(e.target, e.clientX, e.clientY);
+      backdropPointer.current = undefined;
+    }}
+    onPointerCancel={() => { backdropPointer.current = undefined; backdropClick.current = false; }}
+    onClick={e => {
+      // Require both ends of the gesture on the backdrop. Text-selection drags
+      // starting inside the dialog must never dismiss it on release outside.
+      const dismiss = backdropClick.current && onBackdrop(e.target, e.clientX, e.clientY);
+      backdropClick.current = false;
+      if (dismiss) onClose();
+    }}
     onKeyDown={e => {
       if (e.key !== 'Tab') return;
       const controls = [...e.currentTarget.querySelectorAll<HTMLElement>('button:not(:disabled), summary, a[href]')].filter(el => el.getClientRects().length);

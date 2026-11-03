@@ -31,6 +31,7 @@ Vite proxies `/api` and WebSockets to port 8787. Server source changes reload au
 - Conversation headings use saved titles grounded in revealed dialogue, with nearby titles considered to reduce repetition. A title stays fixed while the exchange unfolds and is finalized once it ends or is interrupted. Procedural exchanges work without AI; old saves retain their topic heading. Identical exchanges can still share a title rather than inventing differences.
 - Procedural conversations choose complete 4–6 turn arcs about company, curiosity, rest, play, decisions, help, fairness, recent events, or a grounded callback. Personality, energy, belonging, supplies and trust affect selection and voice; recent pair and neighborhood topics discourage repetition. Active arcs survive saves and only revealed lines become memories. Existing AI requests use the configured provider, with a local guard against replayed exchanges.
 - Pairwise affinity and trust; bounded personal memories; a durable, paginated world history.
+- Relationship stories saved with each pair, independent of the retained journal: how they first met, when they became friends, the subjects and shared events that drew them closer or pushed them apart (up to five each, ranked by how far they moved affinity, with mended disagreements marked), and each resident’s side: who reaches out, who offered repair, kept their word or asked for space, and the words they remember hearing. Insights reads a selected connection as a story built only from these records. AI dialogue receives the subject names, not the stored story.
 - Six extensible events with a shared 45-second world cooldown and a separate allowance of 3 events per player per world in any rolling 5-minute window: shared meal, gift, story night, common project, outage, rumor.
 - Adjustable active population cap (1–40), new residents, reversible time away. Away residents retain memories and relationships and do not count against the cap. Maximum 200 total archived/active residents per world for this first version.
 - Persistent or fast-forward time, configurable for each world.
@@ -39,6 +40,20 @@ Vite proxies `/api` and WebSockets to port 8787. Server source changes reload au
 There are deliberately no accounts, ownership privileges, direct NPC controls, or objectives. Everyone admitted to a world has the same influence, including settings. Presence represents browser identities, not verified people; multiple tabs with the same identity are grouped.
 
 Event allowances are enforced on the server and saved in SQLite, atomically with successful events. A per-world, HttpOnly anonymous player cookie shares the allowance across tabs and refreshes; changing an observer name does not reset it. Failed events do not spend an allowance. The UI shows remaining events, refill progress, and separate personal/world countdowns using server time. Without accounts, clearing cookies or switching browsers creates a new anonymous player. Change the limits in `src/simulation/event-budget.ts`.
+
+On touch screens an event card triggers on a single tap: the hover lift only applies where a fine pointer can hover, so iOS never spends the first tap on hover. The allowance, the shared cooldown and the disabled state while a request is pending are the safeguards against accidental triggers; there is no confirm step. `tests/one-tap-events.browser.mjs` checks this with local snapshots on an emulated phone at 390/320px in light and dark.
+
+## Landing page verification
+
+The landing page uses a discovery-first neighborhood layout with a selectable house preview, search and filters. Its typography is self-hosted; font licenses and sources live in `public/fonts/`.
+
+Run `node tests/landing.browser.mjs` against `pnpm dev:client` with Playwright installed. Set `PLAYWRIGHT_MODULE` and `CHROMIUM_PATH` when using an external installation. The test intercepts directory requests and never writes a server world. It covers light/dark layouts at 1440, 1280, 390, and 320px, entry links, filters/search, preview selection, creation controls, the field guide, theme persistence, and empty/error states. Set `LANDING_SCREENSHOTS=.impeccable/review` to capture the main layouts.
+
+## Shared interface verification
+
+The house screens, insights, dialogs, field guide, and administration share the landing hero’s festival identity. `src/client/festival-tokens.css` owns the self-hosted fonts and brand colors; `theme.css` maps them to semantic interface roles; `app-chrome.css` applies the shared navigation, controls, typography, and panel treatments. Scene and resident colors retain their simulation meaning.
+
+Run `node tests/festival-ui.browser.mjs` against `pnpm dev:client` with Playwright installed (`PLAYWRIGHT_MODULE` and `CHROMIUM_PATH` may point to an external installation). It uses local fixtures for the house, insights, resident panel, settings, creation, field guide, admin sign-in, and password gate at 320, 390, 900, and 1440px in both themes. It checks overflow, primary/selected/toolbar contrast, journal toggling, and long house content. Set `SCREENSHOT_DIR=.impeccable/review` to capture desktop and phone evidence. No real worlds or admin sessions are changed. `tests/theme.test.ts` also checks resolved semantic color contrast in both themes.
 
 ## Architecture and technology choice
 
@@ -97,7 +112,7 @@ LLM_MODEL=@cf/meta/llama-3.1-8b-instruct-fp8-fast
 LLM_DAILY_CALL_LIMIT=240
 ```
 
-Set `LLM_PROVIDER=disabled` to use only procedural dialogue. Errors, quota exhaustion, and malformed responses also preserve procedural dialogue. There is no automatic retry or cross-provider fallback.
+Set `LLM_PROVIDER=disabled` to use only procedural dialogue. Errors, quota exhaustion, and malformed responses also preserve procedural dialogue. There is no cross-provider fallback. Models in the registry (`src/simulation/dialogue-models.ts`) retry once on the default model when the request errors or returns nothing; each such request reserves a second call from the daily budget up front. Malformed JSON is not retried.
 
 `pnpm dev`, `pnpm dev:server`, and `pnpm preview` select the `local` Wrangler environment, which omits the remote AI binding and disables generation. No Cloudflare login or inference charges are required for ordinary development. Wrangler may warn that `env.local` does not inherit `ai`; this omission is intentional. To test real Workers AI, log in with `pnpm exec wrangler login`, then run `pnpm dev:server:ai` and `pnpm dev:client` in separate terminals. This deliberately opts into real Cloudflare inference and metered usage; [Workers AI has no local emulator](https://developers.cloudflare.com/workers/local-development/).
 
@@ -105,17 +120,23 @@ To switch to Vercel AI Gateway or another OpenAI-compatible Chat Completions ser
 
 Server-side model policy uses `LLM_ALLOWED_MODELS` (comma-separated IDs) and `LLM_DEFAULT_MODEL` (one ID). Entries are trimmed and deduplicated; blank entries and malformed IDs (whitespace, unsupported punctuation, or over 200 characters) are discarded. This validates syntax and allowlist membership, not provider availability. An explicitly empty/entirely invalid list disables inference. If the list is omitted, the legacy `LLM_MODEL` supplies a one-model list (or the existing Cloudflare default if absent). The default must belong to the list. When `LLM_DEFAULT_MODEL` is omitted, the legacy model is preferred if allowed; an empty/invalid/disallowed default resolves to the first allowed entry. No credentials or provider endpoints are exposed in snapshots.
 
-Each resident profile offers a labeled native model selector. The selection is saved as optional `Character.model` through the existing durable snapshot and broadcasts. Default selections remain absent rather than freezing today's default into a save. Legacy saves and removed model selections resolve to the current default; the UI explains removed selections without rewriting history. New disallowed selections are rejected server-side. Changing a selection discards unrevealed plans and invalidates in-flight results from the old selection; existing revealed dialogue remains intact. Failed/unsupported models keep procedural dialogue without trying another paid model.
+For Cloudflare, model IDs use the `@cf/...` prefix. The server tolerates a missing `@` in `LLM_ALLOWED_MODELS`, `LLM_DEFAULT_MODEL`, and legacy `LLM_MODEL`, canonicalizing before deduplication/default matching; compatible-provider IDs are left untouched. Checked-in production values use the canonical spelling. A previously saved bare resident selection is treated as a removed selection and safely uses the default until the resident is assigned a canonical choice.
+
+If model choices appear stale, inspect `models.allowed` and `models.defaultModel` in the world's HTTP response and latest WebSocket snapshot using browser developer tools. The selector renders these values directly: they come from `modelOptions(this.env)` on the Durable Object, not from the saved world or a client-side environment variable. A legacy-only list indicates the runtime did not supply `LLM_ALLOWED_MODELS` (or the browser retained an older snapshot); missing `@` alone does not collapse a three-entry list. A fresh page/reconnect distinguishes stale browser state from a currently returned list. Verify the deployed Worker version, the environment serving the URL, and its deployed variable bindings; `env.local` deliberately has separate disabled-AI settings. The existing `/api/version?nonce=<UUID>` reports the asset build, not the bindings or Durable Object version, so it cannot prove model configuration was deployed. Cloudflare documents [environment-specific variables and dashboard deployment](https://developers.cloudflare.com/workers/configuration/environment-variables/). Correcting repository configuration does not itself modify live dashboard values. No environment forwarding or world reset is needed: local restart coverage verifies that existing saved worlds receive updated runtime configuration in HTTP, command responses and WebSocket broadcasts.
+
+Each resident profile offers a labeled native model selector. The selection is saved as optional `Character.model` through the existing durable snapshot and broadcasts. Default selections remain absent rather than freezing today's default into a save. Legacy saves and removed model selections resolve to the current default; the UI explains removed selections without rewriting history. New disallowed selections are rejected server-side. Changing a selection discards unrevealed plans and invalidates in-flight results from the old selection; existing revealed dialogue remains intact. Failed registry models retry once on the default model (see above); other failures keep procedural dialogue.
 
 Conversations remain persistent alternating threads, revealed every six simulation minutes. When all participants resolve to the same model, one request plans 3–7 turns. When models differ, exactly three sequential requests each author only the next speaker's turn using that speaker's resolved model. Every request carries shared context (personality, state, memories, relationships, previous exchanges, recent events) plus the growing transcript. Wrong speakers and malformed/partial plans are rejected. The engine still reveals turns in order and discards stale plans. Mixed-model requests share one six-second cancellation deadline and allocate 300 output tokens each (900 total); same-model requests retain 900 tokens. Input context is repeated, so mixed-model exchanges can cost more and are more likely to time out. There are no retries. The single in-flight exchange, observer-only generation, eight-second spacing between exchanges, and per-world daily budget remain. Each possible provider request is reserved before I/O (three for mixed models, one otherwise); insufficient remaining budget preserves procedural dialogue. Failed or aborted attempts retain their reservation. This is not an account-wide dollar cap.
 
 All current summaries—resident personal-history projections, conversation titles, directory summaries and community insights—are deterministic local code. None invokes a model. `resolveModel(config)` without a resident selection is the default route for any future model-backed summary; no new summary calls were introduced.
 
-Suggested configuration for a future operator-controlled change (not applied by this PR):
+The registry in `src/simulation/dialogue-models.ts` lists vetted Workers AI chat models with labels, prices (Workers AI pricing page, 2026-10-17) and per-model request fields (Gemma 4 gets `chat_template_kwargs.enable_thinking=false`). Per-token prices: Llama 3.1 8B $0.152/$0.287, Llama 3.2 3B $0.0509/$0.335, Gemma 4 26B A4B $0.10/$0.30, Mistral Small 3.1 24B $0.351/$0.555, Llama 3.3 70B fast $0.293/$2.253 (input/output per M tokens); Llama 4 Scout was not price-verified. All are pay-as-you-go on Workers AI beyond the free daily allowance. Reasoning-only models (GPT-OSS, GLM, Kimi, Nemotron) and partner-hosted models (Gemini, Grok) are deliberately excluded: they spend the small output budget on thinking or cost much more. The deployed allowlist and the per-resident selector still decide what is usable; any `@cf` ID can be added to `LLM_ALLOWED_MODELS` and shows its raw ID.
+
+Configuration shipped in `wrangler.jsonc`:
 
 ```text
 LLM_PROVIDER=cloudflare
-LLM_ALLOWED_MODELS=@cf/meta/llama-3.1-8b-instruct-fp8,@cf/meta/llama-3.2-3b-instruct,@cf/mistralai/mistral-small-3.1-24b-instruct
+LLM_ALLOWED_MODELS=@cf/meta/llama-3.1-8b-instruct-fp8,@cf/meta/llama-3.2-3b-instruct,@cf/google/gemma-4-26b-a4b-it,@cf/mistralai/mistral-small-3.1-24b-instruct,@cf/meta/llama-3.3-70b-instruct-fp8-fast,@cf/meta/llama-4-scout-17b-16e-instruct
 LLM_DEFAULT_MODEL=@cf/meta/llama-3.1-8b-instruct-fp8
 LLM_DAILY_CALL_LIMIT=240
 ```
@@ -150,6 +171,17 @@ do not recreate worlds, change their slugs, or clear stored data. Old snapshots
 without `detailsRevision` start at revision zero and can be renamed in place.
 A merged PR alone does not deploy this repository: Cloudflare deployment is
 managed separately.
+
+### New events right after a release
+
+Cloudflare releases a new Worker version eventually consistently: the page and
+its assets can update minutes before a particular world's Durable Object
+restarts on the new code (see Cloudflare's Durable Objects known issues, "Code
+updates"). During that window the old object rejects a new event id with
+`Unknown event.`. To avoid offering it, each snapshot carries `eventIds`, the
+events the world's own server can run, and the event picker shows only the
+client's events in that list. When the object restarts it drops its sockets;
+the reconnect snapshot lists the new events and they appear without a reload.
 
 For a local reproduction, build the current frontend and run
 `node scripts/test-house-details-upgrade.mjs` with an available Playwright
@@ -239,6 +271,30 @@ world requests, using the same Playwright configuration as other browser tests.
 
 Repair integration: completed repair currently changes relationship scores and house tension, not resident mood, energy or belonging directly. It therefore adds no direct resident-stat record; the new tension value is reflected in ongoing mood pressure. Ordinary encounter and house-event records retain their existing effects.
 
+### Resident names
+
+Open a resident profile and choose **Edit name** in the sidebar or expanded panel.
+Save applies a trimmed 1–30 character name through the existing world command API;
+Cancel or Escape leaves it unchanged. Everyone admitted to the house can rename
+residents, including those away. Explicit duplicates are allowed, as with manual
+introductions; IDs distinguish residents and automatic introductions avoid used names.
+
+Renaming preserves IDs, personalities, backstories, needs, relationships and recorded
+history. Current profile, speaker and relationship labels update for all viewers.
+Historical prose keeps its original wording. Unspoken AI plans are discarded and
+in-flight results based on old names are ignored; subsequent prompts use current
+names and explicitly distinguish them from names in older prose. No extra model
+calls or schema migration are needed.
+
+`pnpm test` covers validation, authorization, identity/history preservation, isolation,
+SQLite reconstruction and stale inference. `pnpm test:residents` checks real local
+runtime restarts and broadcasts. With Vite and Playwright available,
+`node tests/resident-name.browser.mjs` checks keyboard editing, cancellation, errors,
+repeated edits, two-viewer updates and 1440/390/320px light/dark layouts using local
+fixtures. Set `PLAYWRIGHT_MODULE`, `CHROMIUM_PATH` and optionally `SCREENSHOT_DIR`
+as with the other browser tests. These checks do not change production residents
+or measure live-model adherence to the prompt.
+
 ### Resident memory summaries
 
 The existing **Story so far**, defining moments, recent tension and retained-history
@@ -304,3 +360,103 @@ listening alone grants no pairwise affinity, trust, or repair credit. Memories
 name the actual participants and contain only dialogue heard after joining;
 unrevealed plans are discarded. Disagreements and repair arcs remain private
 pairs: a warm group does not forgive or resolve anyone's conflict.
+
+### Community score details
+
+Hover, focus, click or tap Togetherness, Tension or Shared resources to inspect the score. Details distinguish current per-step pressures from up to five recorded discrete changes in the last six simulation hours. Production/consumption/scarcity explanations share the engine formula; records contain actual bounded deltas and event IDs. Old saves are never backfilled from journal prose. Close with Escape, the close control, the trigger or an outside click/tap.
+
+With Vite running, `PLAYWRIGHT_MODULE=<path-to-playwright/index.mjs> node scripts/test-community-metrics.mjs` exercises all three controls using mocked local worlds, including keyboard, hover, touch, dismissal, light/dark and 1440/390/320px layouts. No live world is changed.
+
+### Reconnection and quiet company
+
+Repair reuses the existing offer/follow-through process. Completed offers restore 1 mood/belonging per resident; later respected choices restore 3, with bounded house relief. Both residents’ mood and temperament, trust, affinity and house tension affect acceptance. Refusals, interruptions and stale/replayed plans cannot earn repair rewards. Ordinary warm contact has a two-hour recovery interval and cannot rebuild trust while conflict remains unresolved.
+
+Quiet company requires 12 continuously observed simulation minutes nearby without conversation or travel. Trust, affinity, mood and temperament determine comfort; unresolved conflict permits only a small respite after cooling down. Recovery is limited to once per resident per four simulation hours, preserves conflict/trust, and is recorded in the journal, resident state changes and recallable memories. Skipped catch-up time does not count as observed company.
+
+### Dialogue engagement
+
+Moderate fatigue (energy 10–29) now produces a shorter exchange that retains its concrete topic and opinion; severe exhaustion below 10 can still end it. Pair contact is possible from energy 10, and group listeners need 15 (25 for reserved residents). Low mood can sound candid rather than automatically withdrawing. AI prompts favor specific opinions, playful disagreement, vulnerable admissions and meaningful bids for connection, while preserving refusal and grounded memories. Procedural taste/invitation scenes and varied repair openings add similar options without inference. More contact can also create more disagreement; these changes do not guarantee harmony or improve repair acceptance odds.
+
+## House administration
+
+Open `/admin` to list houses (including password-protected houses), identify them
+by name and exact slug, and permanently delete one. Every admin data/mutation
+request requires an authenticated server-side session. The sign-in shell is
+public; it contains no house data or credentials. Administration fails closed
+until the server secret **`KINARIUM_ADMIN_PASSWORD`** is configured.
+
+### Configure the server secret yourself
+
+Use a long, unique, randomly generated password (at least 32 characters). In the
+Cloudflare dashboard, select **Workers & Pages → kinarium → Settings → Variables
+and Secrets → Add**, choose **Secret**, enter `KINARIUM_ADMIN_PASSWORD` as the name,
+and enter your password as its value. Save/deploy the secret using Cloudflare's
+prompt. Do not put it in plaintext Wrangler `vars`, a `VITE_*` variable, GitHub
+source, a build variable, a URL, or logs.
+
+Alternatively, from this repository, authenticate Wrangler to your Cloudflare
+account and run:
+
+```sh
+pnpm exec wrangler secret put KINARIUM_ADMIN_PASSWORD --env ""
+```
+
+Paste the value at Wrangler's hidden interactive prompt, never in the command
+line. The empty environment selects this repository's production `kinarium`
+Worker rather than `env.local`. This command updates the deployed Worker; the
+owner should run it when ready. See [Cloudflare's secret configuration guide](https://developers.cloudflare.com/workers/configuration/secrets/).
+No credential value is included in this repository or configured by the PR.
+
+Production admin access requires HTTPS. Sign-in creates a random, host-only,
+Secure, HttpOnly, SameSite=Strict cookie with a 30-minute absolute expiry; only a
+secret-bound hash is stored on the server. The password stays out of browser
+storage. Sign out revokes the current session. Changing/removing the server
+secret invalidates existing sessions once the updated Worker is serving requests.
+Writes (including sign-in/sign-out) require an exact same-origin `Origin` header;
+cross-site requests are rejected. Persistent limits allow at most 5 sign-in
+attempts per connection and 50 globally per 15 minutes, including successful
+attempts. A distributed attack can temporarily prevent sign-in; wait for the
+window indicated by `Retry-After`. Use the same hostname throughout a session.
+
+### Deletion and retries
+
+Deletion requires typing the **exact slug**, without trimming or case folding,
+and pressing the explicitly destructive confirmation button. It cannot be undone.
+The directory first permanently retires that slug and removes only its listing.
+The room then atomically records a tombstone and erases its state, history,
+password/session data, limits, and players; clears cached state; cancels pending
+inference; closes sockets; disables automatic socket replies; and deletes its
+alarm. Already-issued AI requests may finish at the provider, but their results
+are discarded and further turns are not requested. In-flight commands/init are
+serialized with deletion; late index/init/seed responses cannot restore listings.
+
+A successful response means room cleanup was acknowledged. If a request fails,
+refresh `/admin` before deciding whether to retry. **Cleanup pending** means the
+address is retired but cleanup is not confirmed; the room may still be running
+if the cleanup call did not reach it. Retry the same slug (with the same typed
+confirmation) until it is marked deleted. Repeated requests are safe, including
+a lost success response. Nothing automatically restores or silently resets a
+house. A small permanent slug/tombstone record is retained in both objects to
+prevent resurrection; all house content is erased. Deleted slugs **cannot be
+reused**, including `the-common-house`, which will no longer be auto-seeded.
+Choose a different slug for a new house. Do not manually clear tombstones or roll
+back to code that does not honor them. Cloudflare's platform retention/backups are
+outside this application's deletion operation.
+
+### Local admin verification
+
+Use disposable local storage, never production houses. Set a throwaway
+`KINARIUM_ADMIN_PASSWORD` in ignored `.dev.vars.local`, run `pnpm build`, then:
+
+```sh
+pnpm exec wrangler dev --env local --port 8794 --persist-to .wrangler/admin-test
+# In another terminal, with Playwright installed (or PLAYWRIGHT_MODULE set):
+node --env-file=.dev.vars.local scripts/test-admin.mjs
+```
+
+The browser test only accepts localhost/127.0.0.1 and deletes disposable fixtures
+and the local default house. Loopback HTTP uses a distinct HttpOnly local cookie;
+remote HTTP admin requests are rejected. For missing-secret behavior, start with
+no local secret and verify `/api/admin/houses` returns 503. Unit tests cover
+session expiry/rotation, guess limits, failures/retries, in-flight inference,
+alarm/index/init races, permanent retirement, default seeding, and isolation.

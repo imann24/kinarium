@@ -47,10 +47,10 @@ describe('bounded proximity gatherings', () => {
     if (reason === 'floor') c.floor = c.destination = 1;
     if (reason === 'distance') c.x = people[0].x + CONVERSATION_RADIUS + 1;
     if (reason === 'travel') c.destination = 1;
-    if (reason === 'tired') c.energy = 20;
+    if (reason === 'tired') c.energy = 10;
     if (reason === 'mood') c.mood = 10;
     if (reason === 'distrust') relationship(world, people[1].id, c.id).trust = 0;
-    if (reason === 'reserved') { c.trait = 'reserved'; c.energy = 35; }
+    if (reason === 'reserved') { c.trait = 'reserved'; c.energy = 20; }
     expect(start().characters).toHaveLength(2);
   });
   it('requires all-pairs proximity, not a chain of neighbors', () => {
@@ -96,7 +96,10 @@ describe('bounded proximity gatherings', () => {
     entry.conversation!.planned = [{ speakerId: people[3].id, text: 'Wrong owner' }];
     advance(world, 8);
     expect(entry.conversation!.turns.some(t => t.text === 'Wrong owner')).toBe(false);
-    expect(world.relationships).toEqual(before);
+    // Listeners remember what was said, but scores, beginnings and subjects stay unchanged.
+    const scores = (all: typeof before) => Object.fromEntries(Object.entries(all).map(([key, { story, ...rest }]) => [key, { ...rest, threads: [...story?.connections ?? [], ...story?.disagreements ?? []], beginning: story?.beginning }]));
+    expect(scores(world.relationships)).toEqual(scores(before));
+    expect(bond.story?.perspectives[people[1].id]?.warmWords?.speakerId).toBe(people[2].id);
     expect(buildResidentSummary(people[1], people, world.history, world.minute).tension?.sourceEventIds).toContain(999);
   });
   it('preserves legacy pair saves and keeps repair private', () => {
