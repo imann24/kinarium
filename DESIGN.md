@@ -65,6 +65,10 @@ colors:
   good-dark: "#b6d49f"
   good-soft-dark: "#30402d"
   overlay-dark: "#070f20cc"
+  live-wall-ground: "#354741"
+  live-floor: "#b2b8a5"
+  live-structure: "#929f86"
+  live-window-trim: "#d2d0ad"
   event-option: "#dce5f5"
   event-option-hover: "#f6d58a"
 typography:
@@ -144,6 +148,10 @@ typography:
     fontFamily: "Manrope, sans-serif"
     fontSize: "13px"
     fontWeight: 700
+  navigation-wide:
+    fontFamily: "Manrope, sans-serif"
+    fontSize: "18px"
+    fontWeight: 750
   dialog-action:
     fontFamily: "Manrope, sans-serif"
     fontSize: "14px"
@@ -311,7 +319,7 @@ Navy and cool whites establish the stage/program contrast; saffron supplies warm
 
 **The Resident Continuity Rule.** Preserve resident artwork and colors; change environmental materials only within the authorized house renderer.
 
-The live stage sets its sky roles to stage navy. Light room fills mix each authored room color at (30%) into the cool architectural ground; dark room fills mix at (27%) into the dark ground. Furnishings retain their renderer-specific materials. These environmental treatments do not define resident palettes.
+The live stage sets its sky roles to stage navy. In the light theme, only the live stage mixes each authored room color at (8%) into the mineral live-wall ground, with lighter structure, warm window trim and a lighter floor band (18 scene units) behind the unchanged resident legs. The live environment colors in frontmatter record authored component colors rather than CSS custom properties. Light previews retain the (30%) cool architectural mix; dark rooms retain the (27%) dark mix. Furnishings retain their renderer-specific materials. These scoped environmental treatments do not define resident palettes or change preview/dark artwork.
 
 ## Typography
 
@@ -327,7 +335,7 @@ The live stage sets its sky roles to stage navy. Light room fills mix each autho
 - **Insights title:** Manrope at (750), with a (28px) phone override. Insights panel headings are (21px)/(700); narrative headings are (23px)/(700).
 - **Body / journal / narrative:** preserve their distinct frontmatter roles. Directory descriptions are bounded to (58ch); world descriptions use (16px) and (62ch), with (1.5) leading above (1250px) and (1.65) below, reducing to (12px) on phones. Narrative prose becomes (14px) below (700px).
 - **Names and story titles:** wide cast names are (20px) bold; wide conversation titles and previews use the dedicated frontmatter roles. At widths up to (1250px), the base cast names and conversation titles are (18px), before the smaller layout overrides. Responsive cast names become compact labels inside the scrolling strip.
-- **Actions and fields:** primary actions use the action role, fields (14px), and ordinary labels (13px)/(1.6); dialog labels and actions use (14px). Introduction on the live stage is a stronger (20px)/(750) action above (1250px), with a (16px) base below that threshold. Desktop navigation is (16px)/(650), reducing to (13px) below (1250px).
+- **Actions and fields:** primary actions use the action role, fields (14px), and ordinary labels (13px)/(1.6); dialog labels and actions use (14px). Introduction on the live stage is a stronger (20px)/(750) action above (1250px), with a (16px) base below that threshold. World navigation uses the wide navigation role above (1250px), with (26px) icons. Shared navigation otherwise retains its (16px)/(650) base, reducing to (13px) at (1250px).
 
 **The Program Type Rule.** Use Anton for program landmarks and Manrope for names, controls and sustained reading.
 
@@ -339,7 +347,7 @@ The working world is capped at (1800px). Above (1250px), its normal view has (10
 
 At (1250px), normal-view gutters return to (16px) and columns become (150px), flexible stage, and (300px), with a (12px) gap. At (1100px), the cast becomes a horizontal scrolling strip above a flexible stage and a (310px) journal; the journal is bounded to (720px). At (760px), the page becomes one column with (14px) gutters: cast, stage, event tray, journal disclosure, and journal. The journal is (560px) tall with internal scrolling. The phone heading is (34px), reducing to (29px) at (420px). The preserved journal preference still controls visibility.
 
-The shared masthead is (58px) tall. Phone navigation keeps the brand, field guide, theme control and a single observer presence trigger; world settings moves beside the view links. The stage toolbar has automatic height with a (58px) wide minimum and a (52px) base minimum; its action group wraps and zoom/fullscreen controls do not shrink. Wide controls use vertical separators between time mode, zoom and fullscreen; actual simulated time moves to the heading in the normal wide view. Phone controls retain zoom and fullscreen access. Fullscreen hides the cast and event tray and uses stage plus a (330px) journal on desktop; at the phone breakpoint it becomes a single column and uses in-page expansion with the same accessible enter/exit controls. These are intentional responsive variants, not missing desktop features.
+The shared masthead is (58px) tall. Phone navigation keeps the brand, field guide, theme control and a single observer presence trigger; world settings moves beside the view links. The stage toolbar has automatic height with a (50px) wide minimum, (3px 16px) wide padding and a (52px) base minimum; its action group wraps and zoom/fullscreen controls do not shrink. Wide controls use vertical separators between time mode, zoom and fullscreen; actual simulated time moves to the heading in the normal wide view. Above (1250px), the stage footer uses (8px 18px) padding and the event tray (16px 18px 20px), freeing more height for the live canvas. Phone controls retain zoom and fullscreen access. Fullscreen hides the cast and event tray and uses stage plus a (330px) journal on desktop; at the phone breakpoint it becomes a single column and uses in-page expansion with the same accessible enter/exit controls. These are intentional responsive variants, not missing desktop features.
 
 Event catalog cards use four columns, three at (1100px), two at (760px), and one at (420px). The alternative event deck preserves horizontal paging. The three quick-event choices remain three columns on phones. World metrics become full-width ruled rows at (760px).
 
@@ -385,7 +393,7 @@ The navy masthead uses Manrope links and a saffron active rule. World view links
 
 ### Cast and resident detail
 
-The desktop cast panel contains full-body resident SVGs, names and actual activities; names wrap. Above (1250px), the rows have (91px) minimum height, square corners and a top rule, with (20px) names and (11px) activity labels. Hover and selection use the selected surface. Choosing a resident opens the resident detail experience while the house remains in context. Identity and edit actions sit above background, wellbeing, influences, connections and retained history; model choice and time-away controls sit in a separate Resident settings section after the story. Resident names use the Manrope name role, narrative/history copy uses (14px)/(1.8), and section headings use (16px)/(750). The strip scrolls horizontally on narrower layouts. Full resident management and time-away navigation remain reachable even where the desktop rail footer is hidden.
+The desktop cast panel contains full-body resident SVGs, names and actual activities; names wrap. Above (1250px), the rows have (91px) minimum height, (10px) padding, a (22px) gap, square corners and a top rule, with (20px) names and (11px) activity labels. Hover and selection use the selected surface. Choosing a resident opens the resident detail experience while the house remains in context. Identity and edit actions sit above background, wellbeing, influences, connections and retained history; model choice and time-away controls sit in a separate Resident settings section after the story. Resident names use the Manrope name role, narrative/history copy uses (14px)/(1.8), and section headings use (16px)/(750). The strip scrolls horizontally on narrower layouts. Full resident management and time-away navigation remain reachable even where the desktop rail footer is hidden.
 
 ### Journal
 

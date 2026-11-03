@@ -196,6 +196,25 @@ label small,.form-foot { color:var(--muted); font-size:12px; line-height:1.65; }
 .deck-card b { font-family:var(--font-body); font-weight:750; }
 /* Retain each house's character with a cooler architectural ground. */
 :root[data-theme='light'] .building-room { fill:color-mix(in srgb,var(--room-color) 30%,#e0e6ef); }
+/* Mineral walls restore the comp's architectural contrast on the live stage.
+   A lighter floor keeps the original resident silhouettes readable. */
+:root[data-theme='light'] .world-stage .building {
+  --house-frame:#c8ccba;
+  --window-day:#bdc9b8;
+  --window-night:#a6b7b2;
+  --scene-label:#f0f1e6;
+}
+:root[data-theme='light'] .world-stage .building-room { fill:color-mix(in srgb,var(--room-color) 8%,#354741); }
+.building-floor { fill:transparent; }
+:root[data-theme='light'] .world-stage .building-floor { fill:#b2b8a5; }
+:root[data-theme='light'] .world-stage .building-shell,
+:root[data-theme='light'] .world-stage .building-roof,
+:root[data-theme='light'] .world-stage .building-plinth { fill:#929f86; }
+:root[data-theme='light'] .world-stage .building-floor-edge { fill:#c4c7ad; }
+:root[data-theme='light'] .world-stage .building-window { stroke:#d2d0ad; }
+:root[data-theme='light'] .world-stage .building-window-cross { stroke:#d2d0ad; }
+:root[data-theme='light'] .world-stage .building-elevator-shaft { fill:#bdc2ad; }
+:root[data-theme='light'] .world-stage .building-elevator-rail { stroke:#939d8a; }
 /* Fullscreen remains a live, zoomable stage. */
 .world-fullscreen .cast-rail,.world-fullscreen .scene-events,.world-fullscreen .mobile-world-settings { display:none; }
 .world-fullscreen .world-layout,.world-fullscreen .world-layout:not(.journal-collapsed) { grid-template-columns:minmax(0,1fr) 330px; grid-template-rows:1fr; }
@@ -209,6 +228,9 @@ label small,.form-foot { color:var(--muted); font-size:12px; line-height:1.65; }
 @media(min-width:1251px) {
   .world-site-header { padding-inline:36px; }
   .world-site-header .brand { font-size:34px; padding-right:56px; border-right:1px solid var(--stage-line); }
+  .world-site-header nav>a,.world-site-header .text-button { font-size:18px; font-weight:750; }
+  .world-site-header nav>a>svg,.world-site-header .text-button>svg { width:26px; height:26px; }
+  .world-site-header .theme-control svg { width:26px; height:26px; }
   .world-site-header .alpha { display:none; }
   .world-site-header .world-heading-actions .outline { font-size:15px; padding-inline:16px; }
   .world-site-header .theme-control { border:0; border-left:1px solid var(--stage-line); border-radius:0; }
@@ -225,12 +247,12 @@ label small,.form-foot { color:var(--muted); font-size:12px; line-height:1.65; }
   .cast-heading { padding:16px 19px 28px; }
   .cast-heading h2,.story-heading { font-size:40px; }
   .cast-list { padding-inline:16px; }
-  .cast-person { min-height:91px; padding:10px 0; border-top:1px solid var(--line); border-radius:0; gap:20px; }
+  .cast-person { min-height:91px; padding:10px 10px; border-top:1px solid var(--line); border-radius:0; gap:22px; }
   .cast-person b { font-size:20px; }
   .cast-person small { font-size:11px; }
   .cast-person>svg { display:none; }
   .world-page:not(.world-fullscreen) .stage-toolbar>span { display:none; }
-  .stage-toolbar { min-height:58px; padding:7px 16px; }
+  .stage-toolbar { min-height:50px; padding:3px 16px; }
   .stage-toolbar-actions { gap:18px; }
   .stage-toolbar .time-mode-status>span:first-child { font-size:0; }
   .stage-toolbar .time-mode-status strong { font-size:18px; }
@@ -239,7 +261,7 @@ label small,.form-foot { color:var(--muted); font-size:12px; line-height:1.65; }
   .stage-toolbar .scene-zoom-controls svg { width:22px; height:22px; }
   :root .stage-toolbar .fullscreen-toggle { border:0; border-left:1px solid var(--stage-line); border-radius:0; padding-left:18px; font-size:17px; }
   .stage-toolbar .fullscreen-toggle svg { width:22px; height:22px; }
-  .world-stage .stage-footer { padding:14px 18px; }
+  .world-stage .stage-footer { padding:8px 18px; }
   :root .stage-footer>span,:root .stage-footer i { font-size:16px; }
   :root .stage-footer .introduce-resident { min-height:50px; min-width:268px; font-size:20px; border-radius:9px; }
   .story-heading { padding:14px 18px 8px; }
@@ -265,7 +287,7 @@ label small,.form-foot { color:var(--muted); font-size:12px; line-height:1.65; }
   .journal-panel .journal-conversation>summary small { margin:0; font-size:10px; }
   .journal-panel .journal-conversation>summary .journal-disclosure { min-height:30px; font-size:10px; justify-content:flex-end; }
   .journal-panel .journal-open-conversation { min-height:40px; margin-top:4px; padding:7px 16px; border-radius:9px; font-size:16px; }
-  .scene-events { padding:16px 18px 24px; }
+  .scene-events { padding:16px 18px 20px; }
   .scene-events-heading { gap:24px; margin-bottom:20px; }
   .scene-events h2 { font-size:36px; }
   .scene-events-heading>span { border-left:1px solid var(--stage-line); padding-left:24px; font-size:14px; }

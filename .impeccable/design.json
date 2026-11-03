@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-03T13:05:36.147836+00:00",
+  "generatedAt": "2026-11-03T20:28:28.792221+00:00",
   "title": "Design System: Kinarium",
   "extensions": {
     "colorMeta": {
@@ -913,6 +913,62 @@
           "oklch(87% 0.1007 86.6)",
           "oklch(95% 0.1007 86.6)"
         ]
+      },
+      "live-wall-ground": {
+        "role": "neutral",
+        "displayName": "Live Wall Ground",
+        "tonalRamp": [
+          "oklch(15% 0.0250 172.5)",
+          "oklch(27% 0.0250 172.5)",
+          "oklch(39% 0.0250 172.5)",
+          "oklch(51% 0.0250 172.5)",
+          "oklch(63% 0.0250 172.5)",
+          "oklch(75% 0.0250 172.5)",
+          "oklch(87% 0.0250 172.5)",
+          "oklch(95% 0.0250 172.5)"
+        ]
+      },
+      "live-floor": {
+        "role": "neutral",
+        "displayName": "Live Floor",
+        "tonalRamp": [
+          "oklch(15% 0.0272 121.3)",
+          "oklch(27% 0.0272 121.3)",
+          "oklch(39% 0.0272 121.3)",
+          "oklch(51% 0.0272 121.3)",
+          "oklch(63% 0.0272 121.3)",
+          "oklch(75% 0.0272 121.3)",
+          "oklch(87% 0.0272 121.3)",
+          "oklch(95% 0.0272 121.3)"
+        ]
+      },
+      "live-structure": {
+        "role": "neutral",
+        "displayName": "Live Structure",
+        "tonalRamp": [
+          "oklch(15% 0.0387 129.9)",
+          "oklch(27% 0.0387 129.9)",
+          "oklch(39% 0.0387 129.9)",
+          "oklch(51% 0.0387 129.9)",
+          "oklch(63% 0.0387 129.9)",
+          "oklch(75% 0.0387 129.9)",
+          "oklch(87% 0.0387 129.9)",
+          "oklch(95% 0.0387 129.9)"
+        ]
+      },
+      "live-window-trim": {
+        "role": "neutral",
+        "displayName": "Live Window Trim",
+        "tonalRamp": [
+          "oklch(15% 0.0469 104.7)",
+          "oklch(27% 0.0469 104.7)",
+          "oklch(39% 0.0469 104.7)",
+          "oklch(51% 0.0469 104.7)",
+          "oklch(63% 0.0469 104.7)",
+          "oklch(75% 0.0469 104.7)",
+          "oklch(87% 0.0469 104.7)",
+          "oklch(95% 0.0469 104.7)"
+        ]
       }
     },
     "typographyMeta": {
@@ -987,6 +1043,10 @@
       "conversation-reading": {
         "displayName": "Conversation reading",
         "purpose": "Full conversation turns inside the single-scroll dialog."
+      },
+      "navigation-wide": {
+        "displayName": "Wide world navigation",
+        "purpose": "World masthead links above 1250px, paired with 26px icons; other routes retain shared navigation type."
       }
     },
     "shadows": [
@@ -1120,9 +1180,9 @@
       "name": "Masthead navigation",
       "kind": "nav",
       "refersTo": "navigation",
-      "description": "Navy navigation with saffron active rule.",
-      "html": "<nav class=\"ds-nav\" aria-label=\"Primary\"><a class=\"ds-nav-link\" href=\"#neighborhood\" aria-current=\"page\">The neighborhood</a><button class=\"ds-guide\">Field guide</button></nav>",
-      "css": ".ds-nav { display:flex; align-items:center; gap:28px; height:58px; padding:0 28px; background:var(--stage,#17284d); color:var(--stage-ink,#f6f7fa); font:650 16px var(--font-body,Manrope,sans-serif); } .ds-nav-link { display:flex; align-items:center; height:58px; text-decoration:none; color:inherit; border-bottom:2px solid transparent; } .ds-nav-link[aria-current=page] { border-color:var(--saffron,#f4c455); } .ds-guide { min-height:44px; font:inherit; background:transparent; color:inherit; border:0; cursor:pointer; } .ds-nav a:hover,.ds-guide:hover { color:var(--stage-ink,#f6f7fa); } .ds-nav :focus-visible { outline:3px solid var(--saffron,#f4c455); outline-offset:3px; }"
+      "description": "World masthead navigation with saffron active rule and the wide-screen type variant.",
+      "html": "<nav class=\"ds-nav ds-world-nav\" aria-label=\"Primary\"><a class=\"ds-nav-link\" href=\"#neighborhood\" aria-current=\"page\">The neighborhood</a><button class=\"ds-guide\">Field guide</button></nav>",
+      "css": ".ds-nav { display:flex; align-items:center; gap:28px; height:58px; padding:0 28px; background:var(--stage,#17284d); color:var(--stage-ink,#f6f7fa); font:650 16px var(--font-body,Manrope,sans-serif); } .ds-nav-link { display:flex; align-items:center; height:58px; text-decoration:none; color:inherit; border-bottom:2px solid transparent; } .ds-nav-link[aria-current=page] { border-color:var(--saffron,#f4c455); } .ds-guide { min-height:44px; font:inherit; background:transparent; color:inherit; border:0; cursor:pointer; } .ds-nav a:hover,.ds-guide:hover { color:var(--stage-ink,#f6f7fa); } .ds-nav :focus-visible { outline:3px solid var(--saffron,#f4c455); outline-offset:3px; } @media(min-width:1251px) { .ds-world-nav { font-size:18px; font-weight:750; padding-inline:36px; } }"
     },
     {
       "name": "Event catalog choice",

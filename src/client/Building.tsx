@@ -157,9 +157,10 @@ export default function Building({ world, selected, onSelect, onOpenConversation
       return <g key={floor}>
         <rect x="113" y={y} width="591" height="132" className={`building-room room-${floor}`} style={{ '--room-color': template.floors[floor].color } as CSSProperties} fill={template.floors[floor].color}/>
         <rect x="113" y={y} width="591" height="132" fill={`url(#${wallId})`}/>
-        <path d={`M113 ${y + 128}h591v8H113Z`} fill="#b2bccb"/>
+        <rect className="building-floor" x="113" y={y + 110} width="591" height="18"/>
+        <path className="building-floor-edge" d={`M113 ${y + 128}h591v8H113Z`} fill="#b2bccb"/>
         <path d={`M113 ${y + 130}h591`} stroke="#8d9bb0"/>
-        {[157, 350, 560].map(x => <g key={x}><path d={`M${x} ${y + 89}v-47a27 27 0 0 1 54 0v47Z`} fill={night ? 'var(--window-night, #adbab7)' : 'var(--window-day, #eef0dc)'} stroke="#9eaec3" strokeWidth="5"/><path d={`M${x + 27} ${y + 16}v73m-27-38h54`} stroke="#b4c3d4" strokeWidth="3"/></g>)}
+        {[157, 350, 560].map(x => <g key={x}><path className="building-window" d={`M${x} ${y + 89}v-47a27 27 0 0 1 54 0v47Z`} fill={night ? 'var(--window-night, #adbab7)' : 'var(--window-day, #eef0dc)'} stroke="#9eaec3" strokeWidth="5"/><path className="building-window-cross" d={`M${x + 27} ${y + 16}v73m-27-38h54`} stroke="#b4c3d4" strokeWidth="3"/></g>)}
         {floor === 2 && template.id === 'common-house' && <g><Plant x={250} y={y + 107} size={1.1}/><Plant x={651} y={y + 104} size={1.2}/><rect x="320" y={y + 92} width="110" height="16" rx="3" fill="#9a9b72"/><path d={`M330 ${y + 108}v21m90-21v21`} stroke="#838467" strokeWidth="5"/><Plant x={339} y={y + 73} size={.65}/><Plant x={378} y={y + 73} size={.65}/><Plant x={413} y={y + 73} size={.5}/><path d={`M477 ${y + 124}v-27q20-12 38 0v27m-36-14h34`} fill="#c4ad83" stroke="#a78f6b" strokeWidth="3"/></g>}
         {floor === 1 && !bespoke && <g><rect x="262" y={y + 44} width="51" height="78" fill="#aa906d"/><path d={`M264 ${y + 71}h47m-47 26h47`} stroke="#dbc69f" strokeWidth="3"/>{[0,1,2,3,4].map(i => <rect key={i} x={269+i*8} y={y+51} width="5" height="18" rx="1" fill={['#d0b083','#82917b','#bd8772','#e4d5b5','#969998'][i]}/>)}<rect x="449" y={y + 93} width="88" height="29" rx="6" fill="#99a089"/><rect x="449" y={y + 84} width="88" height="26" rx="7" fill="#aab198"/><path d={`M452 ${y + 100}v17m82-17v17`} stroke="#7d8c71" strokeWidth="8" strokeLinecap="round"/><path d={`M600 ${y + 124}v-69m-17 3h34l-9-17h-16Z`} fill="#e8d7a7" stroke="#a89570" strokeWidth="2"/><Plant x={165} y={y + 109} size={.8}/><rect x="369" y={y + 35} width="34" height="25" fill="#e8debd" stroke="#ad9271" strokeWidth="3"/><circle cx="386" cy={y + 46} r="6" fill="#b4bb98"/></g>}
         {floor === 0 && template.id !== 'makers-house' && !bespoke && <g><rect x="135" y={y + 85} width="94" height="40" fill="#b4ae8c"/><rect x="132" y={y + 81} width="100" height="7" rx="2" fill="#8e8b70"/><path d={`M180 ${y + 89}v34m-39-23h29m20 0h29`} stroke="#8d9075"/><rect x="147" y={y + 67} width="18" height="15" rx="3" fill="#d4c5a1"/><path d={`M165 ${y + 70}q13 1 0 8`} fill="none" stroke="#d4c5a1" strokeWidth="3"/><ellipse cx="397" cy={y + 125} rx="95" ry="8" fill="#b9a078" opacity=".3"/><path d={`M336 ${y + 96}h117m-105 0v30m94-30v30`} stroke="#9a7f5a" strokeWidth="6" strokeLinecap="round"/><rect x="335" y={y + 91} width="120" height="8" rx="3" fill="#b49a73"/><rect x="370" y={y + 81} width="12" height="10" rx="2" fill="#efe1be"/><rect x="414" y={y + 81} width="12" height="10" rx="2" fill="#c8d0ac"/><path d={`M312 ${y + 126}v-32m-1 22h21m144 10v-32m-19 22h20`} stroke="#a49370" strokeWidth="4"/><Plant x={652} y={y + 103} size={1.2}/></g>}
@@ -168,11 +169,11 @@ export default function Building({ world, selected, onSelect, onOpenConversation
         <text x="128" y={y + 18} fontSize="8" letterSpacing="1.4" fill="var(--scene-label, #7f7e67)">0{floor + 1}</text>
       </g>;
     })}
-    <rect x="707" y="112" width="101" height="418" fill="#9aaac0"/>
-    <path d="M722 114v416m71-416v416" stroke="#7e90ab" strokeWidth="2"/>
+    <rect className="building-elevator-shaft" x="707" y="112" width="101" height="418" fill="#9aaac0"/>
+    <path className="building-elevator-rail" d="M722 114v416m71-416v416" stroke="#7e90ab" strokeWidth="2"/>
     <g data-elevator-cabin style={{ transform: `translateY(${(2-motion.elevatorFloor)*143}px)` }}><rect x="724" y="123" width="67" height="115" rx="3" fill="#d5dfed" stroke="#8092ab" strokeWidth="3"/><rect x="731" y="135" width="53" height="97" fill="#bbcadc"/><path d="M757 135v97" stroke="#8da2bf" strokeWidth="2"/><rect x="747" y="126" width="21" height="6" rx="2" fill="#61799c"/></g>
     {[0,1,2].map(i => <g key={i}><path d={`M710 ${245+i*143}h97`} stroke="#8b9db6" strokeWidth="5"/><circle cx="714" cy={206+i*143} r="3" fill="#efe3b9"/></g>)}
-    <rect x="88" y="94" width="744" height="15" rx="3" fill="#536b8c"/><rect x="85" y="551" width="750" height="12" rx="3" fill="#8298b3"/>
+    <rect className="building-roof" x="88" y="94" width="744" height="15" rx="3" fill="#536b8c"/><rect className="building-plinth" x="85" y="551" width="750" height="12" rx="3" fill="#8298b3"/>
     <path d="M317 92v-9h263v9" fill="#94a9c2"/><rect x="356" y="69" width="185" height="24" rx="3" fill="#f1eedf"/>
     <text x="448" y="85" textAnchor="middle" fontSize="9" fill="#344863" letterSpacing={template.id === 'common-house' ? 3 : 1}>{template.id === 'common-house' ? 'A LITTLE LIFE TOGETHER' : template.name.toUpperCase()}</text>
     {people.map((c, index) => {
