@@ -86,7 +86,7 @@ export default function ConversationModal({ world, conversationId, initialEntry,
     }}>
     <div className="modal-content">
       <button type="button" autoFocus className="icon-button modal-close" aria-label="Close conversation" onClick={onClose}><X size={19}/></button>
-      <p className="eyebrow">CONVERSATION</p><h2 id={titleId}>{entry?.conversation?.title ?? entry?.conversation?.topic ?? 'Conversation'}</h2>
+      <h2 id={titleId}>{entry?.conversation?.title ?? entry?.conversation?.topic ?? 'Conversation'}</h2>
       {status && <p role="status">{status}{entry && ' Showing the last received conversation.'}</p>}
       {status.startsWith('The conversation could not') && <button type="button" className="outline" onClick={() => setRetry(n => n + 1)}>Try again</button>}
       {entry && <><ConversationThread entry={entry} characters={world.characters} expanded onSelect={onSelect}/>

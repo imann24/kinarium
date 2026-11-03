@@ -8,7 +8,7 @@ export default function ConversationThread({ entry, characters, onSelect, expand
   const thread = entry.conversation!;
   const name = (id: string) => characters.find(c => c.id === id)?.name ?? 'Former resident';
   const status = <small>{entry.characters.length > 2 ? `${entry.characters.length} residents · ` : ''}{thread.turns.length} turns · {thread.status === 'active' ? 'In conversation' : thread.status === 'interrupted' ? 'Interrupted' : 'At a pause'}</small>;
-  return <details className={`conversation-thread${journal ? ' journal-conversation' : ''}`} open={expanded || thread.status === 'active' ? true : undefined}>
+  return <details className={`conversation-thread${journal ? ' journal-conversation' : ''}`} open={expanded || (!journal && thread.status === 'active') ? true : undefined}>
     {journal ? <summary>
       <span className="entry-meta"><span>{gameTime(entry.minute)}</span><span>{entry.kind}</span></span>
       <strong className="journal-conversation-title">{thread.title ?? thread.topic}</strong>

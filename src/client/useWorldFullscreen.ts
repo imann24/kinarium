@@ -49,6 +49,9 @@ export function useWorldFullscreen() {
     try {
       if (document.fullscreenElement === element) {
         await document.exitFullscreen();
+      } else if (window.matchMedia('(max-width: 760px)').matches) {
+        // An in-page expanded stage works on phones without changing browser orientation or chrome.
+        setExpanded(true);
       } else if (document.fullscreenEnabled && element.requestFullscreen) {
         try { await element.requestFullscreen(); }
         catch { setExpanded(true); }

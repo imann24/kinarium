@@ -14,7 +14,7 @@
   function apply() {
     document.documentElement.dataset.theme = preference;
     document.documentElement.style.colorScheme = preference;
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', preference === 'dark' ? '#1d251f' : '#f4f3ec');
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', preference === 'dark' ? '#101a2d' : '#f6f7fa');
     window.dispatchEvent(new Event('kinarium-theme-change'));
   }
   window.kinariumTheme = {

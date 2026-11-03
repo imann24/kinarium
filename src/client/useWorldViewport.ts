@@ -21,7 +21,9 @@ export function useWorldViewport(stageRef: RefObject<HTMLElement | null>, ready:
       const viewportHeight = visual ? visual.height * visual.scale : window.innerHeight;
       // Leave 16px below the stage, plus its 1px bottom border.
       // Short screens can scroll instead of shrinking the scene to a sliver.
-      const height = Math.max(160, Math.floor(viewportHeight - top - controls - 17));
+      const tray = layout.querySelector<HTMLElement>('.scene-events');
+      const reserved = window.innerWidth > 1100 ? (tray?.offsetHeight ?? 180) + 16 : 0;
+      const height = Math.max(240, Math.floor(viewportHeight - top - controls - reserved - (window.innerWidth > 1250 ? 25 : 17)));
       const value = `${height}px`;
       if (stage!.style.getPropertyValue('--world-canvas-height') !== value) {
         stage!.style.setProperty('--world-canvas-height', value);
@@ -37,6 +39,8 @@ export function useWorldViewport(stageRef: RefObject<HTMLElement | null>, ready:
     observer.observe(stage);
     observer.observe(footer);
     observer.observe(toolbar);
+    const tray = layout.querySelector('.scene-events');
+    if (tray) observer.observe(tray);
     const page = stage.closest('.world-page');
     const heading = page?.querySelector('.world-heading');
     const header = document.querySelector('.site-header');
