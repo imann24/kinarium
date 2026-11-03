@@ -2,8 +2,8 @@
 @layer base, components, theme, interface;
 @layer theme {
 /* Semantic roles shared by every interface; scene colors remain independent. */
-:root { color-scheme: light; --paper: var(--surface); --green: var(--accent); color: var(--text); background: var(--page); --scene-caption: #5e6b54; --scene-label: #585b49; --change-good: var(--good); --change-bad: var(--danger); }
-:root[data-theme='dark'] { color-scheme: dark; --sky-day: #30463e; --sky-night: #182a30; --sky-harbor: #2d424a; --sky-makers: #453d35; --sky-horizon: #26382f; --house-frame: #6d735d; --window-day: #a4b69a; --window-night: #738b81; --scene-label: #e0e5cf; --scene-caption: #c3d0b4; --scene-bubble: #25352a; --scene-text: #eef2df; --scene-outline: #8ba17b; --scene-selection: #e0f2a8; --resident-leg-outline: #c5cfba; color: var(--text); background: var(--page); }
+:root { color-scheme: light; --paper: var(--surface); --green: var(--accent); color: var(--text); background: var(--page); --sky-day: #dce7f4; --sky-night: #b7c8e0; --sky-harbor: #d2e6ee; --sky-makers: #e8dce0; --sky-horizon: #eef1f7; --house-frame: #e8e7e4; --window-day: #f5f6f8; --window-night: #c6d7e7; --scene-caption: #4b5c78; --scene-label: #4b5469; --change-good: var(--good); --change-bad: var(--danger); }
+:root[data-theme='dark'] { color-scheme: dark; --sky-day: #263d60; --sky-night: #182b49; --sky-harbor: #294855; --sky-makers: #493c4b; --sky-horizon: #1d304c; --house-frame: #68758b; --window-day: #adc6dc; --window-night: #7895b7; --scene-label: #e0e9f6; --scene-caption: #c5d6ef; --scene-bubble: #192740; --scene-text: #f3f5fa; --scene-outline: #8a9cba; --scene-selection: #f4c455; --resident-leg-outline: #c5cfba; color: var(--text); background: var(--page); }
 .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
 .theme-control { display:inline-grid; place-items:center; flex-shrink:0; width:44px; height:44px; padding:0; border-radius:50%; color:var(--secondary); }
 .theme-control:hover { background:var(--surface-hover); }
@@ -106,11 +106,11 @@
 :root[data-theme='dark'] :where(.presence-group>span,.presence-row>span) { color:#0b140d; }
 :root[data-theme='dark'] :where(.journal-scroll,.resident-list,.bonds-list,.character-detail) { scrollbar-color:#677a5b transparent; }
 :root[data-theme='dark'] :where(.card-title svg,.event-arrow,.resident-row>svg,.bond-card svg,.stage-footer i) { color:var(--muted); }
-/* Preserve resident/furniture colors and simulation time; only the scene surfaces change. */
-:root[data-theme='dark'] .building-room { fill:color-mix(in srgb,var(--room-color) 27%,#25312c); }
+/* Environment-only color treatment. Resident artwork and simulation time are preserved. */
+:root[data-theme='dark'] .building-room { fill:color-mix(in srgb,var(--room-color) 27%,#22314a); }
 :root[data-theme='dark'] .resident-sprite:hover text { fill:var(--scene-text); }
 :root[data-theme='dark'] :where(.resident-sprite:focus-visible>ellipse,.resident-sprite:hover>ellipse) { stroke:var(--scene-selection); }
-:root[data-theme='dark'] .building { filter:drop-shadow(0 12px 12px #0002); }
+
 @media(max-width:1100px) {
 .header-note { display:none; } }
 @media(max-width:600px) {

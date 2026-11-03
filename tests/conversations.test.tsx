@@ -170,6 +170,15 @@ describe('thread presentation', () => {
 
 
 describe('cohesive journal thread header', () => {
+  it('keeps active journal entries compact while allowing explicit expansion', () => {
+    const { world, entry } = fixture();
+    entry.conversation!.status = 'active';
+    const compact = renderToStaticMarkup(<ConversationThread journal entry={entry} characters={world.characters}/>);
+    const expanded = renderToStaticMarkup(<ConversationThread journal expanded entry={entry} characters={world.characters}/>);
+    expect(compact).not.toContain('open=""');
+    expect(compact).toContain('In conversation');
+    expect(expanded).toContain('open=""');
+  });
   it('puts the record summary, title, timestamp and kind in one native disclosure', () => {
     const { world, entry } = fixture();
     entry.text = 'Otis talks with Fern. They agree to try asking first; the disagreement is not erased.';

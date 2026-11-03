@@ -8,3 +8,8 @@ dist/
 .DS_Store
 .impeccable/review/
 .impeccable/config.local.json
+
+# Local design iteration artifacts (approved references are explicitly tracked).
+.impeccable/build/
+.impeccable/questions/
+.impeccable/mocks/

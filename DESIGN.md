@@ -1,74 +1,113 @@
 ---
-name: "Kinarium — Natural-history diorama"
-description: "A quiet frame for a living miniature: ivory and olive grounds, forest actions, sage selections, and readable Manrope controls."
+name: "Kinarium — Ensemble playhouse"
+description: "A navy live stage, white program sheets, saffron invitations, and an enduring cast of residents."
 colors:
-  page: "#f4f3ec"
-  surface: "#fffef8"
-  surface-soft: "#e9ecdf"
-  surface-hover: "#dfe6d6"
-  text: "#29382e"
-  secondary: "#52604e"
-  muted: "#596550"
-  line: "#c9d0be"
-  control-border: "#748168"
-  accent: "#3e5b43"
-  focus: "#3e5b43"
-  action: "#3e5b43"
-  action-hover: "#2d4733"
-  action-ink: "#fffef8"
-  selected: "#dfe8d4"
-  selected-ink: "#2c4a34"
-  hero: "#e7e9dc"
-  hero-ink: "#29382e"
-  hero-muted: "#52604e"
+  stage: "#17284d"
+  stage-ink: "#f6f7fa"
+  stage-muted: "#c6d3e8"
+  stage-line: "#536582"
+  saffron: "#f4c455"
+  page: "#f6f7fa"
+  surface: "#ffffff"
+  surface-soft: "#e8edf5"
+  surface-hover: "#dce5f2"
+  text: "#17284d"
+  secondary: "#41516e"
+  muted: "#4b5c78"
+  line: "#cbd4e2"
+  control-border: "#6b7b96"
+  accent: "#284e80"
+  focus: "#284e80"
+  action: "#f4c455"
+  action-hover: "#e5ab33"
+  action-ink: "#17284d"
+  selected: "#dce7f7"
+  selected-ink: "#203f70"
+  hero: "#f6f7fa"
+  hero-ink: "#17284d"
+  hero-muted: "#41516e"
+  footer: "#17284d"
+  footer-ink: "#f6f7fa"
+  warm: "#f4c455"
   danger: "#943f2c"
   danger-soft: "#f5e8df"
   warning: "#75601f"
   warning-soft: "#f1ead4"
   good: "#38633d"
   good-soft: "#e4eddc"
-  page-dark: "#1d251f"
-  surface-dark: "#252f27"
-  surface-soft-dark: "#2e3a2e"
-  surface-hover-dark: "#394636"
-  text-dark: "#edf0e2"
-  secondary-dark: "#c5cdb8"
-  muted-dark: "#b7c3aa"
-  line-dark: "#4b5846"
-  control-border-dark: "#8b997e"
-  accent-dark: "#b9cda4"
-  focus-dark: "#d9e7bf"
-  action-dark: "#c2d2ac"
-  action-hover-dark: "#dbe6c9"
-  action-ink-dark: "#233424"
-  selected-dark: "#394935"
-  selected-ink-dark: "#e1ebcd"
-  hero-dark: "#283326"
-  hero-ink-dark: "#edf0e2"
-  hero-muted-dark: "#c5cdb8"
+  overlay: "#101d38b3"
+  page-dark: "#101a2d"
+  surface-dark: "#192740"
+  surface-soft-dark: "#21324e"
+  surface-hover-dark: "#2a3e5c"
+  text-dark: "#f3f5fa"
+  secondary-dark: "#c9d6eb"
+  muted-dark: "#b7c8e2"
+  line-dark: "#40526e"
+  control-border-dark: "#8a9cba"
+  accent-dark: "#c0d5f4"
+  focus-dark: "#f4c455"
+  action-dark: "#f4c455"
+  action-hover-dark: "#ffda80"
+  action-ink-dark: "#17284d"
+  selected-dark: "#304a6c"
+  selected-ink-dark: "#e2edff"
+  hero-dark: "#101a2d"
+  hero-ink-dark: "#f3f5fa"
+  hero-muted-dark: "#c9d6eb"
+  footer-dark: "#0b1425"
+  footer-ink-dark: "#e2edff"
+  warm-dark: "#f4c455"
   danger-dark: "#f0b69a"
   danger-soft-dark: "#46342b"
   warning-dark: "#decd8d"
   warning-soft-dark: "#3c3928"
   good-dark: "#b6d49f"
   good-soft-dark: "#30402d"
+  overlay-dark: "#070f20cc"
+  event-option: "#dce5f5"
+  event-option-hover: "#f6d58a"
 typography:
   display:
-    fontFamily: "Dela Gothic One, sans-serif"
-    fontSize: "clamp(42px, 5.65vw, 84px)"
+    fontFamily: "Anton, sans-serif"
+    fontSize: "clamp(50px,6vw,88px)"
     fontWeight: 400
-    lineHeight: 1.1
-    letterSpacing: "-.04em"
-  headline:
-    fontFamily: "Dela Gothic One, sans-serif"
-    fontSize: "clamp(27px, 3vw, 42px)"
-    lineHeight: 1.25
-    letterSpacing: "-.035em"
+    lineHeight: 1.04
+    letterSpacing: "0"
   world-title:
-    fontFamily: "Manrope, sans-serif"
-    fontSize: "28px"
-    fontWeight: 750
+    fontFamily: "Anton, sans-serif"
+    fontSize: "50px"
+    fontWeight: 400
+    lineHeight: 1.16
+    letterSpacing: "0"
+  program-heading:
+    fontFamily: "Anton, sans-serif"
+    fontSize: "40px"
+    fontWeight: 400
+    lineHeight: 1.2
+    letterSpacing: "0"
+  event-heading:
+    fontFamily: "Anton, sans-serif"
+    fontSize: "34px"
+    fontWeight: 400
+    lineHeight: 1.2
+    letterSpacing: "0"
+  dialog-title:
+    fontFamily: "Anton, sans-serif"
+    fontSize: "32px"
+    fontWeight: 400
     lineHeight: 1.25
+    letterSpacing: "0"
+  listing-title:
+    fontFamily: "Anton, sans-serif"
+    fontSize: "30px"
+    fontWeight: 400
+    lineHeight: 1.2
+    letterSpacing: "0"
+  brand:
+    fontFamily: "Manrope, sans-serif"
+    fontSize: "32px"
+    fontWeight: 800
     letterSpacing: "-.035em"
   insights-title:
     fontFamily: "Manrope, sans-serif"
@@ -76,24 +115,6 @@ typography:
     fontWeight: 750
     lineHeight: 1.15
     letterSpacing: "-.035em"
-  dialog-title:
-    fontFamily: "Manrope, sans-serif"
-    fontSize: "26px"
-    fontWeight: 750
-    lineHeight: 1.25
-    letterSpacing: "-.025em"
-  section-title:
-    fontFamily: "Manrope, sans-serif"
-    fontSize: "24px"
-    fontWeight: 750
-    lineHeight: 1.3
-    letterSpacing: "-.025em"
-  listing-title:
-    fontFamily: "Manrope, sans-serif"
-    fontSize: "24px"
-    fontWeight: 800
-    lineHeight: 1.3
-    letterSpacing: "-.025em"
   body:
     fontFamily: "Manrope, sans-serif"
     fontSize: "13px"
@@ -101,9 +122,19 @@ typography:
     lineHeight: 1.7
   journal-copy:
     fontFamily: "Manrope, sans-serif"
-    fontSize: "13px"
+    fontSize: "14px"
     fontWeight: 400
-    lineHeight: 1.7
+    lineHeight: 1.75
+  journal-preview-wide:
+    fontFamily: "Manrope, sans-serif"
+    fontSize: "16px"
+    fontWeight: 400
+    lineHeight: 1.5
+  story-title-wide:
+    fontFamily: "Manrope, sans-serif"
+    fontSize: "20px"
+    fontWeight: 700
+    lineHeight: 1.35
   narrative:
     fontFamily: "Manrope, sans-serif"
     fontSize: "15px"
@@ -118,19 +149,24 @@ typography:
     fontSize: "12px"
     fontWeight: 700
 rounded:
-  control: "7px"
-  filter: "6px"
+  control: "6px"
+  event-card: "8px"
   panel: "12px"
   dialog: "16px"
-  deck: "14px"
-  stage: "48% 48% 0 0"
 spacing:
-  inline-small: "12px"
-  inline-medium: "20px"
-  section-gap: "24px"
-  column-gap: "36px"
-  gutter-desktop: "32px"
-  gutter-mobile: "18px"
+  tight: "8px"
+  compact: "12px"
+  gap: "16px"
+  reading: "20px"
+  section: "24px"
+  dialog: "32px"
+  column: "36px"
+  landing-section: "48px"
+  world-gutter: "16px"
+  world-gutter-wide: "10px"
+  world-gutter-phone: "14px"
+  landing-gutter: "32px"
+  landing-gutter-phone: "18px"
 components:
   button-primary:
     backgroundColor: "{colors.action}"
@@ -146,177 +182,194 @@ components:
     textColor: "{colors.text}"
     rounded: "{rounded.control}"
     padding: "10px 13px"
-  filter:
-    backgroundColor: "transparent"
-    textColor: "{colors.secondary}"
-    typography: "{typography.filter}"
-    rounded: "{rounded.filter}"
-    padding: "10px 16px"
-  filter-selected:
-    backgroundColor: "{colors.selected}"
-    textColor: "{colors.selected-ink}"
   input:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.text}"
     rounded: "{rounded.control}"
     padding: "11px 12px"
-  panel:
+  filter:
+    backgroundColor: "transparent"
+    textColor: "{colors.secondary}"
+    typography: "{typography.filter}"
+    rounded: "{rounded.control}"
+    padding: "10px 16px"
+  filter-selected:
+    backgroundColor: "{colors.stage}"
+    textColor: "{colors.stage-ink}"
+  live-chip:
+    backgroundColor: "{colors.selected}"
+    textColor: "{colors.selected-ink}"
+    rounded: "5px"
+    padding: "9px 11px"
+  program-panel:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.text}"
     rounded: "{rounded.panel}"
+  event-card:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.text}"
+    rounded: "{rounded.event-card}"
+    padding: "22px"
+  event-tray:
+    backgroundColor: "{colors.stage}"
+    textColor: "{colors.stage-ink}"
+    rounded: "{rounded.panel}"
+    padding: "18px 16px"
   dialog:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.text}"
     rounded: "{rounded.dialog}"
     padding: "32px"
-  event-list-item:
-    backgroundColor: "transparent"
-    textColor: "{colors.text}"
-    padding: "20px 32px 20px 0"
-  house-narrative:
-    backgroundColor: "{colors.surface-soft}"
-    textColor: "{colors.text}"
-    rounded: "{rounded.panel}"
-    padding: "28px"
-  world-navigation:
-    backgroundColor: "{colors.page}"
-    textColor: "{colors.secondary}"
-    height: "56px"
+  navigation:
+    backgroundColor: "{colors.stage}"
+    textColor: "{colors.stage-ink}"
+    height: "58px"
 ---
 
 # Design System: Kinarium
 
 ## Overview
 
-**Creative North Star: "Natural-history diorama"**
+**Creative North Star: "Ensemble playhouse"**
 
-Kinarium frames a living miniature with warm ivory, oat and olive surfaces. Forest actions and pale sage selections relate the working interface to the existing house artwork. The house supplies the detail and personality; controls, navigation and reading surfaces remain calm and legible.
+Kinarium puts the resident ensemble beside a live house stage. Navy frames the scene and navigation, cool white gives stories a readable program sheet, and saffron marks invitations to participate. Condensed Anton headings supply the playbill character; Manrope carries names, controls and sustained reading.
 
-This system records the implemented overhaul after the user rejected the previous plum, mint and yellow combination. The natural-history framing is the implementation direction, not a separately user-approved mood board. The user explicitly confirmed retaining the existing artwork and rebuilding the UI around it; the Building SVG remains the product illustration. Dela Gothic One belongs to the wordmark and landing; Manrope carries the working application.
+The user selected this world for the full interface redesign and approved the cast-beside-stage composition. House structure, furnishings and environmental colors may adapt to the interface; resident artwork and resident colors remain protected. The live SVG, actual residents, recorded stories and authoritative availability remain the content source.
 
-`src/client/design-tokens.css` owns the shared fonts, semantic palette, primary radii and dialog shadow. Component structure lives in the ordered `base`, `components`, `theme`, and `interface` layers. `theme.css` supplies theme mappings and scene treatment; `interface.css` owns the final shared working-surface treatment; `landing.css` owns the landing composition. PRODUCT.md remains the source for durable product behavior.
+`src/client/design-tokens.css` owns semantic colors, fonts, shared radii and dialog shadows. The cascade order is `base`, `components`, `theme`, then `interface`; `interface.css` supplies final working-surface rules and `landing.css` supplies discovery composition. Frontmatter is normative for the roles recorded here. Component styles and responsive overrides remain the implementation source for local exceptions. PRODUCT.md owns product behavior; surface briefs own composition and provenance.
 
 **Key Characteristics:**
-- Warm neutral grounds, olive text, forest actions, and sage selections.
-- Manrope for operational headings and reading; Dela for the brand and landing.
-- Fine rules and open rows, with bounded panels where containment helps.
-- Related olive-charcoal dark surfaces and explicit semantic state colors.
+- Navy stage and navigation, cool white reading surfaces, and saffron actions.
+- Anton program headings with Manrope identity, names, controls and prose.
+- Visible cast, adjacent story desk, and direct access to house events.
+- Modest corners, fine rules, flat panels, and related blue dark surfaces.
 
 ## Colors
 
-The palette follows the house’s earth tones. Frontmatter is the normative sampled palette; suffix `-dark` records the alternative value for the matching semantic role under the explicit dark theme, not a second simultaneous palette.
+Navy and cool whites establish the stage/program contrast; saffron supplies warm, recognizable participation. Frontmatter names correspond to semantic CSS properties; `-dark` records the explicit dark-theme override. Shared stage colors and saffron remain the same in both themes.
 
 ### Primary
 
-- **Forest action** and **action ink** define primary actions; the dark theme uses pale sage action surfaces with dark olive lettering. **Action hover** changes the surface without lowering text opacity.
-- **Accent** identifies links and active details. **Focus** supplies keyboard outlines and can differ from the action color in dark mode.
-- **Selected sage** and **selected ink** identify pressed filters, chosen modes and highlighted journal details. Page navigation also uses an accent underline.
+- **Saffron action**, **action hover**, and **action ink** mark primary participation and conversation actions. Dark mode retains saffron with navy lettering.
+- **Stage navy**, **stage ink**, **stage muted**, and **stage line** frame navigation, the live stage, the featured landing house and the event tray.
+- **Accent** and **focus** identify links and keyboard location. Focus on navy navigation, stage controls and event trays uses saffron.
+- **Selected blue** and **selected ink** identify journal tabs, working filters and selected residents. Directory filters have a deliberate navy selected variant.
 
 ### Neutral
 
-- **Page ivory / olive charcoal** supplies the page canvas. **Surface** holds fields, scene toolbars, journals and dialogs; **surface soft** groups supporting content; **surface hover** supplies interaction feedback.
-- **Text**, **secondary** and **muted** express the reading hierarchy. **Line** separates content; **control border** gives controls a stronger visible boundary.
-- **Hero**, **hero ink** and **hero muted** are landing-specific material roles. Their darker counterparts retain the same contrast relationships.
-- **Danger** uses clay, **warning** uses ochre, and **good** uses green, each with a soft companion surface. Event and chart category colors retain their own meaningful distinctions. Resident and furniture colors remain part of the simulation, not decorative interface accents.
+- **Page** is the cool canvas, **surface** the reading sheet, **surface soft** a supporting group, and **surface hover** interaction feedback. Their dark equivalents are stepped blue surfaces.
+- **Text**, **secondary** and **muted** provide readable hierarchy; **line** divides content and **control border** gives fields and secondary controls a stronger edge.
+- **Hero**, **footer** and their ink roles remain available semantic aliases. The current landing explicitly uses stage roles for its featured house and footer.
+- **Danger**, **warning** and **good**, with their soft companions, retain meaningful states. Existing chart, mood and event category colors are semantic exceptions, not decorative palette replacements.
+- **Event option** and **event option hover** record the pale blue and warm hover materials used by the repeated quick-event buttons. These are authored component colors, not currently CSS custom properties.
 
-**The House First Rule.** Let the existing house illustration carry the visual detail; use semantic interface colors to frame it.
+**The Resident Continuity Rule.** Preserve resident artwork and colors; change environmental materials only within the authorized house renderer.
 
-**The Action and Selection Rule.** Use action and action-ink for primary actions, selected and selected-ink for chosen filters, and danger, warning or good only for meaning.
+The live stage sets its sky roles to stage navy. Light room fills mix each authored room color at (30%) into the cool architectural ground; dark room fills mix at (27%) into the dark ground. Furnishings retain their renderer-specific materials. These environmental treatments do not define resident palettes.
 
 ## Typography
 
-**Display Font:** Dela Gothic One, with sans-serif fallback.
+**Display Font:** Anton, with sans-serif fallback; self-hosted regular TTF, weight (400), swap rendering.
 
-**Body Font:** Manrope, with sans-serif fallback.
-
-Both fonts are self-hosted Latin WOFF2 files with swap rendering. Font provenance and SIL Open Font License files live in `public/fonts/README.md`; other scripts use the browser’s sans-serif fallback. Manrope is a variable face, including the operational (750) heading weight.
+**Body Font:** Manrope, with sans-serif fallback; self-hosted Latin WOFF2, variable weights (400–800), swap rendering. Font provenance and licensing are retained in `public/fonts/`.
 
 ### Hierarchy
 
-- **Display / headline:** fluid landing roles recorded in frontmatter. The featured-house title also uses Dela with `clamp(25px, 2.6vw, 37px)`, (1.2) leading and (-.03em) tracking. These are landing roles, not a universal app scale.
-- **World / insights / dialog titles:** strong Manrope landmarks. The world title reduces to (23px) at the phone breakpoint, insights to (28px), and dialogs to (24px).
-- **Section / listing titles:** Manrope separates tasks and names without a competing display face. Insights sections use (21px), weight (700), while event names use (15px), weight (700).
-- **Body / journal copy:** the directory and working reading roles in frontmatter. Directory descriptions have a maximum measure of (62ch). House narrative prose uses its own more open reading role; it reduces to (14px) on narrow screens.
-- **Action / filter:** sturdy Manrope for primary actions and directory filters. Sidebar tabs and operational journal filters use (12px). Journal headings use (18px), conversation titles (14px), reading copy (13px), and metadata (10–11px). Fields use (14px). These component differences are observed, not a mandate to reduce all controls to the smallest size.
-- **Metrics:** house summary values use (23px), weight (700); insights values use (25px), reducing to (23px) on phones. Time, counts and detailed measurements use tabular numerals where defined by their component.
+- **Display / world title:** uppercase Anton with zero tracking; the landing is fluid and the world title follows its frontmatter role above (1250px). Below that threshold, the base world role is `clamp(32px,3.2vw,48px)` before the (1100px), (760px) and (420px) overrides.
+- **Program / event / dialog / listing titles:** uppercase Anton creates repeated landmarks. Wide cast and story headings use the program role; the base role below (1251px) is (36px) before narrower overrides. Catalog sections use the event role; the wide quick-event tray uses (36px). Modal titles use the dialog role. Directory house names use the listing role.
+- **Brand:** Manrope at (800), not Anton. The wide world masthead uses (34px); the shared base is recorded in frontmatter. It reduces to (22px) on phones; the footer identity has its own (24px) treatment.
+- **Insights title:** Manrope at (750), with a (28px) phone override. Insights panel headings are (21px)/(700); narrative headings are (23px)/(700).
+- **Body / journal / narrative:** preserve their distinct frontmatter roles. Directory descriptions are bounded to (58ch); world descriptions use (16px) and (62ch), with (1.5) leading above (1250px) and (1.65) below, reducing to (12px) on phones. Narrative prose becomes (14px) below (700px).
+- **Names and story titles:** wide cast names are (20px) bold; wide conversation titles and previews use the dedicated frontmatter roles. At widths up to (1250px), the base cast names and conversation titles are (18px), before the smaller layout overrides. Responsive cast names become compact labels inside the scrolling strip.
+- **Actions and fields:** primary actions use the action role, fields (14px), and labels (13px)/(1.6). Introduction on the live stage is a stronger (20px)/(750) action above (1250px), with a (16px) base below that threshold. Desktop navigation is (16px)/(650), reducing to (13px) below (1250px).
 
-**The Working Type Rule.** Reserve Dela for the wordmark and landing; use Manrope for operational headings, controls and sustained reading.
+**The Program Type Rule.** Use Anton for program landmarks and Manrope for names, controls and sustained reading.
 
-The landing display reduces at its own (1100px), (760px), and (450px) breakpoints. Legacy tiny metadata sizes and tracked eyebrow selectors are not a reusable type scale or a recommended new pattern.
+Small inherited metadata and compact control labels are local implementation details, not a recommended type scale. Existing eyebrow selectors are not promoted into the design system.
 
 ## Layout
 
-The world page is capped at (1504px), with (32px) desktop gutters and (18px) phone gutters. Scene and journal share a grid on wide screens, with a (20px) final gap, and stack at (900px). The compact world header is (56px) on desktop; below (760px) it uses a single row with a (60px) minimum height. The general header retains its separate layout. The world’s view navigation sits directly below its title and description.
+The working world is capped at (1800px). Above (1250px), its normal view has (10px) side gutters, a (20px) heading inset, and a grid of `minmax(168px,15fr) minmax(0,59.6fr) minmax(300px,25.2fr)` with (14px) column gaps and (16px) row gaps: cast left, stage center, journal right. Cast and journal span the stage and event-tray rows. The tray sits directly beneath the stage. Closing the journal reallocates its column to the stage. The journal and cast use the measured stage-height variable with a (650px) fallback plus (196px); these are actual CSS bounds, not a guarantee that every story fits above the fold. The viewport fit reserves the tray height plus (16px) above (1100px), then leaves (25px) bottom clearance above (1250px) or (17px) otherwise. A (240px) minimum canvas height allows short screens to scroll instead of crushing the scene.
 
-At (760px), a journal disclosure appears above the stacked panel and an event link appears beside scene actions. The expanded journal below (900px) uses (75dvh), bounded between (480px) and (600px), leaving room for reading beneath the fixed header and filters. Above (900px), the sidebar uses a (320–400px) reading column. The phone default can collapse the journal while retaining the saved preference. House metrics become full-width ruled rows. Event list columns reduce from four to three at (1100px), two at (760px), and one at (540px); the alternative event deck retains horizontal scrolling and paging.
+At (1250px), normal-view gutters return to (16px) and columns become (150px), flexible stage, and (300px), with a (12px) gap. At (1100px), the cast becomes a horizontal scrolling strip above a flexible stage and a (310px) journal; the journal is bounded to (720px). At (760px), the page becomes one column with (14px) gutters: cast, stage, event tray, journal disclosure, and journal. The journal is (560px) tall with internal scrolling. The phone heading is (34px), reducing to (29px) at (420px). The preserved journal preference still controls visibility.
 
-Insights use four summary columns, two at (900px), and one at (540px). On phones each metric places its label and value on one row and its explanation beneath. Reading columns stack at (900px); relationship prose wraps without a decorative left stripe. The house narrative becomes a single column at (700px).
+The shared masthead is (58px) tall. Phone navigation keeps the brand, field guide, theme control and a single observer presence trigger; world settings moves beside the view links. The stage toolbar has automatic height with a (58px) wide minimum and a (52px) base minimum; its action group wraps and zoom/fullscreen controls do not shrink. Wide controls use vertical separators between time mode, zoom and fullscreen; actual simulated time moves to the heading in the normal wide view. Phone controls retain zoom and fullscreen access. Fullscreen hides the cast and event tray and uses stage plus a (330px) journal on desktop; at the phone breakpoint it becomes a single column and uses in-page expansion with the same accessible enter/exit controls. These are intentional responsive variants, not missing desktop features.
 
-The landing keeps its broad arched house stage and open directory rows, with a (1504px) opening width, (32px) desktop gutters and (22px)/(18px) mobile gutters. Its directory is a preview, copy, metadata and entry grid; mobile moves metadata below preview and copy. The landing brief owns the exact composition and display-size changes.
+Event catalog cards use four columns, three at (1100px), two at (760px), and one at (420px). The alternative event deck preserves horizontal paging. The three quick-event choices remain three columns on phones. World metrics become full-width ruled rows at (760px).
 
-Spacing tokens record reused dimensions, not a requirement to quantize every existing gap. Dialog content padding is (32px), reducing to (24px 20px) at (760px). Scrolling, wrapping and containment must continue to work when text is enlarged.
+Insights use four summary columns, two below (900px), and one below (760px); phone metrics put label and value together with explanation below. Reading columns stack at (900px), narrative columns at (700px), and the activity chart at (540px). Tables retain horizontal overflow containers.
+
+Discovery has a (1480px) maximum opening and directory width, (32px) desktop gutters, and (18px) phone gutters. The title and introduction are adjacent, followed by a navy house stage and invitation. Below (760px), those regions stack. Directory rows arrange preview, copy, details and entry control; phones move details beneath preview and copy. At (360px), previews shrink again. Surface briefs carry further composition detail.
 
 ## Elevation & Depth
 
-Most working regions are flat: borders, tone and whitespace establish their hierarchy. The live scene, journal and ordinary event list have no shadow. Dialogs deliberately float above an olive translucent backdrop with (3px) blur. Event-deck cards retain subtle elevation and a stronger active treatment on small screens; this is a distinct interaction, not the event list’s appearance. Contextual popovers and the simulation artwork keep their own separation shadows.
+The ordinary interface is flat. Borders, tonal surfaces and whitespace separate cast, stage, journal, event cards, insights and directory rows. Final interface overrides remove event-deck resting and active shadows. Dialogs float over a translucent backdrop with (3px) blur; contextual overlays retain a smaller shadow. The live SVG supplies its own illustrated depth.
 
 ### Shadow Vocabulary
 
-- **Dialog:** `var(--shadow)` from design-tokens.css; light and dark values are recorded in the sidecar.
-- **Context overlay:** `0 5px 18px #0004` for time-mode tooltips and resident-choice popovers.
-- **Deck resting:** `0 1px 2px rgba(60,70,50,.05)` for event-deck cards.
-- **Deck active:** `0 10px 26px rgba(60,70,50,.13)` for the active mobile card and draw animation.
+- **Dialog light / dark:** `var(--shadow)`; exact values are recorded in the sidecar from design-tokens.css.
+- **Context overlay:** `0 5px 18px #0004`, used by time-mode and resident-name popovers.
+- **Resident arrival start:** `0 6px 20px #14284b18`, transitioning to the dialog shadow only when reduced motion is not requested.
 
-**The Containment Rule.** Use rules and space for ordinary reading and metrics; use bounded surfaces for the scene, journal, disclosures and dialogs.
+**The Reading Surface Rule.** Use tone, borders and space for ordinary panels; reserve floating depth for dialogs and contextual overlays.
 
 ## Shapes
 
-Controls share the control radius; directory filters and the native featured-house selector use the slightly tighter filter radius. Scene frames, journal panels, house narrative and disclosure containers use the panel radius. Dialogs have the larger dialog radius; event-deck cards use the deck radius. Open event lists and metric rows are square and ruled. The landing artwork keeps its broad arch with square lower corners, while thumbnails remain rounded rectangles. Counts and dedicated icon controls can be circular; these roles do not make every container a pill.
+Controls use the shared control radius; cast, stage, journal, featured landing house and tray use the panel radius. Catalog and deck cards use the event-card radius, and dialogs use the larger dialog radius. Listing thumbnails have the event-card radius. Wide participation and conversation actions use local (9px) corners, quick-event options use (7px), and the wide live-state chip uses (10px); these do not replace the shared control radius. Observer dots and status indicators remain circular. Directory listings and insights metrics are open, ruled rows. The former arched landing stage is superseded by a rounded rectangular navy stage.
 
 ## Components
 
 ### Buttons
 
-Primary buttons use action/action ink, (12px 18px) padding, strong Manrope and a minimum height of (44px). Hover uses action hover. Secondary buttons use surface/text with a control border and (10px 13px) padding; hover changes the surface and accent border. The landing’s stage action uses (15px 20px) padding, weight (800) and a (49px) minimum height. Its secondary creation action uses selected/selected ink.
+Primary buttons use action/action ink, the frontmatter padding, a (44px) minimum height and a background hover change. Secondary buttons use surface/text, a control border and their frontmatter padding. Introduction on the stage uses (22px) inline padding; above (1250px) it is at least (50px) tall and (268px) wide, with a (48px) minimum height below that threshold. The landing action uses (14px 18px) padding and a (48px) minimum height. Icon buttons normally occupy (44px) squares; compact header and stage variants retain their authored sizes.
 
-The shared focus treatment is a (3px) outline with a (3px) offset. Landing groups use a (5px) offset; component-specific focus treatments remain where defined. Disabled controls keep native behavior and component-specific reduced emphasis.
-
-### Filters and selection
-
-Directory filters are labeled buttons with `aria-pressed`, a (44px) minimum height, transparent resting surfaces and selected-sage pressed states. Journal and connection filters use the same semantic selection pair. Selected native time modes use the related soft surface with accent text and a control border. Sidebar tabs have (48px) minimum height and an accent rule plus selected tone. Journal filters form a two-column grid with (44px) targets and expose their pressed state. The keyboard-focusable journal scroll region identifies its newest-first order; conversation summaries use explicit read/hide labels, with a separate action to open the full conversation. Event-deck tone labels remain semantic category information rather than decorative section headings.
+Shared keyboard focus is a (3px) outline offset by (3px). Stage, tray and masthead focus use saffron. Component-specific focus rules remain, including the search group's outline. Disabled actions keep their native state and never imply available event capacity when the server disallows it.
 
 ### Inputs / Fields
 
-Native fields use surface/text, a control border, control radius, (11px 12px) padding and a (44px) minimum height. Focus changes the border and keeps a visible outline. Labels remain visible; hints use muted text. The directory search is an intentional variant: transparent, underlined, (280px) wide on desktop, full width on mobile, and focused as a group. The featured-house picker remains a labeled native select on the hero surface.
+Native inputs, text areas and selects use surface/text, a control border, control radius, (11px 12px) padding and a (44px) minimum height. Focus changes the border and retains a visible outline. Labels remain visible. Directory search is an underlined transparent variant, (290px) wide on desktop and full-width on phones. The featured-house select is native, (250px) on desktop and (60%) of its phone row.
 
-### Cards / Containers
+### Navigation and selection
 
-The live scene and journal use a fine line, panel radius and ordinary surface. The scene toolbar and footer share that surface instead of competing color bands. Insights panels and event list items use open ruled rows. The house narrative uses a soft inset surface without a prose stripe. Event-deck cards retain their semantic top strip, illustrated SVG icon, effects and cooldown states; do not transfer their elevation to ordinary data rows.
+The navy masthead uses Manrope links and a saffron active rule. World view links are compact underlined tabs on the page canvas. Directory filters expose `aria-pressed`, have (44px) minimum height, and select to navy/white. Sidebar tabs normally use selected blue and an active underline. Above (1250px), they use a transparent selected surface and a (4px) saffron underline; journal filters are compact, transparent and text-underlined when selected. Narrower layouts retain the selected-blue filters. Live state is a labeled chip; visual selection never replaces the corresponding accessible state.
 
-### Dialogs and disclosures
+### Cast and resident detail
 
-Dialogs use the semantic surface, dialog radius and dialog shadow, with a scrollable bounded height and independently locked page scroll. Titles and internal headings use Manrope. Field-guide disclosures remain bordered panel-radius containers with a soft open-state heading and rotating SVG chevron. Their existing (17px) summaries and (13.5px)/(1.75) body copy remain specific reading roles. This is not a flat divider-only list.
+The desktop cast panel contains full-body resident SVGs, names and actual activities; names wrap. Above (1250px), the rows have (91px) minimum height, square corners and a top rule, with (20px) names and (11px) activity labels. Hover and selection use the selected surface. Choosing a resident opens the existing resident detail experience while the house remains in context. The strip scrolls horizontally on narrower layouts. Full resident management and time-away navigation remain reachable even where the desktop rail footer is hidden.
 
-### Navigation
+### Journal
 
-The wordmark keeps Dela; navigation uses Manrope and subdued semantic text on a neutral surface. The active world-view link uses an accent underline. On phones the world header retains the brand, field guide and theme control while hiding secondary desktop navigation; the journal control moves next to its content. Theme controls remain accessible icon buttons. Header dimensions are route-specific, not one global height token.
+The white or dark reading sheet has an Anton heading, tabs, filters and a keyboard-focusable newest-first scroll region. Above (1250px), conversation previews use the wide frontmatter role and two visible lines, story titles use the wide title role, and timestamps use (14px). Status and conversation disclosure share a row; Open conversation uses (16px) text, (7px 16px) padding, (9px) corners and a (40px) minimum height. Journal entries have bottom rules with (16px 0 20px) padding. The newest-first label remains available to assistive technology while being visually hidden in this wide layout.
+
+Between (761px) and (1100px), the journal uses compact chrome, a (27px) story heading, (16px)/(1.35) conversation titles, (12px)/(1.6) two-line previews and a (40px) minimum-height Open conversation action. Entries use (14px) vertical padding in this range. At (1101–1250px) and on phones, conversation previews retain the (14px) base and up to three lines.
+
+Non-conversation records longer than (160 characters) keep a native disclosure labeled “Read full moment” / “Close moment.” Their previews remain (14px)/(1.75) with three lines, including above (1250px); only the (761–1100px) compact rule reduces them to (12px)/(1.6) and two lines. Short entries remain direct prose. Full factual text, full conversation reading and the separate conversation dialog remain reachable. Conversation actions use saffron, and journal data never comes from the comp's invented sample stories.
+
+### Event tray and catalog
+
+The navy tray offers the first three server-permitted catalog entries with actual allowance and cooldown status; its “All events” link reaches the full picker. First choice uses saffron, remaining choices pale blue, and hover uses a warm surface. Above (1250px), quick-event labels use (18px), options have a (77px) minimum height, and the outlined All events link has a (141px) minimum width. Allowance is separated from the heading by a vertical rule. Authoritative cooldown disables quick choices. The full catalog remains a grid of bounded flat cards, with the existing paged deck as an alternative. Event icons are drawn SVG, and meaningful kind/mixed/disruptive distinctions remain.
+
+### Insights, dialogs and disclosures
+
+Insights pair ruled summaries and open analysis rows with a soft narrative container. Relationship prose has no decorative stripe. Native explanatory disclosures and factual caveats remain. Dialogs use the semantic surface, dialog radius, bounded scrolling, locked page scroll and Anton titles; internal reading headings stay Manrope. Field-guide disclosures retain their bordered containers, soft open headings and SVG chevrons.
 
 ### Motion
 
-The landing house switch uses a single (420ms) `cubic-bezier(.16,1,.3,1)` arrival. Event-deck cards retain their draw animation and paging feedback. Reduced motion disables the house reveal, deck animation and associated transitions where implemented. Ordinary event-list hover changes tone without lifting.
+Cast hover changes background over (160ms); resident dialog arrival uses (220ms) with `cubic-bezier(.16,1,.3,1)` and an (8px) vertical arrival. Both are within `prefers-reduced-motion: no-preference`. Existing event-deck motion and scene movement retain their own reduced-motion handling; do not add motion merely to animate the program panels.
 
 ## Do's and Don'ts
 
 ### Do:
-- Do use the semantic light and dark roles from design-tokens.css across new working surfaces.
-- Do preserve visible focus, native field labels, pressed filter states and disabled behavior.
-- Do keep long names and descriptions wrapping inside their available columns.
-- Do use the existing Building SVG and preserve resident, furniture and semantic chart colors.
-- Do honor reduced motion for the house arrival and event-deck animations.
+- Do use the semantic light and dark roles from design-tokens.css for new interface surfaces.
+- Do keep the live house renderer and the original resident art and colors.
+- Do preserve visible focus, native field labels, pressed states and truthful disabled states.
+- Do keep long names wrapping and full journal content reachable behind explicit disclosures.
+- Do preserve observer identity, zoom, fullscreen, resident management and event access across responsive layouts.
+- Do honor reduced motion for optional arrival and state animations.
 
 ### Don't:
-- Don't restore the rejected plum, mint and yellow decorative combination.
-- Don't carry the landing’s display typography or arched stage into everyday task screens.
-- Don't turn metric rows and open directory listings into an elevated card grid.
-- Don't add decorative eyebrows, glyph icons or prose border stripes as new system conventions.
-- Don't replace the product’s house renderer with new raster illustrations.
+- Don't restore the superseded green/tan/Dela interface world.
+- Don't recolor resident sprites or replace them with generated portraits.
+- Don't copy sample comp dialogue, counts or availability into production history.
+- Don't turn directory listings and insights reading rows into elevated card grids.
+- Don't introduce decorative eyebrows, glyph icons or prose border stripes as reusable conventions.

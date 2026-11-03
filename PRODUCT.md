@@ -38,7 +38,7 @@ The following are current behavior, explicitly confirmed by the product owner as
 - Persistent world history and saved relationships, with bounded resident memories and summaries that may cover only retained records.
 - Optional AI dialogue enrichment with procedural fallback. Generated words do not themselves change authoritative simulation state.
 
-The existing simulation renderer remains an explicit implementation constraint from prior product context. A separate protected admin route supports operational house deletion; equal influence describes admitted visitors within a world.
+The existing simulation renderer remains an explicit implementation constraint from prior product context. House structure, furnishing, and background colors may be adjusted to match a new interface theme; resident colors and artwork must remain unchanged (confirmed November 3, 2026). A separate protected admin route supports operational house deletion; equal influence describes admitted visitors within a world.
 
 Other implemented capabilities include multiple house templates, resident mood/energy/belonging, distinct affinity and trust, conflict and repair, nearby group conversations, shared resources, and server-enforced event allowances. README.md, the field guide, and implementation remain the detailed references for evolving behavior and limits.
 

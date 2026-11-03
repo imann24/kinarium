@@ -27,7 +27,7 @@ describe('theme bootstrap', () => {
     expect(storage.get('kinarium-theme')).toBe(expected);
     expect(root.dataset.theme).toBe(expected);
     expect(root.style.colorScheme).toBe(expected);
-    expect(meta.setAttribute).toHaveBeenCalledWith('content', dark ? '#1d251f' : '#f4f3ec');
+    expect(meta.setAttribute).toHaveBeenCalledWith('content', dark ? '#101a2d' : '#f6f7fa');
     expect(listeners.media).toBeUndefined();
   });
   it.each(['system', 'unexpected'])('migrates legacy/invalid %s values to a persistent binary choice', stored => {

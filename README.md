@@ -51,7 +51,7 @@ Run `node tests/landing.browser.mjs` against `pnpm dev:client` with Playwright i
 
 ## Shared interface verification
 
-The house screens, insights, dialogs, field guide, and administration share the landing hero’s festival identity. `src/client/festival-tokens.css` owns the self-hosted fonts and brand colors; `theme.css` maps them to semantic interface roles; `app-chrome.css` applies the shared navigation, controls, typography, and panel treatments. Scene and resident colors retain their simulation meaning.
+The neighborhood and working screens share an Ensemble playhouse design: navy stages, white reading surfaces, saffron actions, and self-hosted Anton / Manrope typography. `src/client/design-tokens.css` owns the theme tokens; `theme.css` maps scene and semantic roles; `interface.css` and `landing.css` define the layouts. The live world puts a resident cast beside the house and journal, with event shortcuts below the stage. On smaller screens the cast scrolls horizontally and the journal stacks below. House environment colors may follow the theme; resident artwork and colors are preserved.
 
 Run `node tests/festival-ui.browser.mjs` against `pnpm dev:client` with Playwright installed (`PLAYWRIGHT_MODULE` and `CHROMIUM_PATH` may point to an external installation). It uses local fixtures for the house, insights, resident panel, settings, creation, field guide, admin sign-in, and password gate at 320, 390, 900, and 1440px in both themes. It checks overflow, primary/selected/toolbar contrast, journal toggling, and long house content. Set `SCREENSHOT_DIR=.impeccable/review` to capture desktop and phone evidence. No real worlds or admin sessions are changed. `tests/theme.test.ts` also checks resolved semantic color contrast in both themes.
 

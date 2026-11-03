@@ -2,29 +2,36 @@
 version: 1
 slug: "src-client-main-tsx"
 primary_target: "src/client/main.tsx"
-related_targets: ["src/client/landing.css","src/client/design-tokens.css","src/client/interface.css"]
+related_targets: ["src/client/landing.css","src/client/interface.css","src/client/design-tokens.css","src/client/Building.tsx","src/client/theme.css","src/client/CommunityInsights.tsx"]
 ---
 
-# Landing / public directory
+# Kinarium / Ensemble playhouse
 
-Mode: Persuade. Discover and enter a house; creation, search, filters, field guide and themes remain available. The existing Building SVG is the authoritative product preview.
+Scope: full interface revamp. Discovery and live participation receive equal attention. Landing is Persuade; world, insights and administration are Operate; the field guide and history are Read. Preserve simulation behavior, available controls, content provenance, and resident colors/assets. House environment colors may change to fit the new theme.
 
 ## Direction contract
 
-THESIS: Introduce a living miniature through its real house artwork, framed by quiet earth tones and open directory rows.
+THESIS: An ensemble playhouse: a visible cast, central live stage, and adjacent story desk make social life understandable and invite participation.
 
-OWN-WORLD: Warm ivory and oat grounds, olive text, forest entry actions and sage selections. Dela belongs to the brand and landing; Manrope carries listings and controls. DESIGN.md owns the shared tokens.
+OWN-WORLD: Navy stage and navigation, white program sheets, saffron primary actions, condensed program headings, readable sans-serif prose, aligned rules and modest corners. Light and dark themes share the same hierarchy.
 
-STORY: Understand the shared simulation, see an actual listed house, then enter it or browse the neighborhood. A template fallback remains explicitly labeled.
+STORY: Discover a house and its cast; enter, follow the unfolding story, select a resident, and introduce an event without losing the scene.
 
-FIRST VIEWPORT: A two-line display title and brief introduction sit above the arched featured-house scene, with the house name and entry invitation attached. The native selector changes the preview. Phones stack the scene and invitation while preserving entry access.
+FIRST VIEWPORT: At 1536px, a compact header and house title sit over three columns: roughly 15% resident cast, 60% live stage, 25% journal. A navy event tray sits directly under the stage. Cast becomes a horizontal strip on smaller screens; story and event regions stack with explicit navigation. Landing uses a large house stage beside an introduction and a discoverable directory.
 
-FORM: Natural-history diorama framing, seventh grounded candidate; seed:f4adad7f5187bf7e. This implementation direction replaces the rejected festival palette while retaining the working landing composition. The user explicitly confirmed keeping the artwork and rebuilding the UI around it; no separate mood-board approval is claimed.
+FORM: Ensemble theatre playbill and stage-management desk, first grounded candidate; seed:b12428c0, user-selected pick. Approved composition: `.impeccable/mocks/decision/model-pick.webp` (cast beside the stage). Signature interaction: selecting a cast member opens their profile while retaining the house context; event tray opens the full event selection. Motion is brief state feedback, with reduced-motion support. House/resident rendering stays live SVG; comp sample stories, altered portraits and the preview label are not production content. User explicitly permits house environment recoloring and forbids resident recoloring.
 
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
 
-## Composition and responsive detail
+Provenance note: seed:b12428c0 is retained from the original direction session, but its original roll output is unavailable. The saved user choice of Ensemble playhouse / Cast beside the stage is the authoritative composition decision. The automated pixel gate remains below threshold; live content, unchanged resident art, and user-authorized environment recoloring are deliberate adaptations, not a numerical gate override.
 
-The opening and footer are capped at (1504px), including gutters. Desktop opening gutters are (32px); mobile gutters become (22px), then (18px). The directory uses `205px minmax(0,1fr) 185px 115px` columns with (30px) gaps. At (1100px), the decorative stage note disappears and directory previews narrow. At (760px), the title and introduction stack, the house stage becomes one column, search fills the width, and directory metadata moves below the preview and copy. At (450px), the entry invitation becomes a single column. Preview widths reduce through (205px), (170px), (120px), and (90px).
 
-The landing retains its fluid Dela roles and broad artwork arch; working screens use Manrope headings. The house arrival is (420ms) and disabled for reduced motion. No raster assets were added. The final source uses semantic tokens from design-tokens.css and the explicit interface layer.
+## Final wide-screen implementation
+
+The additional user-requested fidelity round applies above 1250px. The normal world view uses 10px gutters, 14px column gaps and a 15/59.6/25.2 flexible grid, with the same cast/stage/story topology. The heading is 50px Anton with actual simulation time beside it; cast and journal landmarks are 40px. Ruled cast rows use 91px minimum height and preserve the original resident artwork and colors.
+
+The stage toolbar wraps with automatic height and a 58px minimum. Time-mode, zoom and fullscreen groups use vertical separators, and participation uses a larger saffron introduction action. The viewport-fit calculation reserves the quick-event tray and 25px bottom clearance; short screens may scroll once the canvas reaches its 240px minimum.
+
+The wide journal uses underlined filters, a saffron active-tab rule, 14px timestamps, 20px conversation titles and 16px/two-line conversation previews. Status and disclosure share a row above the saffron conversation action. Non-conversation record previews remain 14px/three-line disclosures at wide widths. The 761–1100px compact journal retains 12px/two-line previews, while other responsive layouts retain their earlier behavior. The newest-first label remains accessible when visually hidden on wide screens.
+
+The quick-event tray retains authoritative availability and its three live catalog choices, with 18px labels and a substantial outlined All events link. The landing composition and layouts at 1250px and below retain their established rules. This session uses comp-first; the saved workflow default remains code-first. Current gate results and the finish verdict live in the review artifacts; below-threshold comparisons remain open and are not numerical overrides.
