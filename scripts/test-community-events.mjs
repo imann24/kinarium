@@ -20,12 +20,12 @@ try {
   await page.routeWebSocket('**/api/worlds/**/socket*', () => {});
   await page.goto(`${base}/w/events`);
   for (const [name, id] of [['A community gathering', 'community-gathering'], ['A vulnerable share out', 'vulnerable-share'], ['A group meditation', 'group-meditation']]) {
-    const button = page.getByRole('button', { name: new RegExp(`^${name}`) });
+    const button = page.locator(`#house-events [data-event-id="${id}"]`);
     await Promise.all([page.waitForResponse(r => r.url().endsWith('/commands')), button.tap()]);
     assert.deepEqual(sent.at(-1), { type: 'trigger-event', eventId: id });
   }
-  assert.equal(await page.locator('.event-card').count(), 9);
-  assert(await page.getByRole('button', { name: /^A shared meal/ }).isVisible());
-  await page.screenshot({ path: '/tmp/kinarium-community-events.png', fullPage: true });
-  console.log('PASS: all three new event cards send the correct command on touch; all six existing choices remain');
+  const catalogSize = await page.evaluate(async () => (await import('/src/simulation/catalog.ts')).EVENTS.length);
+  assert.equal(await page.locator('.event-option').count(), catalogSize);
+  assert(await page.locator('#house-events [data-event-id="shared-meal"]').isVisible());
+  console.log('PASS: all three community events send the correct command on touch; the full event catalog remains available');
 } finally { await browser.close(); }

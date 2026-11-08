@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-03T20:28:28.792221+00:00",
+  "generatedAt": "2026-11-08T05:29:11.626135+00:00",
   "title": "Design System: Kinarium",
   "extensions": {
     "colorMeta": {
@@ -986,7 +986,7 @@
       },
       "event-heading": {
         "displayName": "Event Heading",
-        "purpose": "Event tray and catalog landmarks."
+        "purpose": "Retained incumbent event-heading role; the replaced house-events section uses the program heading with a 32px phone override."
       },
       "dialog-title": {
         "displayName": "Dialog Title",
@@ -1086,6 +1086,11 @@
         "name": "primary-hover",
         "value": "background .2s",
         "purpose": "Inherited primary button feedback."
+      },
+      {
+        "name": "house-event-feedback",
+        "value": "background-color 160ms ease-out",
+        "purpose": "House-event row and tone-choice background feedback; removed when reduced motion is requested."
       }
     ],
     "breakpoints": [
@@ -1132,6 +1137,10 @@
       {
         "name": "widget-phone",
         "value": "600px"
+      },
+      {
+        "name": "event-menu-single-column",
+        "value": "1200px"
       }
     ]
   },
@@ -1185,12 +1194,12 @@
       "css": ".ds-nav { display:flex; align-items:center; gap:28px; height:58px; padding:0 28px; background:var(--stage,#17284d); color:var(--stage-ink,#f6f7fa); font:650 16px var(--font-body,Manrope,sans-serif); } .ds-nav-link { display:flex; align-items:center; height:58px; text-decoration:none; color:inherit; border-bottom:2px solid transparent; } .ds-nav-link[aria-current=page] { border-color:var(--saffron,#f4c455); } .ds-guide { min-height:44px; font:inherit; background:transparent; color:inherit; border:0; cursor:pointer; } .ds-nav a:hover,.ds-guide:hover { color:var(--stage-ink,#f6f7fa); } .ds-nav :focus-visible { outline:3px solid var(--saffron,#f4c455); outline-offset:3px; } @media(min-width:1251px) { .ds-world-nav { font-size:18px; font-weight:750; padding-inline:36px; } }"
     },
     {
-      "name": "Event catalog choice",
-      "kind": "card",
-      "refersTo": "event-card",
-      "description": "A flat bounded choice with catalog content.",
-      "html": "<button class=\"ds-event\"><b>A shared meal</b><small>Make room at the table. Small connections have to start somewhere.</small></button>",
-      "css": ".ds-event { display:flex; flex-direction:column; text-align:left; gap:12px; background:var(--surface,#fff); color:var(--text,#17284d); border:1px solid var(--line,#cbd4e2); border-radius:8px; padding:22px; box-shadow:none; cursor:pointer; max-width:320px; } .ds-event b { font:750 15px var(--font-body,Manrope,sans-serif); } .ds-event small { font:400 12px/1.65 var(--font-body,Manrope,sans-serif); color:var(--secondary,#41516e); } .ds-event:hover:not(:disabled) { background:var(--selected,#dce7f7); border-color:var(--control-border,#6b7b96); } .ds-event:focus-visible { outline:3px solid var(--focus,#284e80); outline-offset:3px; } .ds-event:disabled { opacity:.45; cursor:default; }"
+      "name": "House event row",
+      "kind": "custom",
+      "refersTo": "event-row",
+      "description": "A ruled full-row dispatch button with authored content and signed starting effects. One activation sends immediately; pending, acknowledged, failed and disabled states remain explicit.",
+      "html": "<button type=\"button\" class=\"ds-event-row\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"ds-event-icon\" aria-hidden=\"true\"><path d=\"M12 21a9 9 0 0 0 9-9H3a9 9 0 0 0 9 9Z\"></path><path d=\"M7 21h10\"></path><path d=\"M19.5 12 22 6\"></path><path d=\"M16.25 3c.27.1.8.53.75 1.36-.06.83-.93 1.2-1 2.02-.05.78.34 1.24.73 1.62\"></path><path d=\"M11.25 3c.27.1.8.53.74 1.36-.05.83-.93 1.2-.98 2.02-.06.78.33 1.24.72 1.62\"></path><path d=\"M6.25 3c.27.1.8.53.75 1.36-.06.83-.93 1.2-1 2.02-.05.78.34 1.24.74 1.62\"></path></svg><span class=\"ds-event-copy\"><span class=\"ds-event-heading\"><b>A shared meal</b><span class=\"ds-event-tone\">Gentle</span></span><span class=\"ds-event-description\">Make room at the table. Small connections have to start somewhere.</span><span class=\"ds-event-effects\"><span class=\"ds-event-bad\">Supplies <strong>−8</strong></span><span class=\"ds-event-good\">Mood <strong>+8</strong></span><span class=\"ds-event-good\">Togetherness <strong>+7</strong></span><span class=\"ds-event-good\">Tension <strong>−7</strong></span></span></span><span class=\"ds-event-send\">Send <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"></path><path d=\"m12 5 7 7-7 7\"></path></svg></span></button>",
+      "css": ".ds-event-row { display:grid; grid-template-columns:22px minmax(0,1fr) auto; align-items:start; gap:12px; width:100%; padding:24px 0; border:0; border-bottom:1px solid var(--line,#cbd4e2); border-radius:0; background:transparent; color:var(--text,#17284d); text-align:left; font-family:var(--font-body,Manrope,sans-serif); cursor:pointer; touch-action:manipulation; transition:background-color 160ms ease-out; } .ds-event-icon { margin-top:2px; color:var(--secondary,#41516e); } .ds-event-copy { min-width:0; } .ds-event-heading { display:flex; flex-wrap:wrap; align-items:baseline; gap:5px 10px; } .ds-event-heading>b { font:750 15px/1.45 var(--font-body,Manrope,sans-serif); overflow-wrap:anywhere; } .ds-event-tone { color:var(--good,#38633d); font-size:10px; line-height:1.4; } .ds-event-description { display:block; margin-top:9px; max-width:65ch; color:var(--secondary,#41516e); font-size:12px; line-height:1.7; } .ds-event-effects { display:flex; flex-wrap:wrap; gap:5px 12px; margin-top:12px; font-size:11px; line-height:1.6; } .ds-event-effects>span { color:var(--secondary,#41516e); white-space:nowrap; } .ds-event-effects strong { font-weight:700; font-variant-numeric:tabular-nums; } .ds-event-good strong { color:var(--good,#38633d); } .ds-event-bad strong { color:var(--danger,#943f2c); } .ds-event-send { display:inline-flex; align-items:center; justify-content:center; gap:5px; border-radius:5px; background:var(--action,#f4c455); color:var(--action-ink,#17284d); min-height:32px; padding:6px 9px; font-size:11px; font-weight:750; white-space:nowrap; } .ds-event-row:focus-visible { position:relative; border-radius:4px; outline:2px solid var(--focus,#284e80); outline-offset:3px; } .ds-event-row:active:not(:disabled) { background:var(--selected,#dce7f7); } .ds-event-row:disabled { cursor:default; opacity:1; } .ds-event-row:disabled .ds-event-send { background:var(--surface-soft,#e8edf5); color:var(--muted,#4b5c78); } .ds-event-row.ds-event-sent .ds-event-send { background:var(--good-soft,#e4eddc); color:var(--good,#38633d); } @media(hover:hover) and (pointer:fine) { .ds-event-row:hover:not(:disabled) { background:var(--surface-soft,#e8edf5); } .ds-event-row:hover:not(:disabled) .ds-event-send { background:var(--action-hover,#e5ab33); } } @media(max-width:1200px) { .ds-event-row { padding:20px 0; } } @media(max-width:760px) { .ds-event-row { gap:9px; } .ds-event-copy { display:contents; } .ds-event-icon { grid-column:1; grid-row:1; } .ds-event-heading { grid-column:2; grid-row:1; flex-direction:column; gap:4px; } .ds-event-description,.ds-event-effects { grid-column:1 / -1; margin-top:0; } .ds-event-description { font-size:13px; } .ds-event-send { grid-column:3; grid-row:1; align-self:start; padding-inline:8px; } } @media(prefers-reduced-motion:reduce) { .ds-event-row { transition:none; } }"
     },
     {
       "name": "Program reading panel",

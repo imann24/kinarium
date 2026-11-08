@@ -1,9 +1,7 @@
 import type { EventDefinition, EventTone } from '../simulation/catalog';
 import { availableEvents, type PlayerEventBudget } from '../simulation/event-budget';
 
-export type EventView = 'deck' | 'grid';
 export type ToneFilter = 'all' | EventTone;
-export const EVENT_VIEW_KEY = 'kinarium:event-view';
 
 export const TONE_LABELS: Record<EventTone, string> = { kind: 'Gentle', mixed: 'Mixed', disruptive: 'Disruptive' };
 export const TONE_FILTERS: { tone: ToneFilter; label: string }[] = [
@@ -37,9 +35,14 @@ export function eventEffects(event: EventDefinition): EventEffect[] {
 
 export const filterEvents = (events: EventDefinition[], tone: ToneFilter) => tone === 'all' ? events : events.filter(e => e.tone === tone);
 
-/** A saved choice wins; otherwise phones get the card deck and larger screens keep the grid. */
-export function initialEventView(saved: string | null, phone: boolean): EventView {
-  return saved === 'deck' || saved === 'grid' ? saved : phone ? 'deck' : 'grid';
+/** Search the words visitors can read on an event, including its tone and effects. */
+export function searchEvents(events: EventDefinition[], query: string): EventDefinition[] {
+  const words = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  if (!words.length) return events;
+  return events.filter(event => {
+    const text = [event.name, event.description, TONE_LABELS[event.tone], ...eventEffects(event).map(effect => effect.label)].join(' ').toLowerCase();
+    return words.every(word => text.includes(word));
+  });
 }
 
 /** Minutes and seconds left, as m:ss. */
@@ -59,6 +62,3 @@ export function eventWait(now: number, world: { readyAt: number; total: number }
   if (availableEvents(budget, now) === 0 && refill !== undefined) waits.push({ reason: 'allowance', readyAt: refill, total: budget.windowMs });
   return waits.sort((a, b) => b.readyAt - a.readyAt)[0];
 }
-
-/** How much of the wait is left, from 1 (just started) to 0 (ready). */
-export const waitLeft = (wait: EventWait, now: number) => Math.max(0, Math.min(1, (wait.readyAt - now) / wait.total));
