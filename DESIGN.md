@@ -236,6 +236,11 @@ components:
     textColor: "{colors.text}"
     rounded: "{rounded.event-card}"
     padding: "22px"
+  event-row:
+    backgroundColor: "transparent"
+    textColor: "{colors.text}"
+    rounded: "0"
+    padding: "24px 0"
   event-tray:
     backgroundColor: "{colors.stage}"
     textColor: "{colors.stage-ink}"
@@ -330,7 +335,7 @@ The live stage sets its sky roles to stage navy. In the light theme, only the li
 ### Hierarchy
 
 - **Display / world title:** uppercase Anton with zero tracking; the landing is fluid and the world title follows its frontmatter role above (1250px). Below that threshold, the base world role is `clamp(32px,3.2vw,48px)` before the (1100px), (760px) and (420px) overrides.
-- **Program / event / dialog / listing titles:** uppercase Anton creates repeated landmarks. Wide cast and story headings use the program role; the base role below (1251px) is (36px) before narrower overrides. Catalog sections use the event role; the wide quick-event tray uses (36px). Modal titles use the dialog role, with a (28px) direct-title override below (600px). Resident identity uses its separate Manrope name role. Directory house names use the listing role.
+- **Program / event / dialog / listing titles:** uppercase Anton creates repeated landmarks. Wide cast and story headings use the program role; the base role below (1251px) is (36px) before narrower overrides. The house-events section uses the program role, reducing to (32px) at (760px); its menu heading uses Manrope (18px)/(750), reducing to (16px). The earlier event-heading token is retained for incumbent styles but does not govern this component. The wide quick-event tray uses (36px). Modal titles use the dialog role, with a (28px) direct-title override below (600px). Resident identity uses its separate Manrope name role. Directory house names use the listing role.
 - **Brand:** Manrope at (800), not Anton. The wide world masthead uses (34px); the shared base is recorded in frontmatter. It reduces to (22px) on phones; the footer identity has its own (24px) treatment.
 - **Insights title:** Manrope at (750), with a (28px) phone override. Insights panel headings are (21px)/(700); narrative headings are (23px)/(700).
 - **Body / journal / narrative:** preserve their distinct frontmatter roles. Directory descriptions are bounded to (58ch); world descriptions use (16px) and (62ch), with (1.5) leading above (1250px) and (1.65) below, reducing to (12px) on phones. Narrative prose becomes (14px) below (700px).
@@ -349,7 +354,7 @@ At (1250px), normal-view gutters return to (16px) and columns become (150px), fl
 
 The shared masthead is (58px) tall. Phone navigation keeps the brand, field guide, theme control and a single observer presence trigger; world settings moves beside the view links. The stage toolbar has automatic height with a (50px) wide minimum, (3px 16px) wide padding and a (52px) base minimum; its action group wraps and zoom/fullscreen controls do not shrink. Wide controls use vertical separators between time mode, zoom and fullscreen; actual simulated time moves to the heading in the normal wide view. Above (1250px), the stage footer uses (8px 18px) padding and the event tray (16px 18px 20px), freeing more height for the live canvas. Phone controls retain zoom and fullscreen access. Fullscreen hides the cast and event tray and uses stage plus a (330px) journal on desktop; at the phone breakpoint it becomes a single column and uses in-page expansion with the same accessible enter/exit controls. These are intentional responsive variants, not missing desktop features.
 
-Event catalog cards use four columns, three at (1100px), two at (760px), and one at (420px). The alternative event deck preserves horizontal paging. The three quick-event choices remain three columns on phones. World metrics become full-width ruled rows at (760px).
+The house-events section is a program panel capped at (1560px), with (32px) insets and a (56px) top margin. A (190px) tone rail sits beside two columns of ruled event rows with (28px) between columns. At (1200px), panel insets and the rail gap become (24px), the rail narrows to (160px), and rows form one column. At (760px), panel insets become (20px), the allowance stacks below the heading, tone choices form a horizontal row, and search fills the width. At (360px), panel insets become (16px 12px). These are component-local layout rules; the three quick-event choices remain three columns on phones. World metrics become full-width ruled rows at (760px).
 
 Insights use four summary columns, two below (900px), and one below (760px); phone metrics put label and value together with explanation below. Reading columns stack at (900px), narrative columns at (700px), and the activity chart at (540px). Tables retain horizontal overflow containers.
 
@@ -361,7 +366,7 @@ Settings use two equal columns with a (40px) gap and a ruled second column, each
 
 ## Elevation & Depth
 
-The ordinary interface is flat. Borders, tonal surfaces and whitespace separate cast, stage, journal, event cards, insights and directory rows. Final interface overrides remove event-deck resting and active shadows. Dialogs float over a translucent backdrop with (3px) blur; contextual overlays retain a smaller shadow. The live SVG supplies its own illustrated depth.
+The ordinary interface is flat. Borders, tonal surfaces and whitespace separate cast, stage, journal, event rows, insights and directory rows. House-event rows use bottom rules without individual card borders or shadows. Dialogs float over a translucent backdrop with (3px) blur; contextual overlays retain a smaller shadow. The live SVG supplies its own illustrated depth.
 
 ### Shadow Vocabulary
 
@@ -373,7 +378,7 @@ The ordinary interface is flat. Borders, tonal surfaces and whitespace separate 
 
 ## Shapes
 
-Controls use the shared control radius; cast, stage, journal, featured landing house and tray use the panel radius. Catalog and deck cards use the event-card radius, and dialogs use the larger dialog radius. Listing thumbnails have the event-card radius. Wide participation and conversation actions use local (9px) corners, quick-event options use (7px), and the wide live-state chip uses (10px); these do not replace the shared control radius. Observer dots and status indicators remain circular. Directory listings and insights metrics are open, ruled rows. The former arched landing stage is superseded by a rounded rectangular navy stage.
+Controls use the shared control radius; cast, stage, journal, featured landing house, event panel and tray use the panel radius. House-event rows have square corners; their inline Send affordance uses local (5px) corners. The earlier event-card component token remains recorded for incumbent styles and listing thumbnails retain its radius, but it does not govern the replaced house-events menu. Dialogs use the larger dialog radius. Wide participation and conversation actions use local (9px) corners, quick-event options use (7px), and the wide live-state chip uses (10px); these do not replace the shared control radius. Observer dots and status indicators remain circular. Directory listings and insights metrics are open, ruled rows. The former arched landing stage is superseded by a rounded rectangular navy stage.
 
 ## Components
 
@@ -405,7 +410,13 @@ Non-conversation records longer than (160 characters) keep a native disclosure l
 
 ### Event tray and catalog
 
-The navy tray offers the first three server-permitted catalog entries with actual allowance and cooldown status; its “All events” link reaches the full picker. First choice uses saffron, remaining choices pale blue, and hover uses a warm surface. Above (1250px), quick-event labels use (18px), options have a (77px) minimum height, and the outlined All events link has a (141px) minimum width. Allowance is separated from the heading by a vertical rule. Authoritative cooldown disables quick choices. The full catalog remains a grid of bounded flat cards, with the existing paged deck as an alternative. Event icons are drawn SVG, and meaningful kind/mixed/disruptive distinctions remain.
+The navy tray offers the first three server-permitted catalog entries with actual allowance and cooldown status; its “All events” link reaches the full picker. First choice uses saffron, remaining choices pale blue, and hover uses a warm surface. Above (1250px), quick-event labels use (18px), options have a (77px) minimum height, and the outlined All events link has a (141px) minimum width. Allowance is separated from the heading by a vertical rule. Authoritative cooldown disables quick choices.
+
+The full picker is a ruled menu with All, Gentle, Mixed and Disruptive tone choices, category counts, and search across names, descriptions, tone labels and visible effect names. The selected tone uses selected blue and selected ink with an accessible pressed state. Tone labels and signed effect values preserve meaning alongside good, warning and danger colors. Nonzero effects appear largest-first; rising tension is unfavorable. Their copy identifies these as starting changes, with resident reactions left open.
+
+Each event is one native button containing its SVG icon, authored name and description, base effects and a saffron Send affordance. Row names use Manrope (15px)/(750), descriptions use (12px)/(1.7) with a (65ch) maximum, and phone descriptions become (13px). The compact tone and effect metadata is local to this menu rather than a new global type scale. Rows use the event-row frontmatter role, changing to (20px 0) padding at (1200px). Hover adds surface soft and changes the Send affordance to action hover; pressed rows use selected blue. Keyboard focus is a local (2px) focus outline with (3px) offset. On phones, the icon, name and Send affordance form the first line; description and effects span the full row below.
+
+One activation sends immediately, as explicitly chosen by the user; there is no preview step. A row reads Sending while pending, then Sent only after a successful server acknowledgement and while the resulting wait remains active. Polite result feedback persists separately; failures identify the event and expose Retry when available. Connection loss, another pending change, house cooldown or exhausted allowance disable dispatch while tone selection and search remain usable. Disabled rows keep their copy at full opacity and mute only the Send affordance. The nearby status distinguishes reconnecting, sending, house settling and allowance recharge. The allowance uses a semantic segmented meter, available/limit count and next-refill countdown. Empty search has a Show all events recovery action; an empty server catalog explains that the menu will update.
 
 ### Insights, dialogs and disclosures
 
@@ -417,7 +428,7 @@ Metric popovers use the frontmatter width and inset, reducing to (24px) padding 
 
 ### Motion
 
-Cast hover changes background over (160ms); resident dialog arrival uses (220ms) with `cubic-bezier(.16,1,.3,1)` and an (8px) vertical arrival. Both are within `prefers-reduced-motion: no-preference`. Existing event-deck motion and scene movement retain their own reduced-motion handling; do not add motion merely to animate the program panels.
+Cast hover changes background over (160ms); resident dialog arrival uses (220ms) with `cubic-bezier(.16,1,.3,1)` and an (8px) vertical arrival. Both are within `prefers-reduced-motion: no-preference`. House-event rows and tone choices use (160ms) ease-out background transitions, removed for reduced motion. Scene movement retains its own reduced-motion handling; do not add motion merely to animate the program panels.
 
 ## Do's and Don'ts
 
