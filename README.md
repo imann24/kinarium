@@ -47,6 +47,8 @@ On touch screens an event card triggers on a single tap: the hover lift only app
 
 The landing page uses a discovery-first neighborhood layout with a selectable house preview, search and filters. Its typography is self-hosted; font licenses and sources live in `public/fonts/`.
 
+See [Brand assets](docs/brand-assets.md) for favicon and Open Graph image sources, regeneration, and sharing metadata.
+
 Run `node tests/landing.browser.mjs` against `pnpm dev:client` with Playwright installed. Set `PLAYWRIGHT_MODULE` and `CHROMIUM_PATH` when using an external installation. The test intercepts directory requests and never writes a server world. It covers light/dark layouts at 1440, 1280, 390, and 320px, entry links, filters/search, preview selection, creation controls, the field guide, theme persistence, and empty/error states. Set `LANDING_SCREENSHOTS=.impeccable/review` to capture the main layouts.
 
 ## Shared interface verification
