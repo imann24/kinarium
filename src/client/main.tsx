@@ -199,6 +199,15 @@ function World({ slug, insights }: { slug: string; insights: boolean }) {
     void connect(); return () => { disposed = true; controller.abort(); clearTimeout(retry); clearInterval(heartbeat); socket?.close(); };
   }, [slug, reload, identity]);
   async function command(c: Command, rethrow = false) { setPending(true); setError(''); try { acceptSnapshot(await api<Snapshot>(`/worlds/${slug}/commands`,c)); return true; } catch(e) { if (e instanceof ApiError && e.data.playerEvents && typeof e.data.serverNow === 'number') { serverOffset.current = e.data.serverNow - Date.now(); setNow(e.data.serverNow); setSnapshot(previous => previous ? { ...previous, playerEvents: e.data.playerEvents as PlayerEventBudget } : previous); } setError(getError(e)); if (rethrow) throw e; return false; } finally { setPending(false); } }
+  async function sendEventFromList(eventId: string) {
+    if (!await command({ type: 'trigger-event', eventId })) return false;
+    stageRef.current?.scrollIntoView({
+      behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+      block: 'start',
+      inline: 'nearest',
+    });
+    return true;
+  }
   if (locked) return <main className="locked-world"><div className="large-icon"><LockKeyhole size={28}/></div><h1>This door has a key.</h1><p>Enter the world’s password to join its story.</p><form onSubmit={async e => { e.preventDefault(); setPending(true); try { await api(`/worlds/${slug}/unlock`,{ password }); setLocked(false); setReload(n=>n+1); } catch(e) { setError(getError(e)); } finally { setPending(false); } }}><input autoFocus type="password" autoComplete="current-password" aria-label="World password" placeholder="World password" value={password} onChange={e=>setPassword(e.target.value)} required/><button className="primary" disabled={pending}>Open the door <ArrowRight size={16}/></button>{error && <p className="error-box" role="alert">{error}</p>}</form><a href="/" className="quiet-link"><ArrowLeft size={14}/> Back to the neighborhood</a></main>;
   if (missing) return <main className="empty-page"><h1>This world hasn’t begun yet.</h1><a href="/">Find a world in the neighborhood</a></main>;
   if (!snapshot) return <main className="empty-page"><Sprout size={30}/><p>{error || 'Finding your little corner…'}</p></main>;
@@ -215,7 +224,7 @@ function World({ slug, insights }: { slug: string; insights: boolean }) {
       <SceneEvents budget={budget} now={now} readyAt={w.cooldowns.events || 0} eventIds={snapshot.eventIds} disabled={pending || !connected} onPick={eventId=>void command({type:'trigger-event',eventId})}/>
     </div>
     <CommunityMetrics world={w}/>
-    <section id="house-events" className="events-section" aria-labelledby="house-events-title"><div className="event-section-heading"><div><h2 id="house-events-title">House events</h2><p>A little kindness. A change of plans. What happens next?</p></div><EventAllowance budget={budget} now={now}/></div><EventPicker key={w.slug} events={serverEvents(EVENTS, snapshot.eventIds)} disabled={pending} connected={connected} wait={eventWait(now, { readyAt: w.cooldowns.events || 0, total: EVENT_COOLDOWN_MS }, budget)} now={now} onPick={eventId=>command({type:'trigger-event',eventId})}/></section><div className="world-footnote"><Leaf size={13}/> Nothing to win. A lot to notice.<span>Changes are saved as life unfolds.</span></div>
+    <section id="house-events" className="events-section" aria-labelledby="house-events-title"><div className="event-section-heading"><div><h2 id="house-events-title">House events</h2><p>A little kindness. A change of plans. What happens next?</p></div><EventAllowance budget={budget} now={now}/></div><EventPicker key={w.slug} events={serverEvents(EVENTS, snapshot.eventIds)} disabled={pending} connected={connected} wait={eventWait(now, { readyAt: w.cooldowns.events || 0, total: EVENT_COOLDOWN_MS }, budget)} now={now} onPick={sendEventFromList}/></section><div className="world-footnote"><Leaf size={13}/> Nothing to win. A lot to notice.<span>Changes are saved as life unfolds.</span></div>
     </>}
     {openConversation !== undefined && <ConversationModal key={`${w.slug}:${openConversation.id}`} world={w} conversationId={openConversation.id} initialEntry={openConversation.entry} onClose={()=>setOpenConversation(undefined)} onJournal={entry=>{setOpenConversation(undefined);setConversationRequest({id:entry.id,entry});setTab('journal');journalPanel.setCollapsed(false);}} onSelect={id=>{setOpenConversation(undefined);setSelected(id);setTab('residents');journalPanel.setCollapsed(false);}}/>}
     {expandedResident && !insights && residentModal(()=>setExpandedResident(false))}
