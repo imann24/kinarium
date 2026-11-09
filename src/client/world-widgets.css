@@ -161,8 +161,43 @@
 .world-sidebar .resident-row { padding:16px 0; gap:16px; }
 .world-sidebar .resident-row b { font-size:14px; overflow-wrap:anywhere; }
 .world-sidebar .resident-row small { font-size:12px; line-height:1.6; white-space:normal; }
-.world-sidebar .bond-card { padding:20px 0; }
-.world-sidebar .bond-card p { font-size:13px; line-height:1.7; }
+/* Bonds keep identity, relationship state, and the two independent scores together. */
+.world-sidebar .bonds-intro { padding:24px 20px 16px; }
+.world-sidebar .bonds-intro h3 { margin:0; font-size:20px; font-weight:750; line-height:1.35; letter-spacing:-.025em; }
+.world-sidebar .bonds-intro>p { margin-top:8px; font-size:12px; line-height:1.7; }
+:root .world-sidebar .bonds-list { display:flex; flex-direction:column; gap:12px; padding:4px 20px 20px; scrollbar-color:var(--control-border) transparent; scroll-padding-block:8px; }
+:root .world-sidebar .bond-card { display:block; flex-shrink:0; margin:0; padding:16px; border:1px solid var(--line); border-radius:12px; background:var(--surface); text-align:left; }
+:root .world-sidebar .bond-card:hover { background:var(--surface-hover); border-color:var(--control-border); }
+:root .world-sidebar .bond-card:active { background:var(--selected); }
+:root .world-sidebar .bond-card:focus-visible,.world-sidebar .bonds-list:focus-visible { outline:3px solid var(--focus); outline-offset:3px; }
+.bond-card-heading { display:flex; align-items:center; gap:12px; }
+.bond-pair { display:flex; flex-shrink:0; align-items:center; width:54px; }
+.bond-pair-portrait { display:block; width:32px; height:40px; padding:3px 1px 0; overflow:hidden; border-radius:8px; background:var(--surface-soft); }
+.bond-pair-portrait+span { margin-left:-10px; transform:translateY(5px); border:2px solid var(--surface); }
+.bond-pair-portrait svg { display:block; width:100%; height:100%; }
+.bond-card-identity { display:block; flex:1; min-width:0; }
+:root .world-sidebar .bond-card-identity b { display:block; font-size:14px; font-weight:750; line-height:1.5; color:var(--text); overflow-wrap:anywhere; }
+:root .world-sidebar .bond-card-identity b span { margin:0 2px; color:var(--muted); font-weight:400; }
+.bond-card-identity small { display:block; margin-top:4px; color:var(--secondary); font-size:11px; line-height:1.65; overflow-wrap:anywhere; }
+:root .world-sidebar .bond-card-identity small svg { display:inline; vertical-align:-2px; margin-right:5px; color:var(--accent); }
+:root .world-sidebar .bond-card[data-kind='close'] small svg { color:var(--good); fill:var(--good); }
+:root .world-sidebar .bond-card[data-kind='strained'] small svg { color:var(--danger); }
+:root .world-sidebar .bond-card[data-kind='repairing'] small svg,
+:root .world-sidebar .bond-card[data-kind='easing'] small svg { color:var(--warning); }
+:root .world-sidebar .bond-card-chevron { color:var(--muted); }
+.bond-card-scores { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; margin-top:20px; }
+.bond-card-score { display:block; min-width:0; }
+.bond-card-score-label { display:flex; justify-content:space-between; align-items:baseline; gap:8px; color:var(--secondary); font-size:11px; line-height:1.5; }
+.bond-card-score-label strong { color:var(--text); font-size:12px; font-weight:750; font-variant-numeric:tabular-nums; }
+.bond-card-gauge { display:block; position:relative; height:5px; margin-top:8px; border-radius:3px; background:var(--line); }
+.bond-card-gauge>span { display:block; position:absolute; height:100%; border-radius:3px; background:var(--accent); }
+.bond-card-gauge.diverging>span { background:var(--good); }
+.negative .bond-card-gauge.diverging>span { background:var(--danger); }
+.bond-card-gauge.diverging::after { content:''; position:absolute; left:50%; top:-2px; height:9px; width:1px; background:var(--muted); }
+.bonds-list .empty-note { padding:24px 0; color:var(--secondary); font-size:13px; line-height:1.7; }
+@media(prefers-reduced-motion:no-preference) {
+  .world-sidebar .bond-card { transition:background-color 160ms ease-out,border-color 160ms ease-out; }
+}
 .away-confirmation .away-consequences { gap:20px; font-size:15px; line-height:1.8; }
 .away-confirmation .away-actions { gap:12px; margin-top:32px; }
 
