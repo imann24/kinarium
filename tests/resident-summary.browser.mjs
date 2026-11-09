@@ -28,7 +28,10 @@ try {
   const panel = page.locator('.personal-history');
   await panel.waitFor();
   assert.match(await panel.innerText(), /I became friends with/);
+  assert.match(await panel.innerText(), /Refresh pending/);
+  await panel.locator('.history-freshness > summary').click();
   assert.match(await panel.innerText(), /waiting for the next refresh/);
+  await panel.locator('.history-freshness > summary').click();
   for (const theme of ['light', 'dark']) {
     await page.evaluate(theme => { document.documentElement.dataset.theme = theme; }, theme);
     for (const width of [1440, 390, 320]) {
