@@ -25,7 +25,10 @@ export default function PersonalHistory({ character, characters, onSelect, minut
   }
   return <section className="personal-history" aria-label={`${character.name}’s personal history`}>
     <h4>Story so far</h4><p className="history-note">Highlights from retained memories.</p>
-    <p className="history-note" aria-label="Summary freshness">{cached ? `Updated ${gameTime(cached.minute)}. ${pending ? 'New memories or context are waiting for the next refresh. ' : ''}` : 'Local summary. '}Changed summaries refresh at most once per real-time minute while the world is active, or when it next resumes. Original records are preserved.</p>
+    <details className="history-freshness">
+      <summary>{cached ? `Updated ${gameTime(cached.minute)}` : 'About this summary'}{pending && <span className="history-pending">Refresh pending</span>}</summary>
+      <p className="history-note" aria-label="Summary freshness">{cached ? `Updated ${gameTime(cached.minute)}. ${pending ? 'New memories or context are waiting for the next refresh. ' : ''}` : 'Local summary. '}Changed summaries refresh at most once per real-time minute while the world is active, or when it next resumes. Original records are preserved.</p>
+    </details>
     {summary.story.length ? <><p className="history-story">{summary.story.map((episode, index) => <span key={episode.key}>{index > 0 ? ' ' : ''}{renderText(episode)}</span>)}</p><details className="history-sources"><summary>Story sources</summary>{summary.story.map(episode => <div key={episode.key}>{originals(episode)}</div>)}</details></>
       : <p className="history-note">{summary.timeline.length ? 'Their retained moments are preserved below in their original words.' : 'Their lived history will grow as they take part in the world.'}</p>}
     {!!summary.defining.length && <><h4>Defining moments</h4><ul className="history-highlights">{summary.defining.map(episode => <li key={episode.key}><p>{renderText(episode)}</p>{sources(episode)}</li>)}</ul></>}

@@ -33,7 +33,7 @@ Dialog text inputs and selects have 48px minimum height, and text areas have 112
 
 Settings have two equal columns with a 40px gap and a vertical rule before the simulation form. Each form keeps its own heading and save action. At 900px the dialog caps at 680px, columns stack and the divider becomes horizontal.
 
-Resident identity and edits form a separate top region. Background, wellbeing, influences and connections occupy the first reading column; history occupies the second, with a 1/1.15 proportion and 48px gap. Resident settings follow both columns beneath a rule. At 900px the reading and control grids stack. Resident names use 28px Manrope; reading uses 14px/1.8. No resident art or colors are changed.
+Resident identity and edits form a separate top region, with settings below the reading content. The later story-first modal overhaul is documented in [Resident profile / put their story first](src-client-resident-profile-css.md), which owns the current modal column order, proportions, spacing, type and disclosure treatment. The shared widget rules here remain the inherited baseline for the compact sidebar and other dialogs; its original overview-before-history order and expanded influences are preserved. No resident art or colors are changed.
 
 Appearance places a 160px-wide sticky preview beside choices separated by 24px. At 600px the preview is static, centered and 120px wide above a single choices column. Swatches and hair controls remain 44px, with 12px gaps. Save/cancel actions follow a rule and share the phone row.
 

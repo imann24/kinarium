@@ -28,7 +28,7 @@ try {
   await page.goto(`${origin}/w/state-browser`);
   await page.getByRole('button', { name: 'Residents', exact: true }).click();
   await page.locator('.resident-row').filter({ hasText: 'Cleo' }).click();
-  const panel = page.getByRole('region', { name: 'What affects these values' });
+  const panel = page.locator('.resident-state');
   await panel.waitFor();
   assert.match(await panel.innerText(), /At 0 · downward pressure/);
   assert.match(await panel.innerText(), /Energy · At 100 · upward pressure/);
@@ -63,6 +63,8 @@ try {
   assert.equal(await panel.locator('summary').count(), 1);
   await page.goto(`${origin}/w/state-browser/insights`);
   await page.locator('.insights-resident').filter({ hasText: 'Cleo' }).click();
+  const influences = page.locator('.resident-modal .resident-influences > summary');
+  await influences.focus(); await page.keyboard.press('Enter');
   await panel.waitFor();
   assert.match(await panel.innerText(), /Scarce supplies push mood down/);
   assert.deepEqual(errors, []);

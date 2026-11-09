@@ -50,7 +50,7 @@ try {
   assert.equal(await input(panel).evaluate(el => el === document.activeElement), true);
   await input(panel).fill('Cancelled'); await panel.getByRole('button', { name: 'Cancel', exact: true }).click();
   assert.equal(commands.length, 0);
-  assert.equal(await edit(panel).evaluate(el => el === document.activeElement), true);
+  await page.waitForFunction(label => document.activeElement?.getAttribute('aria-label') === label, await edit(panel).getAttribute('aria-label'));
   await edit(panel).click(); await input(panel).fill('   '); await save(panel).click();
   await panel.getByRole('alert').filter({ hasText: 'between 1 and 30' }).waitFor();
   assert.equal(commands.length, 0); assert.equal(await input(panel).getAttribute('maxlength'), '30');
@@ -59,7 +59,7 @@ try {
   await panel.getByRole('heading', { name: 'Ellis', exact: true }).waitFor();
   await observer.locator('.world-sidebar').getByRole('heading', { name: 'Ellis', exact: true }).waitFor();
   assert.deepEqual(commands, [{ type: 'rename-character', characterId: before.characters[0].id, name: 'Ellis' }]);
-  assert.equal(await edit(panel).evaluate(el => el === document.activeElement), true);
+  await page.waitForFunction(label => document.activeElement?.getAttribute('aria-label') === label, await edit(panel).getAttribute('aria-label'));
   await edit(panel).click(); await save(panel).click(); assert.equal(commands.length, 1);
   await panel.getByRole('button', { name: /in a larger panel/ }).click();
   const modal = page.locator('.resident-modal');
