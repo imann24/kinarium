@@ -6,10 +6,10 @@ import { houseNarrative } from './house-narrative';
 export default function HouseNarrative({ world }: { world: WorldState }) {
   const narrative = useMemo(() => houseNarrative(world), [world]);
   return <section className="house-narrative" aria-labelledby="house-narrative-title">
-    <div><h3 id="house-narrative-title">A little of the story.</h3></div>
+    <div className="house-narrative-heading"><h3 id="house-narrative-title">A little of the story.</h3><span>Whole house · {gameTime(world.minute)}</span></div>
     <div className="house-narrative-copy">
-      <p>{narrative.atmosphere}</p>
-      {narrative.moments.length ? <p>{narrative.moments.map(moment => <span key={moment.id}>{moment.text} <small>({gameTime(moment.minute)})</small>{' '}</span>)}</p> : <p>{narrative.empty}</p>}
+      <p className="house-atmosphere">{narrative.atmosphere}</p>
+      {narrative.moments.length ? <ul className="house-moments">{narrative.moments.map(moment => <li key={moment.id}><small>{gameTime(moment.minute)}</small><p>{moment.text}</p></li>)}</ul> : <p className="house-narrative-empty">{narrative.empty}</p>}
       <p className="insights-note">Turning points from the last simulated day lead, then other retained moments from the last six hours. Records may be incomplete.</p>
       <details><summary>About this reading</summary><p>Whole house, including recorded interactions with residents now away. Turning points (a disagreement settled, an agreement to try, a turn for the better, a new friendship) from the last simulated day come first, then selected moments from the last six simulation hours; current atmosphere uses the house’s togetherness and tension scores. The statistics filters do not change this reading.</p><p>{narrative.coverage} This is a selection, not a complete history or an explanation of anyone’s feelings.</p></details>
     </div>
