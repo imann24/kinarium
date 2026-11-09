@@ -85,7 +85,7 @@
 .journal-panel .journal-scroll:focus-visible { outline: 2px solid var(--focus); outline-offset: -3px; }
 .journal-reading-order { display: flex; align-items: center; gap: 6px; margin-bottom: 20px; color: var(--muted); font-size: 11px; }
 .journal-panel .timeline { padding-left: 12px; }
-.journal-panel .journal-entry { padding: 0 0 24px 23px; overflow-wrap: anywhere; }
+.journal-panel .journal-entry { padding: 0 0 24px 24px; overflow-wrap: anywhere; }
 .journal-panel .journal-entry:last-child { padding-bottom: 8px; border-left-color: transparent; }
 .journal-panel .timeline-icon { width: 26px; height: 26px; left: -14px; top: -3px; }
 .journal-panel .entry-meta { flex-wrap: wrap; gap: 2px 8px; font-size: 11px; line-height: 1.6; font-variant-numeric: tabular-nums; }
