@@ -426,6 +426,8 @@ Conversations use the conversation-reading role, ruled turns with (24px) vertica
 
 Metric popovers use the frontmatter width and inset, reducing to (24px) padding on phones. Titles use (20px)/(750), body uses (14px)/(1.75), and disclosure/close targets remain (44px). The sidebar resident and bond lists use (20px) insets, wrapped resident labels and more space between rows. These compact widgets retain the scene context rather than adopting dialog-scale widths.
 
+The Bonds widget pairs unchanged resident SVG portraits with (14px)/(750) names, the actual relationship label and encounter count, and a detail chevron. Each connection uses a flat, (12px)-radius bordered button with (16px) insets and a (12px) list gap. Separate affinity and trust columns show signed affinity on its diverging −100 to 100 scale and trust on its 0–100 scale. Green and clay mark affinity direction; blue marks trust. State icons distinguish close, strained, repair and other relationships without suggesting a favorite toggle. Names and metadata wrap, the list scrolls by keyboard, and each button preserves the existing relationship dialog and focus return. Colors use semantic light/dark tokens; optional hover transitions honor reduced motion.
+
 ### Motion
 
 Cast hover changes background over (160ms); resident dialog arrival uses (220ms) with `cubic-bezier(.16,1,.3,1)` and an (8px) vertical arrival. Both are within `prefers-reduced-motion: no-preference`. House-event rows and tone choices use (160ms) ease-out background transitions, removed for reduced motion. Scene movement retains its own reduced-motion handling; do not add motion merely to animate the program panels.
