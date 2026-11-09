@@ -49,33 +49,6 @@ label small,.form-foot { color:var(--muted); font-size:12px; line-height:1.65; }
 .mode-picker button.selected { background:var(--selected); color:var(--selected-ink); border-color:var(--accent); }
 .mode-picker button strong { font-size:14px; }
 /* Reading surfaces use rules and whitespace instead of nested card trophies. */
-.insights-heading { padding:12px 0; }
-.insights-heading h2 { font-size:30px; font-weight:750; letter-spacing:-.035em; }
-.house-narrative { background:var(--surface-soft); border:0; border-radius:var(--radius-panel); padding:28px; }
-.house-narrative h3 { font-size:23px; font-weight:700; }
-.house-narrative-copy small { white-space:normal; }
-.insights-summary { gap:0; border-block:1px solid var(--line); padding:20px 0; }
-.insights-summary>div { background:transparent; border:0; border-right:1px solid var(--line); border-radius:0; padding:0 24px; }
-.insights-summary>div:first-child { padding-left:0; }
-.insights-summary>div:last-child { border:0; }
-.insights-summary strong { font-size:25px; font-weight:700; margin:8px 0; }
-.insights-summary span,.insights-summary small { font-size:12px; }
-.insights-panel { background:transparent; border:0; border-top:1px solid var(--line); border-radius:0; padding:24px 0; }
-.insights-panel h3 { font-size:21px; font-weight:700; }
-.insights-distribution { background:transparent; }
-.connection-key { display:flex; flex-wrap:wrap; gap:4px 12px; }
-.connection-key button { min-width:140px; font-size:12px; }
-.connection-key button[aria-pressed=true] { background:var(--selected); color:var(--selected-ink); border-color:var(--control-border); }
-.insights-columns { gap:36px; }
-.insights-bond,.insights-resident { font-size:13px; }
-.insights-bond small,.insights-resident small { font-size:12px; }
-.insights-pair { border:0; border-radius:var(--radius-control); }
-.insights-pair article { border:0; padding:0; }
-.insights-explainer { margin:10px 0; font-size:12px; color:var(--secondary); }
-.insights-explainer summary { min-height:44px; padding:12px 0; cursor:pointer; }
-.activity-window { border:0; border-left:1px solid var(--line); border-radius:0; padding:0 20px; }
-.activity-window:first-child { border:0; padding-left:0; }
-.activity-window>small,.activity-series { font-size:12px; }
 .metric-details h3 { font-size:20px; }
 .metric-more>summary,.resident-state summary,.journal-arc-earlier summary { min-height:44px; padding-block:12px; }
 .appearance-swatch { min-width:44px; min-height:44px; }
@@ -337,8 +310,6 @@ label small,.form-foot { color:var(--muted); font-size:12px; line-height:1.65; }
   .stage-footer>span { width:100%; }
   .stage-footer .introduce-control { margin-left:auto; }
   .event-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
-  .insights-summary>div { padding:12px 20px; }
-  .insights-summary>div:nth-child(2) { border:0; }
 }
 @media(min-width:761px) and (max-width:1100px) {
   .world-sidebar .story-heading { font-size:27px; padding:16px 16px 10px; }
@@ -409,13 +380,6 @@ label small,.form-foot { color:var(--muted); font-size:12px; line-height:1.65; }
   .event-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
   .modal-content { padding:24px 20px; }
   .modal h2 { font-size:30px; }
-  .house-narrative { padding:20px; }
-  .insights-heading h2 { font-size:28px; }
-  .insights-columns { gap:16px; grid-template-columns:1fr; }
-  .insights-summary { grid-template-columns:1fr; padding:0; }
-  .insights-summary>div,.insights-summary>div:first-child { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:4px 16px; padding:16px 0; border:0; border-bottom:1px solid var(--line); }
-  .insights-summary>div>small { grid-column:1/-1; }
-  .insights-summary strong { margin:0; }
   .activity-window,.activity-window:first-child { padding:16px 0; border:0; border-top:1px solid var(--line); }
   .world-footnote { flex-wrap:wrap; gap:8px; }
   .world-fullscreen .world-layout,.world-fullscreen .world-layout:not(.journal-collapsed) { grid-template-columns:1fr; height:auto; }
