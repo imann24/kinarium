@@ -19,19 +19,45 @@ export default function CommunityMetrics({ world }: { world: WorldState }) {
   const id = useId(), root = useRef<HTMLElement>(null), panel = useRef<HTMLDivElement>(null);
   const buttons = useRef<Partial<Record<CommunityMetric, HTMLButtonElement | null>>>({});
   const pointerToggle = useRef(false);
+  const hoverTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const lastScroll = useRef(-Infinity);
+  const keyboardPreview = useRef(false);
   const dismissed = useRef<CommunityMetric | undefined>(undefined);
   const suppressFocus = useRef(false), focusPanel = useRef(false);
   const [active, setActive] = useState<CommunityMetric>();
   const [pinned, setPinned] = useState(false);
   const [position, setPosition] = useState({ top: 0, left: 12 });
   const [layout, setLayout] = useState(0), relayout = () => setLayout(n => n + 1);
+  const cancelHover = () => { clearTimeout(hoverTimer.current); hoverTimer.current = undefined; };
+  const preview = (key: CommunityMetric, pointerType: string) => {
+    if (pointerType === 'touch' || pinned || active === key || dismissed.current === key || hoverTimer.current !== undefined || performance.now() - lastScroll.current < 200) return;
+    hoverTimer.current = setTimeout(() => { hoverTimer.current = undefined; keyboardPreview.current = false; setActive(key); }, 350);
+  };
   const close = (restore = false) => {
+    cancelHover();
+    keyboardPreview.current = false;
     dismissed.current = active;
     if (restore && active) {
       suppressFocus.current = true; buttons.current[active]?.focus(); suppressFocus.current = false;
     }
     setActive(undefined); setPinned(false);
   };
+  useEffect(() => {
+    const scrolling = (event: Event) => {
+      // Reading inside the popover should not dismiss it or block page scrolling.
+      if (event.target instanceof Node && panel.current?.contains(event.target)) return;
+      lastScroll.current = performance.now();
+      cancelHover();
+      if (!pinned && !keyboardPreview.current && !panel.current?.contains(document.activeElement)) setActive(undefined);
+    };
+    window.addEventListener('wheel', scrolling, { capture: true, passive: true });
+    window.addEventListener('scroll', scrolling, true);
+    return () => {
+      cancelHover();
+      window.removeEventListener('wheel', scrolling, true);
+      window.removeEventListener('scroll', scrolling, true);
+    };
+  }, [pinned]);
   useEffect(() => {
     if (!active) return;
     const outside = (event: PointerEvent) => { if (!root.current?.contains(event.target as Node)) close(); };
@@ -58,15 +84,22 @@ export default function CommunityMetrics({ world }: { world: WorldState }) {
   const detail = active ? communityMetricDetails(world, active) : undefined;
   const label = metrics.find(m => m.key === active)?.label;
   return <section ref={root} className="community-stats world-summary metric-summary" aria-label="Community summary"
-    onPointerLeave={() => { dismissed.current = undefined; if (!pinned && !root.current?.contains(document.activeElement)) close(); }}
+    onPointerLeave={() => { cancelHover(); if (!pinned && !keyboardPreview.current && !panel.current?.contains(document.activeElement)) close(); dismissed.current = undefined; }}
     onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) close(); }}>
     {metrics.map(({ key, label, Icon, color, description }) => <button type="button" className="stat metric-trigger" key={key}
       ref={node => { buttons.current[key] = node; }} aria-label={`${label}: ${Math.round(world[key])} of 100. Show what affects this score`}
       aria-expanded={active === key} aria-controls={`${id}-details`} aria-haspopup="dialog"
-      onPointerEnter={event => { if (event.pointerType !== 'touch' && !pinned && dismissed.current !== key) setActive(key); }}
-      onFocus={() => { if (!suppressFocus.current && !(pinned && active === key)) { setActive(key); setPinned(false); } }}
-      onPointerDown={event => { pointerToggle.current = active === key && (pinned || event.pointerType === 'touch'); }}
+      onPointerEnter={event => preview(key, event.pointerType)}
+      onPointerMove={event => preview(key, event.pointerType)}
+      onPointerLeave={() => { cancelHover(); suppressFocus.current = false; }}
+      onFocus={() => { cancelHover(); if (!suppressFocus.current && !(pinned && active === key)) { keyboardPreview.current = true; setActive(key); setPinned(false); } }}
+      // Wait for the click before opening pointer-initiated details: a focus
+      // preview can otherwise cover the button before pointerup arrives.
+      onPointerDown={event => { cancelHover(); suppressFocus.current = true; pointerToggle.current = active === key && (pinned || event.pointerType === 'touch'); }}
+      onPointerUp={() => { suppressFocus.current = false; }}
+      onPointerCancel={() => { suppressFocus.current = false; }}
       onClick={() => {
+        cancelHover();
         if (pointerToggle.current || (pinned && active === key)) close();
         else { dismissed.current = undefined; focusPanel.current = true; setActive(key); setPinned(true); }
         pointerToggle.current = false;
