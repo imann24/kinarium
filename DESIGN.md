@@ -410,7 +410,7 @@ Non-conversation records longer than (160 characters) keep a native disclosure l
 
 ### Event tray and catalog
 
-The navy tray offers the first three server-permitted catalog entries with actual allowance and cooldown status; its “All events” link reaches the full picker. First choice uses saffron, remaining choices pale blue, and hover uses a warm surface. Above (1250px), quick-event labels use (18px), options have a (77px) minimum height, and the outlined All events link has a (141px) minimum width. Allowance is separated from the heading by a vertical rule. Authoritative cooldown disables quick choices.
+The navy tray offers up to three randomly drawn server-permitted catalog entries with actual allowance and cooldown status; its Shuffle button refreshes the selection and its “All events” link reaches the full picker. First choice uses saffron, remaining choices pale blue, and hover uses a warm surface. Above (1250px), quick-event labels use (18px), options have a (77px) minimum height, and the outlined All events link has a (141px) minimum width. Allowance is separated from the heading by a vertical rule. Authoritative cooldown disables quick choices.
 
 The full picker is a ruled menu with All, Gentle, Mixed and Disruptive tone choices, category counts, and search across names, descriptions, tone labels and visible effect names. The selected tone uses selected blue and selected ink with an accessible pressed state. Tone labels and signed effect values preserve meaning alongside good, warning and danger colors. Nonzero effects appear largest-first; rising tension is unfavorable. Their copy identifies these as starting changes, with resident reactions left open.
 
